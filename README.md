@@ -1,1 +1,2 @@
-Empty README; to be edited following initial commit
+* About
+Welcome to 8-track-using-spotify, an in-development SERN-stack web application that aims to simulate an 8-track player, for users with premium Spotify subscriptions. This project remains in the early stage of development and will contain a more feature-rich README in the future.

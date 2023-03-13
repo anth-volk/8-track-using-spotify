@@ -4,7 +4,8 @@
   "description": "A full-stack application that simulates an 8-track player via a premium user's Spotify account",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,8 @@
     "nodemon": "^2.0.21"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "sequelize": "^6.29.3",
     "sequelize-cli": "^6.6.0"
   }
