@@ -1,0 +1,26 @@
+{
+  "name": "8-track-using-spotify",
+  "version": "0.0.0-dev-1",
+  "description": "A full-stack application that simulates an 8-track player via a premium user's Spotify account",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anth-volk/8-track-using-spotify.git"
+  },
+  "author": "Anthony Volk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anth-volk/8-track-using-spotify/issues"
+  },
+  "homepage": "https://github.com/anth-volk/8-track-using-spotify#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  },
+  "dependencies": {
+    "sequelize": "^6.29.3",
+    "sequelize-cli": "^6.6.0"
+  }
+}
