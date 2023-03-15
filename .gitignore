@@ -1,5 +1,5 @@
 /node_modules
 /other
-/db_config
+/sequelize_config
 .env
 .sequelizerc

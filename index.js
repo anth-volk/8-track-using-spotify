@@ -7,7 +7,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Local imports
-// TESTING
 const { logger } = require('./utilities/logger');
 
 app.get('/', (req, res) => {
