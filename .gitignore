@@ -1,3 +1,5 @@
 /node_modules
 /other
+/db_config
 .env
+.sequelizerc

@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+	"db:create": "sequelize-cli db:create",
+	"db:migrate": "sequelize-cli db:migrate",
+	"db:g:migration": "sequelize-cli migration:generate --name",
+	"db:seeds": "sequelize-cli db:seed:all",
+	"db:g:seed": "sequelize-cli seed:generate --name"
   },
   "repository": {
     "type": "git",
