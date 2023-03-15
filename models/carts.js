@@ -1,9 +1,10 @@
 'use strict';
+
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class carts extends Model {
+  class Cart extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
 	  
     }
   }
-  carts.init({
+  Cart.init({
     cart_id: {
 		type: DataTypes.UUID,
 		allowNull: false,
@@ -38,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     track4_fade_out_seconds: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'carts',
+    modelName: 'Cart',
   });
-  return carts;
+  return Cart;
 };
