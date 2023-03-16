@@ -1,9 +1,8 @@
 'use strict';
 
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+const { Model, DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   class User extends Model {
     /**
      * Helper method for defining associations.
@@ -18,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     user_id: {
 		type: DataTypes.UUID,
 		allowNull: false,
-		unique: true
+		unique: true,
+		primaryKey: true
 	},
     email: {
 		type: DataTypes.STRING,
