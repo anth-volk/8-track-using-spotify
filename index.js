@@ -49,9 +49,6 @@ app.route('/testing')
 	})
 	.post( async (req, res) => {
 
-		// View request data
-		console.log(req.body);
-
 		// Create new user
 		await createUser(req);
 

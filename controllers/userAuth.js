@@ -21,15 +21,17 @@ const SALT_ROUNDS = 10;
 
 const User = require('../models/User')(sequelize);
 
-function hashPassword(password) {
+async function hashPassword(password) {
 
-	// Should probably be refactored to be async function
 	try {
-		const salt = bcrypt.genSaltSync(SALT_ROUNDS);
-		const hash = bcrypt.hashSync(password, salt);
-		return hash;
-	} catch (err) {
-		console.error('Error while trying to create new password hash: ', err);
+
+		const salt = await bcrypt.genSalt(SALT_ROUNDS);
+		const hash = await bcrypt.hash(password, salt);
+		return Promise.resolve(hash);
+
+	}
+	catch (err) {
+		console.error('Error while hashing password:', err);
 	}
 	
 }
