@@ -5,6 +5,9 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const querystring = require('querystring');
+const fetch = require('node-fetch');
+
 
 // Local imports
 const { logger } = require('./utilities/logger');
@@ -51,6 +54,11 @@ const sequelize = new Sequelize(
 const User = require('./models/User')(sequelize);
 const Cart = require('./models/Cart')(sequelize);
 
+// Spotify auth setup
+const client_id = process.env.SPOTIFY_CLIENT_ID;
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
+
 // Routes used for testing
 // ------------------------------------------------------------------------------------
 app.route('/testing')
@@ -60,7 +68,7 @@ app.route('/testing')
 
 		// If user is logged in, show logout link
 		if (session.userId) {
-			res.sendFile(__dirname + '/testing/user_auth_log_out.html');
+			res.sendFile(__dirname + '/testing/user_auth_user_page.html');
 		} 
 		// Otherwise, show login form
 		else {
@@ -80,13 +88,7 @@ app.route('/testing')
 			session.userId = userId;
 		}
 
-		// Otherwise, display unable to login
-
-		// Create new user
-		/*
-		await createUser(req);
-		res.sendFile(__dirname + '/testing/user_auth_logged_in.htm');
-		*/
+		// Redirect to GET request on the same route
 		res.redirect('/testing');
 	});
 
@@ -97,6 +99,87 @@ app.route('/testing/createUser')
 	.post( async (req, res) => {
 		await createUser(req);
 		res.redirect('/testing');
+	});
+
+app.route('/testing/spotify_auth')
+	.get( (req, res) => {
+
+		// Based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+		const session = req.session;
+
+		// Set Spotify auth variables
+		// TODO: Write function to randomly generate this code
+		const state = 'jaw98ejff8j39f3lasdjf';
+		const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
+
+		// TESTING
+		console.log(redirect_uri);
+
+		res.redirect('https://accounts.spotify.com/authorize?' +
+			querystring.stringify({
+				response_type: 'code',
+				client_id: client_id,
+				scope: scope,
+				redirect_uri: redirect_uri,
+				state: state
+			}));
+
+	})
+	.post()
+
+app.route('/testing/spotify_auth/callback')
+	.get( async (req, res) => {
+
+		// Based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+
+		// Authorization elements from req
+		const code = req.query.code || null;
+		const state = req.query.state || null;
+
+		// If state is null
+		// TODO: Create better handler for this case
+		if (state === null || req.query.error) {
+			res.redirect('/error');
+		} else {
+
+			// Store relevant form options in object
+			const spotifyAuthBody = {
+				'code': code,
+				'redirect_uri': redirect_uri,
+				'grant_type': 'authorization_code'
+			}
+
+			// Manually construct form body
+			let formBody = Object.keys(spotifyAuthBody)
+				.reduce( (accu, key) => {
+					return accu.concat(encodeURIComponent(key) + '=' + encodeURIComponent(spotifyAuthBody[key]));
+				}, [])
+				.join('&');
+
+			const spotifyRequestRaw = await fetch(
+				'https://accounts.spotify.com/api/token',
+				{
+					method: 'POST',
+					headers: {
+						'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')),
+						'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+					},
+					body: formBody
+				}
+			);
+
+			const spotifyRequestJSON = await spotifyRequestRaw.json();
+
+			if (spotifyRequestRaw.ok) {
+				const access_token = spotifyRequestJSON.access_token;
+				res.send({
+					'access_token': access_token
+				});
+			} else {
+				res.send('Error in completing Spotify authentication');
+			}
+
+		};
 	});
 
 
