@@ -21,6 +21,8 @@ const SALT_ROUNDS = 10;
 
 const User = require('../models/User')(sequelize);
 
+
+
 async function hashPassword(password) {
 
 	try {
@@ -29,9 +31,8 @@ async function hashPassword(password) {
 		const hash = await bcrypt.hash(password, salt);
 		return Promise.resolve(hash);
 
-	}
-	catch (err) {
-		console.error('Error while hashing password:', err);
+	} catch (err) {
+		return Promise.reject('Error while hashing password:', err);
 	}
 	
 }
@@ -54,6 +55,42 @@ async function createUser(req) {
 
 }
 
+async function verifyUser(req) {
+
+	const submittedEmail = req.body.email;
+	const submittedPassword = req.body.password;
+	let userId = null;
+
+	try {
+
+		const userQuery = await User.findOne({
+			where: {
+				email: submittedEmail
+			}
+		});
+
+		if (userQuery.dataValues.email) {
+
+			const isPasswordMatching = await bcrypt.compare(submittedPassword, userQuery.dataValues.password_hash);
+
+			if (userQuery.dataValues.email === submittedEmail && isPasswordMatching) {
+				
+				userId = userQuery.dataValues.user_id;
+			}
+
+		}
+		
+		return userId;
+
+	} catch (err) {
+
+		throw new Error('Error while verifying user: ', err);
+
+	} 
+
+}
+
 module.exports = {
-	createUser
+	createUser,
+	verifyUser
 }
