@@ -21,8 +21,6 @@ const SALT_ROUNDS = 10;
 
 const User = require('../models/User')(sequelize);
 
-
-
 async function hashPassword(password) {
 
 	try {

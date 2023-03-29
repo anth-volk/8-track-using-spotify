@@ -10,6 +10,8 @@ module.exports = (sequelize) => {
      */
     static associate(models) {
       // define association here
+	  Cart.hasMany(Program);
+	  Cart.belongsTo(User);
 	  
     }
   }
@@ -27,14 +29,46 @@ module.exports = (sequelize) => {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-    track1_link: DataTypes.STRING,
-    track1_fade_out_seconds: DataTypes.INTEGER,
-    track2_link: DataTypes.STRING,
-    track2_fade_out_seconds: DataTypes.INTEGER,
-    track3_link: DataTypes.STRING,
-    track3_fade_out_seconds: DataTypes.INTEGER,
-    track4_link: DataTypes.STRING,
-    track4_fade_out_seconds: DataTypes.INTEGER
+	program1_id: {
+		type: DataTypes.UUID,
+		allowNull: false,
+		references: {
+			model: {
+				tableName: 'Programs'
+			},
+			key: 'program_id'
+		}
+	},
+	program2_id: {
+		type: DataTypes.UUID,
+		allowNull: false,
+		references: {
+			model: {
+				tableName: 'Programs'
+			},
+			key: 'program_id'
+		}
+	},
+	program3_id: {
+		type: DataTypes.UUID,
+		allowNull: false,
+		references: {
+			model: {
+				tableName: 'Programs'
+			},
+			key: 'program_id'
+		}
+	},
+	program4_id: {
+		type: DataTypes.UUID,
+		allowNull: false,
+		references: {
+			model: {
+				tableName: 'Programs'
+			},
+			key: 'program_id'
+		}
+	}
   }, {
     sequelize,
     modelName: 'Cart',

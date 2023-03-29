@@ -12,6 +12,7 @@ const fetch = require('node-fetch');
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyUser } = require('./controllers/userAuth');
+const { storeSpotifyData } = require('./controllers/spotify');
 
 // Express setup
 const express = require('express');
@@ -130,6 +131,10 @@ app.route('/testing/spotify_auth')
 app.route('/testing/spotify_auth/callback')
 	.get( async (req, res) => {
 
+		const session = req.session;
+		// TESTING
+		console.log(req.session);
+
 		// Based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
 
 		// Authorization elements from req
@@ -168,13 +173,23 @@ app.route('/testing/spotify_auth/callback')
 				}
 			);
 
-			const spotifyRequestJSON = await spotifyRequestRaw.json();
 
 			if (spotifyRequestRaw.ok) {
-				const access_token = spotifyRequestJSON.access_token;
-				res.send({
-					'access_token': access_token
-				});
+
+				// Convert raw request data to JSON
+				const spotifyRequestJSON = await spotifyRequestRaw.json();
+
+				// Await input and/or updating of DB via separate controller
+				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
+				if (isSpotifyDataStored) {
+
+					// Send to cart library page
+					res.send('Placeholder for redirecting to cart library view');
+				}
+				else {
+					res.send('Error while trying to store Spotify authentication data');
+				}
+
 			} else {
 				res.send('Error in completing Spotify authentication');
 			}
