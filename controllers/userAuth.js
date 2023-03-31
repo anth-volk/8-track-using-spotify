@@ -21,6 +21,11 @@ const SALT_ROUNDS = 10;
 
 const User = require('../models/User')(sequelize);
 
+/**
+ * Function for creating password hashes using bcrypt
+ * @param {string} password 
+ * @returns {Promise<string|error>} Returns either a promise resolved with a hashed password, or a rejected promise that raises an error
+ */
 async function hashPassword(password) {
 
 	try {
@@ -35,6 +40,11 @@ async function hashPassword(password) {
 	
 }
 
+/**
+ * Function for creating user by adding them to underlying SQL database (via Sequelize)
+ * @param {Object} req The HTTP request body
+ * @returns {undefined} Only returns if data is entered successfully; otherwise, raises error
+ */
 async function createUser(req) {
 
 	const passwordHash = await hashPassword(req.body.password);
@@ -53,6 +63,11 @@ async function createUser(req) {
 
 }
 
+/**
+ * Function for verifying a user's account
+ * @param {Object} req The HTTP request body
+ * @returns {(UUID|null)} Returns either the user's ID in UUID format, or null if the user could not be found
+ */
 async function verifyUser(req) {
 
 	const submittedEmail = req.body.email;
