@@ -24,18 +24,18 @@ const User = require('../models/User')(sequelize);
 /**
  * Function for creating password hashes using bcrypt
  * @param {string} password 
- * @returns {Promise<string|error>} Returns either a promise resolved with a hashed password, or a rejected promise that raises an error
- */
+ * @returns {string} Returns a hashed password 
+*/
 async function hashPassword(password) {
 
 	try {
 
 		const salt = await bcrypt.genSalt(SALT_ROUNDS);
 		const hash = await bcrypt.hash(password, salt);
-		return Promise.resolve(hash);
+		return hash;
 
 	} catch (err) {
-		return Promise.reject('Error while hashing password:', err);
+		throw new Error('Error while hashing password: ', err);
 	}
 	
 }
