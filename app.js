@@ -285,13 +285,13 @@ app.route('/create_cart')
 
 	});
 
-app.route('/create_cart/preview')
+app.route('/create_cart/preview/:albumID')
 	// POST request will preview cart, but not actually
 	// create cart or add to user's library
 	.post( (req, res) => {
 
-		// Need to determine how to trigger the route on click;
-		// may somehow embed clicked value into a query value
+		// Set albumID as a standalone const
+		const albumID = req.params.albumID;
 
 		// Display "loading" (How to bridge back end and front end?)
 
@@ -328,6 +328,8 @@ app.route('/create_cart/create')
 app.route('/create_cart/search')
 	// POST requests will search Spotify for album
 	.post( (req, res) => {
+
+		// May set up query params in order to use req.query
 
 		// Set maximum number of results to query Spotify for, 
 		// based on how many cart creation view can display
