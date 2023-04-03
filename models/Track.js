@@ -25,7 +25,9 @@ module.exports = (sequelize, DataTypes) => {
 		allowNull: false
 	},
     track_name: DataTypes.STRING,
-    artists_array: DataTypes.ARRAY(DataTypes.STRING)
+    artists_array: DataTypes.ARRAY(DataTypes.STRING),
+	start_time_seconds: DataTypes.BIGINT,
+	end_time_seconds: DataTypes.BIGINT
   }, {
     sequelize,
     modelName: 'Track',
