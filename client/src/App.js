@@ -1,4 +1,10 @@
-// Local imports
+// External imports
+
+
+// Component imports
+import Navbar from './components/Navbar.js';
+
+// Style imports
 import './styles/App.css';
 
 function App() {
@@ -7,7 +13,7 @@ function App() {
 
 	return (
 		<div className="App">
-			<Navbar></Navbar>
+			<Navbar />
 		</div>
 	);
 }
