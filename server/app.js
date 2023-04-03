@@ -17,7 +17,7 @@ const { storeSpotifyData } = require('./controllers/spotify');
 // Express setup
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 // Express configuration
 app.use(bodyParser.urlencoded({extended: true}));
