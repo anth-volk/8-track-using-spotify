@@ -2,11 +2,11 @@
   "name": "8-track-using-spotify",
   "version": "0.0.0-dev-1",
   "description": "A full-stack application that simulates an 8-track player via a premium user's Spotify account",
-  "main": "app.js",
+  "main": "/server/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js",
-    "start": "node app.js",
+    "dev": "nodemon /server/app.js",
+    "start": "node /server/app.js",
     "db:create": "sequelize-cli db:create",
     "db:migrate": "sequelize-cli db:migrate",
     "db:g:migration": "sequelize-cli migration:generate --name",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/anth-volk/8-track-using-spotify#readme",
   "devDependencies": {
+    "create-react-app": "^5.0.1",
     "nodemon": "^2.0.21",
     "sequelize-cli": "^6.6.0"
   },

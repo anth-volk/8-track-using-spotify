@@ -1,6 +1,7 @@
-/node_modules
-/other
-/sequelize_config
-/testing
+/client/node_modules
+/server/node_modules
+/server/other
+/server/sequelize_config
+/server/testing
+/server/.sequelizerc
 .env
-.sequelizerc

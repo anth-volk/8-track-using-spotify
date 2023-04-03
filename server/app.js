@@ -285,10 +285,10 @@ app.route('/create_cart')
 
 	});
 
-app.route('/create_cart/preview/:albumID')
-	// POST request will preview cart, but not actually
+app.route('/api/v1/create_cart/preview/:albumID')
+	// GET request will preview cart, but not actually
 	// create cart or add to user's library
-	.post( (req, res) => {
+	.get( (req, res) => {
 
 		// Set albumID as a standalone const
 		const albumID = req.params.albumID;
@@ -309,7 +309,7 @@ app.route('/create_cart/preview/:albumID')
 
 	});
 
-app.route('/create_cart/create')
+app.route('/api/v1/create_cart/create')
 	// POST requests will create new cart
 	.post( (req, res) => {
 
@@ -325,9 +325,9 @@ app.route('/create_cart/create')
 
 	});
 
-app.route('/create_cart/search')
-	// POST requests will search Spotify for album
-	.post( (req, res) => {
+app.route('/api/v1/create_cart/search')
+	// GET requests will search Spotify for album
+	.get( (req, res) => {
 
 		// May set up query params in order to use req.query
 
