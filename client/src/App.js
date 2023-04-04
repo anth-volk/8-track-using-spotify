@@ -17,16 +17,14 @@ function App() {
 	// State variable for user object
 	const [userObject, setUserObject] = useState(null);
 
-	// Fetch locally stored user ID from localStorage;
+	// Fetch locally stored user object from localStorage;
 	// this is a very basic authentication method, and is
 	// definitely not the most secure method possible
 	useEffect(() => {
 
 		async function fetchUser() {
 
-
-
-
+			await setUserObject(localStorage.getItem('userObject'));
 
 		}
 
@@ -37,13 +35,13 @@ function App() {
 
 	return (
 		<Fragment>
-			<Navbar userId={userId} />
+			<Navbar userObject={userObject} />
 
 			<Routes>
 				<Route 
 					path='/' 
 					element={
-						userId ? (
+						userObject ? (
 							{/*<CartLibrary />*/}
 						) : (
 							<Home />
