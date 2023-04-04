@@ -4,13 +4,36 @@ import { Routes, Route } from 'react-router-dom';
 
 // Component imports
 import Navbar from './components/Navbar.js';
+import Home from './components/Home.js';
+import Login from './components/Login.js';
+import Signup from './components/Signup.js';
+
 
 // Style imports
 import './styles/App.css';
 
 function App() {
 
-	// Determine if user is authenticated or not; is it possible to somehow pass req.session to app?
+	// State variable for user object
+	const [userObject, setUserObject] = useState(null);
+
+	// Fetch locally stored user ID from localStorage;
+	// this is a very basic authentication method, and is
+	// definitely not the most secure method possible
+	useEffect(() => {
+
+		async function fetchUser() {
+
+
+
+
+
+		}
+
+		fetchUser();
+
+	}, [])
+
 
 	return (
 		<Fragment>
