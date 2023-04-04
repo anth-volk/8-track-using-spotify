@@ -13,13 +13,13 @@ export default function Navbar(props) {
 					<h2 className='navbar_logo'>TEXT PLACEHOLDER</h2>
 					<ul>
 						<li>
-							<NavLink to='/' activeClassName='active'>Home</NavLink>
+							<NavLink to='/' className='active'>Home</NavLink>
 						</li>
 						<li>
-							<NavLink to='/signup' activeClassName='active'>Sign Up</NavLink>
+							<NavLink to='/signup' className='active'>Sign Up</NavLink>
 						</li>
 						<li>
-							<NavLink to='/login' activeClassName='active'>Log In</NavLink>
+							<NavLink to='/login' className='active'>Log In</NavLink>
 						</li>
 					</ul>
 				</nav>
@@ -29,13 +29,13 @@ export default function Navbar(props) {
 		return (
 			<Fragment>
 				<nav>
-					<h2 className='navbar_logo' activeClassName='active'>TEXT PLACEHOLDER</h2>
+					<h2 className='navbar_logo'>TEXT PLACEHOLDER</h2>
 					<ul>
 						<li>
-							<NavLink to='/' activeClassName='active'>Home</NavLink>
+							<NavLink to='/' className='active'>Home</NavLink>
 						</li>
 						<li>
-							<NavLink to='/logout' activeClassName='active'>Log Out</NavLink>
+							<NavLink to='/logout' className='active'>Log Out</NavLink>
 						</li>
 					</ul>
 				</nav>
