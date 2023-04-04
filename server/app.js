@@ -8,7 +8,6 @@ const cookieParser = require('cookie-parser');
 const querystring = require('querystring');
 const fetch = require('node-fetch');
 
-
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyUser } = require('./controllers/userAuth');
@@ -59,6 +58,79 @@ const Cart = require('./models/Cart')(sequelize);
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
+
+// Middleware
+app.use('/api', bodyParser.json());
+
+app.route('/api/v1/user_auth/login')
+	// POST requests will attempt to log user in;
+	// if account exists, method will respond with a JSON
+	// user object; if account does not exist, method will
+	// respond with status 200 and empty user response
+	.post(async (req, res) => {
+
+		// Define a user object prototype for emission
+		let userObjectToEmit = {};
+
+		try {
+			// Await completion of verifyUser(), then store return object 
+			// as part of session
+			const userObject = await verifyUser(req);
+
+			// Update emitted user object with connection status
+			userObjectToEmit = {
+				...userObjectToEmit,
+				connection_status: 'success'
+			};
+
+			// If login successful, destroy any existing session, then set server-side session's userObject value
+			if (userObject) {
+
+				if (req.session) {
+					req.session.destroy;
+				};
+
+				session.userObject = userObject;
+
+				// Next, add more detail to the user object, then emit the user object as a JSON object
+				userObjectToEmit = {
+					...userObjectToEmit,
+					data_status: 'user_exists',
+					userObject: {
+						...userObject
+					}
+				};
+
+			} else {
+
+				// Otherwise, add detail to emitted object indicating that user doesn't exist, then emit
+				userObjectToEmit = {
+					...userObjectToEmit,
+					data_status: 'user_not_found'
+				};
+			}
+
+			return res.status(200).json(userObjectToEmit);
+
+		} catch (err) {
+
+			// Log error to console
+			console.error(`Error while trying to log in: ${err}`);
+
+			// Edit userObjectToEmit to specify issues
+			userObjectToEmit = {
+				...userObjectToEmit,
+				connection_status: 'failure',
+				error: err
+			};
+			return res.status(500).json(userObjectToEmit);
+
+		}
+
+	});
+
+// Currently review all of the below routes in order to improve application
+//----------------------------------------------------------------
 
 app.route('/')
 	// GET requests will display user profile page (if logged in) or

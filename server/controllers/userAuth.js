@@ -82,22 +82,27 @@ async function verifyUser(req) {
 			}
 		});
 
-		if (userQuery.dataValues.email) {
+		if (userQuery) {
 
 			const isPasswordMatching = await bcrypt.compare(submittedPassword, userQuery.dataValues.password_hash);
 
 			if (userQuery.dataValues.email === submittedEmail && isPasswordMatching) {
 				
 				userId = userQuery.dataValues.user_id;
+
+				return ({
+					userId: userId
+				});
+
 			}
 
-		}
-		
-		return userId;
+		} 
 
+		return null;
+		
 	} catch (err) {
 
-		throw new Error('Error while verifying user: ', err);
+		throw new Error(`Error while verifying user: ${err}`);
 
 	} 
 
