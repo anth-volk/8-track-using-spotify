@@ -43,13 +43,13 @@ async function hashPassword(password) {
 /**
  * Function for creating user by adding them to underlying SQL database (via Sequelize)
  * @param {Object} req The HTTP request body
- * @returns {undefined} Only returns if data is entered successfully; otherwise, raises error
+ * @returns {Object} Returns an object with data about the success or failure of the user creation
  */
 async function createUser(req) {
 
-	const passwordHash = await hashPassword(req.body.password);
-	
 	try {
+		const passwordHash = await hashPassword(req.body.password);
+
 		const newUser = await User.create({
 			user_id: crypto.randomUUID(),
 			email: req.body.email,
@@ -57,8 +57,19 @@ async function createUser(req) {
 			first_name: req.body.fname,
 			last_name: req.body.lname
 		});
+
+		return ({
+			status: 'success'
+		});
+
+
 	} catch (err) {
-		console.error('Error while trying to create new user:', err);
+		console.error(`Error while trying to create new user: ${err}`);
+		return ({
+			status: 'failure',
+			error: err
+		});
+
 	}
 
 }

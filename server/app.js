@@ -11,7 +11,7 @@ const fetch = require('node-fetch');
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyUser } = require('./controllers/userAuth');
-const { storeSpotifyData } = require('./controllers/spotify');
+const { storeSpotifyData } = require('./controllers/spotifyAuth');
 
 // Express setup
 const express = require('express');
@@ -69,19 +69,20 @@ app.route('/api/v1/user_auth/login')
 	// respond with status 200 and empty user response
 	.post(async (req, res) => {
 
-		// Define a user object prototype for emission
+		// Define a user object prototype for emission,
+		// as well as default values for its key-value pairs
 		let userObjectToEmit = {};
+		let connectionStatus = 'failure';
+		let dataStatus = null;
+		let userObject = null;
 
 		try {
 			// Await completion of verifyUser(), then store return object 
 			// as part of session
-			const userObject = await verifyUser(req);
+			userObject = await verifyUser(req);
 
-			// Update emitted user object with connection status
-			userObjectToEmit = {
-				...userObjectToEmit,
-				connection_status: 'success'
-			};
+			// Update connection status after successful querying
+			connectionStatus = 'success';
 
 			// If login successful, destroy any existing session, then set server-side session's userObject value
 			if (userObject) {
@@ -92,23 +93,21 @@ app.route('/api/v1/user_auth/login')
 
 				session.userObject = userObject;
 
-				// Next, add more detail to the user object, then emit the user object as a JSON object
-				userObjectToEmit = {
-					...userObjectToEmit,
-					data_status: 'user_exists',
-					userObject: {
-						...userObject
-					}
-				};
+				// Update data status
+				dataStatus = 'user_exists';
 
 			} else {
 
-				// Otherwise, add detail to emitted object indicating that user doesn't exist, then emit
-				userObjectToEmit = {
-					...userObjectToEmit,
-					data_status: 'user_not_found'
-				};
+				// Otherwise, add detail to emitted object indicating that user doesn't exist
+				dataStatus = 'user_not_found'
+
 			}
+
+			userObjectToEmit = {
+				connection_status: connectionStatus,
+				data_status: dataStatus,
+				user_object: userObject
+			};
 
 			return res.status(200).json(userObjectToEmit);
 
@@ -119,15 +118,34 @@ app.route('/api/v1/user_auth/login')
 
 			// Edit userObjectToEmit to specify issues
 			userObjectToEmit = {
-				...userObjectToEmit,
-				connection_status: 'failure',
-				error: err
+				connection_status: connectionStatus,
 			};
 			return res.status(500).json(userObjectToEmit);
 
 		}
 
 	});
+
+app.route('/api/v1/user_auth/signup')
+	// POST requests will create new user, then emit
+	// user creation status or an error; DOES NOT create
+	// new session or emit completed user object
+	.post(async (req, res) => {
+
+		try {
+
+			const createUserReturn = await createUser(req);
+			res.status(200).json(createUserReturn);
+
+		} catch (err) {
+
+			console.error(`Error while trying to sign up new user: ${err}`);
+			res.status(500);
+
+		}
+
+
+	})
 
 // Currently review all of the below routes in order to improve application
 //----------------------------------------------------------------
