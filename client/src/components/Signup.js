@@ -1,6 +1,6 @@
 // External imports
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Signup() {
 
@@ -12,6 +12,8 @@ export default function Signup() {
 		password: '',
 		confirmPassword: ''
 	};
+
+	// Object for storing form errors
 	const formErrorsObject = {
 		fname: '',
 		lname: '',
@@ -22,145 +24,76 @@ export default function Signup() {
 
 	const [form, setForm] = useState(formObject);
 	const [formErrors, setFormErrors] = useState(formErrorsObject);
-	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-	const [isFormValid, setIsFormValid] = useState(true);
+	const [submissionMessage, setSubmissionMessage] = useState('');
 
-	useEffect(() => {
+	// Declare navigate from react-router-dom in order to use inside submit handler
+	const navigate = useNavigate();
 
-		handleValidation();
+	// Create new timer Ref for use with later setTimeout
+	const timerRef = useRef(null);
 
-	}, [isFormSubmitted])
-
+	// Function to validate form upon submission
 	function handleValidation() {
 
-		console.log(form);
+		// Store error messages
+		let errors = {};
+
+		// Bool for whether or not form is valid
 		let isValid = true;
 
 		// Map over form keys
 		Object.keys(form)
-			.map( (formElementKey) => {
-				console.log(formElementKey);
-				console.log(form[formElementKey]);
-				console.log(!form[formElementKey]);
+			.forEach( (formElementKey) => {
 
-				if(!form[formElementKey]) {
-					console.log('No input');
-					setFormErrors( (prev) => ({
-						...prev,
-						[formElementKey]: 'No input'
-					}))
-				} else {
-					setFormErrors( (prev) => ({
-						...prev,
-						[formElementKey]: ''
-					}))
+				// If the element exists...
+				if(form[formElementKey]) {
+
+					switch (formElementKey) {
+						// Validate email addresses against regex from https://www.w3resource.com/javascript/form/email-validation.php
+						case 'email':
+							if (!form[formElementKey].match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+								errors.email = 'Must input a valid email address';
+								isValid = false;
+							} else {
+								errors.email = '';
+							}
+							break;
+						// Validate that passwords match; this does not currently constrain passwords to any set values
+						case 'password':
+							if (form[formElementKey] !== form.confirmPassword) {
+								const pwdErrMsg = 'Passwords must match'
+								errors.password = pwdErrMsg;
+								errors.confirmPassword = pwdErrMsg;
+								isValid = false;
+							} else {
+								errors.password = '';
+								errors.confirmPassword = '';
+							}
+							break;
+						// For everything else, as long as a value exists, ensure that no errors are listed
+						default:
+							errors[formElementKey] = '';
+							break;
+						
+					}
+
+				} 
+				// If the value is blank, add the below as an error message
+				else {
+					errors[formElementKey] = 'This field is required';
+					isValid = false;
 				}
-
 
 			})
 		
-		/*
-
-
-		Object.keys(form)
-			.map( (formElementKey) => {
-
-				// If element doesn't exist, place message in formErrors
-				console.log('Form:');
-				console.log(form);
-				console.log('formElementKey:');
-				console.log(formElementKey);
-				console.log('form[formElementKey]:');
-				console.log(form[formElementKey]);
-
-				if (!form[formElementKey]) {
-					console.log('Not form element key')
-
-					setFormErrors( (prevObj) => ({
-						...prevObj,
-						[formElementKey]: 'This field is required'
-					}));
-					setIsFormValid(false);
-
-					console.log(formErrors);
-
-				} else {
-
-					switch(formElementKey) {
-						case 'email':
-							if (!form.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-								setFormErrors( (prevObj) => ({
-									...prevObj,
-									email: 'Must input a valid email address'
-								}));
-								setIsFormValid(false);
-							}
-							break;
-						case 'password':
-
-							if (form.password !== form.confirmPassword) {
-								setFormErrors( (prevObj) => ({
-									...formErrors,
-									password: 'Input passwords must match'
-								}));
-								setIsFormValid(false);
-							}
-							break;
-					}
-				}
-
-			})
-		*/
-
-
-
-
-		// Old code below
-		/*
-		formElementsArray.map( (element) => {
-
-			const key = element.name;
-			const value = element.value;
-
-			switch(key) {
-				case 'fname':
-				case 'lname':
-					if (value) {
-						setValidity({
-							...validity,
-							[key]: true
-						});
-					}
-					break;
-				case 'email':
-					// Email regex taken from https://www.w3resource.com/javascript/form/email-validation.php
-					const isEmailValid = value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
-					setValidity({
-						...validity,
-						email: isEmailValid
-					});
-					if (!isEmailValid) {
-						setFormErrors({
-							...formErrors,
-							email: 'Please input a valid email address'
-						});
-					};
-					break;
-				case 'password':
-					const confirmPassword = formElementsArray
-						.find( (element) => {
-							return element.name === 'confirmPassword'
-						});
-					if (value === confirmPassword.value) {
-						setValidity({
-							...validity,
-							password: true
-						});
-					};
-					break;
-			}
-		})
-		*/
+		// Set formErrors based on the errors accumulated
+		setFormErrors( (prev) => ({
+			...prev,
+			...errors
+		}));
+		
+		return isValid;
+		
 	}
 
 	// Form input handler
@@ -173,25 +106,54 @@ export default function Signup() {
 	};
 
 	// Form submission handler
-	function handleFormSubmit(event) {
+	async function handleFormSubmit(event) {
+		// Prevent default web redirect
 		event.preventDefault();
 
-		setIsFormSubmitted( prev => !prev);
-		console.log(formErrors);
+		// Validate form
+		const isFormValid = handleValidation();
 
-		// Pass form elements to a validation function
-		// handleValidation();
-		
+		// If the form is valid...
+		if (isFormValid) {
 
-		// TESTING
-		
-		// Otherwise, re-render and display warning messages
+			// Submit data to API endpoint via POST request
+			const res = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/signup', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'CORS': 'Access-Control-Allow-Origin'
+				},
+				body: JSON.stringify(form)
+			});
 
+			// Convert response to JSON
+			const resJSON = await res.json();
 
+			// If signup is successful per returned JSON object...
+			if (resJSON.status === 'success') {
+				// Clear any existing timeout
+				clearTimeout(timerRef.current);
+
+				// Set a positive submission message
+				setSubmissionMessage('Successfully registered account. Please log in. Redirecting to home page in 3 seconds...');
+				
+				// Wait 3 seconds, then navigate to '/' route
+				timerRef.current = setTimeout(() => {
+					navigate('/');
+				}, 3000);
+				
+			} 
+			// Otherwise, set negative submission message
+			else {
+				setSubmissionMessage('Unable to create account. Please try again.')
+			}
+		}
 	}
 
-
-	// Logic for confirming password
+	// Clear any existing timeouts upon re-render
+	useEffect(() => {
+		return () => clearTimeout(timerRef.current);
+	}, [])
 
 	return(
 		<div className='Signup'>
@@ -201,17 +163,23 @@ export default function Signup() {
 				<form className='Signup_form' onSubmit={handleFormSubmit}>
 					<label htmlFor='fname'>First Name</label>
 					<input className='Signup_textInput' type='text' name='fname' value={form.fname} onChange={handleFormChange} placeholder='First Name'></input>
+					<p className='Signup_validationText'>{formErrors.fname}</p>
 					<label htmlFor='lname'>Last Name</label>
 					<input className='Signup_textInput' type='text' name='lname' value={form.lname} onChange={handleFormChange} placeholder='Last Name'></input>
+					<p className='Signup_validationText'>{formErrors.lname}</p>
 					<label htmlFor='email'>Email Address</label>
 					<input className='Signup_textInput' type='email' name='email' value={form.email} onChange={handleFormChange} placeholder='Email Address'></input>
+					<p className='Signup_validationText'>{formErrors.email}</p>
 					<label htmlFor='password'>Password</label>
 					<input className='Signup_textInput' type='password' name='password' value={form.password} onChange={handleFormChange}></input>
+					<p className='Signup_validationText'>{formErrors.password}</p>
 					<label htmlFor='confirmPassword'>Confirm Password</label>
 					<input className='Signup_textInput' type='password' name='confirmPassword' value={form.confirmPassword} onChange={handleFormChange}></input>
+					<p className='Signup_validationText'>{formErrors.confirmPassword}</p>
 					<button type='submit' className='Util_button'>Sign Up</button>
 				</form>
 				<Link to='/login'>I already have an account</Link>
+				<p className='Signup_submissionMessage'>{submissionMessage}</p>
 			</div>
 		</div>
 	)

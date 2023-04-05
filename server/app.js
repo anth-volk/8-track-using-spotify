@@ -7,6 +7,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const querystring = require('querystring');
 const fetch = require('node-fetch');
+const cors = require('cors');
 
 // Local imports
 const { logger } = require('./utilities/logger');
@@ -60,6 +61,7 @@ const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
 
 // Middleware
+app.use(cors());
 app.use('/api', bodyParser.json());
 
 app.route('/api/v1/user_auth/login')
