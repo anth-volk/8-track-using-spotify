@@ -77,6 +77,7 @@ app.route('/api/v1/user_auth/login')
 		let connectionStatus = 'failure';
 		let dataStatus = null;
 		let userObject = null;
+		let httpCode = null;
 
 		try {
 			// Await completion of verifyUser(), then store return object 
@@ -97,11 +98,13 @@ app.route('/api/v1/user_auth/login')
 
 				// Update data status
 				dataStatus = 'user_exists';
+				httpCode = 200;
 
 			} else {
 
 				// Otherwise, add detail to emitted object indicating that user doesn't exist
-				dataStatus = 'user_not_found'
+				dataStatus = 'user_not_found';
+				httpCode = 401;
 
 			}
 
@@ -111,7 +114,7 @@ app.route('/api/v1/user_auth/login')
 				user_object: userObject
 			};
 
-			return res.status(200).json(userObjectToEmit);
+			return res.status(httpCode).json(userObjectToEmit);
 
 		} catch (err) {
 
@@ -137,7 +140,7 @@ app.route('/api/v1/user_auth/signup')
 		try {
 
 			const createUserReturn = await createUser(req);
-			res.status(200).json(createUserReturn);
+			res.status(201).json(createUserReturn);
 
 		} catch (err) {
 
