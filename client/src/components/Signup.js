@@ -1,5 +1,5 @@
 // External imports
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Signup() {
@@ -12,7 +12,7 @@ export default function Signup() {
 		password: '',
 		confirmPassword: ''
 	};
-	const validationErrorObject = {
+	const formErrorsObject = {
 		fname: '',
 		lname: '',
 		email: '',
@@ -21,6 +21,147 @@ export default function Signup() {
 	};
 
 	const [form, setForm] = useState(formObject);
+	const [formErrors, setFormErrors] = useState(formErrorsObject);
+	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+	const [isFormValid, setIsFormValid] = useState(true);
+
+	useEffect(() => {
+
+		handleValidation();
+
+	}, [isFormSubmitted])
+
+	function handleValidation() {
+
+		console.log(form);
+		let isValid = true;
+
+		// Map over form keys
+		Object.keys(form)
+			.map( (formElementKey) => {
+				console.log(formElementKey);
+				console.log(form[formElementKey]);
+				console.log(!form[formElementKey]);
+
+				if(!form[formElementKey]) {
+					console.log('No input');
+					setFormErrors( (prev) => ({
+						...prev,
+						[formElementKey]: 'No input'
+					}))
+				} else {
+					setFormErrors( (prev) => ({
+						...prev,
+						[formElementKey]: ''
+					}))
+				}
+
+
+			})
+		
+		/*
+
+
+		Object.keys(form)
+			.map( (formElementKey) => {
+
+				// If element doesn't exist, place message in formErrors
+				console.log('Form:');
+				console.log(form);
+				console.log('formElementKey:');
+				console.log(formElementKey);
+				console.log('form[formElementKey]:');
+				console.log(form[formElementKey]);
+
+				if (!form[formElementKey]) {
+					console.log('Not form element key')
+
+					setFormErrors( (prevObj) => ({
+						...prevObj,
+						[formElementKey]: 'This field is required'
+					}));
+					setIsFormValid(false);
+
+					console.log(formErrors);
+
+				} else {
+
+					switch(formElementKey) {
+						case 'email':
+							if (!form.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+								setFormErrors( (prevObj) => ({
+									...prevObj,
+									email: 'Must input a valid email address'
+								}));
+								setIsFormValid(false);
+							}
+							break;
+						case 'password':
+
+							if (form.password !== form.confirmPassword) {
+								setFormErrors( (prevObj) => ({
+									...formErrors,
+									password: 'Input passwords must match'
+								}));
+								setIsFormValid(false);
+							}
+							break;
+					}
+				}
+
+			})
+		*/
+
+
+
+
+		// Old code below
+		/*
+		formElementsArray.map( (element) => {
+
+			const key = element.name;
+			const value = element.value;
+
+			switch(key) {
+				case 'fname':
+				case 'lname':
+					if (value) {
+						setValidity({
+							...validity,
+							[key]: true
+						});
+					}
+					break;
+				case 'email':
+					// Email regex taken from https://www.w3resource.com/javascript/form/email-validation.php
+					const isEmailValid = value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
+					setValidity({
+						...validity,
+						email: isEmailValid
+					});
+					if (!isEmailValid) {
+						setFormErrors({
+							...formErrors,
+							email: 'Please input a valid email address'
+						});
+					};
+					break;
+				case 'password':
+					const confirmPassword = formElementsArray
+						.find( (element) => {
+							return element.name === 'confirmPassword'
+						});
+					if (value === confirmPassword.value) {
+						setValidity({
+							...validity,
+							password: true
+						});
+					};
+					break;
+			}
+		})
+		*/
+	}
 
 	// Form input handler
 	function handleFormChange(event) {
@@ -35,16 +176,16 @@ export default function Signup() {
 	function handleFormSubmit(event) {
 		event.preventDefault();
 
-		// Store form data in new variable;
-		// note that data is accessible via FIELD_NAME.value
-		const formElements = event.target.elements;
+		setIsFormSubmitted( prev => !prev);
+		console.log(formErrors);
 
+		// Pass form elements to a validation function
+		// handleValidation();
+		
 
-		// Validate that no fields are empty
-
-
-		// Validate password
-
+		// TESTING
+		
+		// Otherwise, re-render and display warning messages
 
 
 	}
