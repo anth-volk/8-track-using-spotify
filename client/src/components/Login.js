@@ -1,6 +1,7 @@
 // External imports
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 export default function Login() {
 
@@ -19,7 +20,9 @@ export default function Login() {
 	const [form, setForm] = useState(formObject);
 	const [formErrors, setFormErrors] = useState(formErrorsObject);
 	const [submissionMessage, setSubmissionMessage] = useState('');
-	const [userObject, setUserObject] = useState(null);
+	const [userToken, setUserToken] = useState(null);
+
+	const [cookies, setCookie, removeCookie] = useCookies();
 
 	// Declare navigate from react-router-dom in order to use inside submit handler
 	const navigate = useNavigate();
@@ -94,6 +97,8 @@ export default function Login() {
 		// Validate form
 		const isFormValid = handleValidation();
 
+		console.log('isFormValid: ', isFormValid);
+
 		// If the form is valid...
 		if (isFormValid) {
 
@@ -107,16 +112,19 @@ export default function Login() {
 				body: JSON.stringify(form)
 			});
 
+			console.log(res);
+
 			// Convert response to JSON
 			const resJSON = await res.json();
 
+			console.log(resJSON);
+
 			// If signup is successful per returned JSON object...
-			if (resJSON.status === 'success') {
+			if (resJSON.connection_status === 'success' && resJSON.data_status === 'user_exists') {
 
 				// TESTING
 				console.log(resJSON);
-
-				setUserObject(resJSON);
+				setUserToken(resJSON.user_token);
 
 				// Clear any existing timeout
 				clearTimeout(timerRef.current);
@@ -145,19 +153,22 @@ export default function Login() {
 	// Store user object to local storage
 	useEffect(() => {
 
-		if(userObject) {
+		if(userToken) {
 
-			const expiryDate = new Date().getTime() + localStorageLength;
+			const maxAge = 60 * 60 * 24 * 30;
 
-			const storageObject = {
-				userObject: userObject,
-				expiry: expiryDate
-			};
+			setCookie(
+				'userAuth',
+				userToken,
+				{
+					path: '/',
+					maxAge: maxAge
+				}
+			)
 
-			localStorage.setItem('8track.userObject', JSON.stringify(storageObject));
 		}
 
-	}, [userObject])
+	}, [userToken])
 
 	return(
 		<div className='Login'>
