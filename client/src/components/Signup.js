@@ -116,36 +116,46 @@ export default function Signup() {
 		// If the form is valid...
 		if (isFormValid) {
 
-			// Submit data to API endpoint via POST request
-			const res = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/signup', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'CORS': 'Access-Control-Allow-Origin'
-				},
-				body: JSON.stringify(form)
-			});
+			let res = null;
+
+			try {
+				// Submit data to API endpoint via POST request
+				res = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/signup', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'CORS': 'Access-Control-Allow-Origin'
+					},
+					body: JSON.stringify(form)
+				});
+				setSubmissionMessage('');
+			} catch (err) {
+				console.error(err);
+				setSubmissionMessage('Server error while trying to sign up. Please try again later.');
+			}
 
 			// Convert response to JSON
-			const resJSON = await res.json();
+			if (res) {
+				const resJSON = await res.json();
 
-			// If signup is successful per returned JSON object...
-			if (resJSON.status === 'success') {
-				// Clear any existing timeout
-				clearTimeout(timerRef.current);
+				// If signup is successful per returned JSON object...
+				if (resJSON.status === 'success') {
+					// Clear any existing timeout
+					clearTimeout(timerRef.current);
 
-				// Set a positive submission message
-				setSubmissionMessage('Successfully registered account. Please log in. Redirecting to home page in 3 seconds...');
-				
-				// Wait 3 seconds, then navigate to '/' route
-				timerRef.current = setTimeout(() => {
-					navigate('/');
-				}, 3000);
-				
-			} 
-			// Otherwise, set negative submission message
-			else {
-				setSubmissionMessage('Unable to create account. Please try again.')
+					// Set a positive submission message
+					setSubmissionMessage('Successfully registered account. Please log in. Redirecting to home page in 3 seconds...');
+
+					// Wait 3 seconds, then navigate to '/' route
+					timerRef.current = setTimeout(() => {
+						navigate('/');
+					}, 3000);
+
+				} 
+				// Otherwise, set negative submission message
+				else {
+					setSubmissionMessage('Unable to create account. Please try again.')
+				}
 			}
 		}
 	}
