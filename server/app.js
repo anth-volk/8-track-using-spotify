@@ -8,10 +8,11 @@ const cookieParser = require('cookie-parser');
 const querystring = require('querystring');
 const fetch = require('node-fetch');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 // Local imports
 const { logger } = require('./utilities/logger');
-const { createUser, verifyUser } = require('./controllers/userAuth');
+const { createUser, verifyJWT, verifyUser } = require('./controllers/userAuth');
 const { storeSpotifyData } = require('./controllers/spotifyAuth');
 
 // Express setup
@@ -63,6 +64,8 @@ const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
 // Middleware
 app.use(cors());
 app.use('/api', bodyParser.json());
+app.use('/api/testing', verifyJWT);
+
 
 app.route('/api/v1/user_auth/login')
 	// POST requests will attempt to log user in;
@@ -140,6 +143,23 @@ app.route('/api/v1/user_auth/signup')
 			console.error(`Error while trying to sign up new user: ${err}`);
 			res.status(500);
 
+		}
+
+
+	})
+
+// TESTING route
+app.route('/api/testing')
+	.post( (req, res) => {
+
+		if (req.user) {
+			res.json({
+				user: req.user
+			});
+		} else {
+			res.json({
+				message: 'Error while processing request'
+			})
 		}
 
 

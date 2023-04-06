@@ -1,5 +1,5 @@
 // External package imports
-require('dotenv'.config());
+require('dotenv').config();
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -45,6 +45,28 @@ async function hashPassword(password) {
 	
 }
 
+// Based on tutorial at https://buddy.works/tutorials/securing-node-and-express-restful-api-with-json-web-token#updating-todo-api-folder-structure
+/**
+ * Middleware for verifying JSON web tokens
+ */
+function verifyJWT(req, res, next) {
+
+	try {
+
+		if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
+
+			const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET);
+
+			req.user = decodedData;
+		}
+	} catch (err) {
+		console.error('Error while authenticating JWT: ', err);
+		req.user = undefined;
+	} finally {
+		next();
+	}
+}
+
 /**
  * Function for creating user by adding them to underlying SQL database (via Sequelize)
  * @param {Object} req The HTTP request body
@@ -82,7 +104,7 @@ async function createUser(req) {
 /**
  * Function for verifying a user's account
  * @param {Object} req The HTTP request body
- * @returns {(UUID|null)} Returns either the user's ID in UUID format, or null if the user could not be found
+ * @returns {(JsonWebKey|null)} Returns either a JSON web token, or null if the user could not be found
  */
 async function verifyUser(req) {
 
@@ -108,7 +130,12 @@ async function verifyUser(req) {
 					userId: userQuery.dataValues.user_id
 				}
 
-				return jwt.sign(userObject, JWT_SECRET);
+				return jwt.sign(
+					userObject, 
+					process.env.JWT_SECRET,
+					{
+						expiresIn: 60 * 60 * 24 * 14
+					});
 
 			}
 
@@ -126,5 +153,6 @@ async function verifyUser(req) {
 
 module.exports = {
 	createUser,
+	verifyJWT,
 	verifyUser
 }
