@@ -76,25 +76,18 @@ app.route('/api/v1/user_auth/login')
 		let userObjectToEmit = {};
 		let connectionStatus = 'failure';
 		let dataStatus = null;
-		let userObject = null;
+		let userToken = null;
 		let httpCode = null;
 
 		try {
-			// Await completion of verifyUser(), then store return object 
-			// as part of session
-			userObject = await verifyUser(req);
+			// Await completion of verifyUser() and store return JSON web token
+			userToken = await verifyUser(req);
 
 			// Update connection status after successful querying
 			connectionStatus = 'success';
 
-			// If login successful, destroy any existing session, then set server-side session's userObject value
-			if (userObject) {
-
-				if (req.session) {
-					req.session.destroy;
-				};
-
-				session.userObject = userObject;
+			// If login successful, set JSON object key-values
+			if (userToken) {
 
 				// Update data status
 				dataStatus = 'user_exists';
@@ -111,7 +104,7 @@ app.route('/api/v1/user_auth/login')
 			userObjectToEmit = {
 				connection_status: connectionStatus,
 				data_status: dataStatus,
-				user_object: userObject
+				user_token: userToken
 			};
 
 			return res.status(httpCode).json(userObjectToEmit);

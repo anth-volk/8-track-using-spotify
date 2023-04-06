@@ -1,6 +1,8 @@
 // External package imports
+require('dotenv'.config());
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // ORM import
 const { Sequelize } = require('sequelize');
@@ -18,6 +20,9 @@ const sequelize = new Sequelize(
 
 // bcrypt configuration
 const SALT_ROUNDS = 10;
+
+// JWT configuration
+const jwtSecret = process.env.JWT_SECRET;
 
 const User = require('../models/User')(sequelize);
 
@@ -99,11 +104,11 @@ async function verifyUser(req) {
 
 			if (userQuery.dataValues.email === submittedEmail && isPasswordMatching) {
 				
-				userId = userQuery.dataValues.user_id;
+				const userObject = {
+					userId: userQuery.dataValues.user_id
+				}
 
-				return ({
-					userId: userId
-				});
+				return jwt.sign(userObject, JWT_SECRET);
 
 			}
 
