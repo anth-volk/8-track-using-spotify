@@ -21,9 +21,6 @@ const sequelize = new Sequelize(
 // bcrypt configuration
 const SALT_ROUNDS = 10;
 
-// JWT configuration
-const jwtSecret = process.env.JWT_SECRET;
-
 const User = require('../models/User')(sequelize);
 
 /**
@@ -59,11 +56,17 @@ function verifyJWT(req, res, next) {
 
 			req.user = decodedData;
 		}
+
+		next();
+
 	} catch (err) {
+
 		console.error('Error while authenticating JWT: ', err);
 		req.user = undefined;
-	} finally {
-		next();
+		res.status(401).json({
+			message: 'User not found or token is expired'
+		});
+
 	}
 }
 
