@@ -1,12 +1,14 @@
 // External imports
 import { Fragment, useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 // Component imports
 import Navbar from './components/Navbar.js';
 import Home from './components/Home.js';
 import Login from './components/Login.js';
 import Signup from './components/Signup.js';
+import CartLibrary from './components/CartLibrary.js';
 
 
 // Style imports
@@ -15,34 +17,33 @@ import './styles/App.css';
 function App() {
 
 	// State variable for user object
-	const [userObject, setUserObject] = useState(null);
+	const [userToken, setUserToken] = useState(null);
 
-	// Fetch locally stored user object from localStorage;
-	// this is a very basic authentication method, and is
-	// definitely not the most secure method possible
+	// Cookies object
+	const [cookies, setCookie, removeCookie] = useCookies();
+
+	// Determine if user profile cookie is present
 	useEffect(() => {
 
-		async function fetchUser() {
+		if(cookies.userAuth) {
 
-			await setUserObject(localStorage.getItem('userObject'));
+			setUserToken(cookies.userAuth);
 
 		}
-
-		fetchUser();
 
 	}, [])
 
 
 	return (
 		<Fragment>
-			<Navbar userObject={userObject} />
+			<Navbar userToken={userToken} />
 
 			<Routes>
 				<Route 
 					path='/' 
 					element={
-						userObject ? (
-							{/*<CartLibrary />*/}
+						userToken ? (
+							<CartLibrary userToken={userToken}/>
 						) : (
 							<Home />
 						)
