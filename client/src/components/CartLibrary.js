@@ -56,13 +56,6 @@ export default function CartLibrary(props) {
 
 	}, [props.userToken]);
 
-	// TESTING
-	useEffect(() => {
-
-		console.log(userSpotifyInfo);
-
-	}, [userSpotifyInfo]);
-
 	// useEffect that executes following database query that determines what
 	// user's current spotify connection status is
 	useEffect(() => {

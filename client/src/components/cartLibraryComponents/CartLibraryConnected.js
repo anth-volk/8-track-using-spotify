@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // Internal imports
-import CartCreation from './cartLibraryComponents/CartCreation.js';
+import CartCreation from './CartCreation.js';
 
 export default function CartLibraryConnected(props) {
 
