@@ -66,7 +66,6 @@ app.use(cors());
 app.use('/api', bodyParser.json());
 app.use('/api/v1/user_auth/protected', verifyJWT);
 
-
 app.route('/api/v1/user_auth/login')
 	// POST requests will attempt to log user in;
 	// if account exists, method will respond with a JSON

@@ -5,6 +5,26 @@ export default function CartLibraryNoConnection(props) {
 
 	const { userToken } = props;
 
+
+
+	/*
+
+	async function handleSpotifyAuth(userToken) {
+
+		const response = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/protected/spotify_auth', {
+			method: 'GET',
+			headers: {
+				'Authorization': 'JWT ' + userToken,
+				'Content-Type': 'application/json',
+				'CORS': 'Access-Control-Allow-Origin'
+			}
+		});
+	}
+
+	*/
+
+
+	/*
 	const client_id = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 	const client_secret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
 	const redirect_uri = 'http://localhost:8000/api/v1/user_auth/protected/spotify_auth/callback';	
@@ -24,11 +44,14 @@ export default function CartLibraryNoConnection(props) {
 			redirect_uri: redirect_uri,
 			state: state
 		}));
+	*/
 		
 	return(
 		<section className="CartLibraryNoConnect">
 			<h1 className="Util_logoText">TEXT PLACEHOLDER</h1>
-			<a href={spotifyURL}>Connect to Spotify Premium</a>
+			<a href="http://localhost:8000/api/v1/user_auth/protected/spotify_auth">Auth</a>
+			{/*<button type="button" onClick={(event) => handleSpotifyAuth(userToken)}>Auth</button>*/}
+			{/*<a href={spotifyURL}>Connect to Spotify Premium</a>*/}
 		</section>
 	)
 
