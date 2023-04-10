@@ -68,7 +68,7 @@ export default function CartLibrary(props) {
 		}
 
 		// Otherwise, if token is expired, refresh it and reload this page
-		else if (userSpotifyInfo.spotify_access_token_updatedAt + userSpotifyInfo.spotify_access_token_age < Date.now()) {
+		else if (userSpotifyInfo.spotify_access_token_updatedAt && userSpotifyInfo.spotify_access_token_updatedAt + userSpotifyInfo.spotify_access_token_age < Date.now()) {
 			// Call server-side token refresh route function
 
 			// Afterward, refresh this page
