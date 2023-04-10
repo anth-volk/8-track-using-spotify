@@ -47,7 +47,7 @@ export default function CartLibrary(props) {
 
 			}
 			catch (err) {
-				console.log('Error while fetching user Spotify data: ', err);
+				console.error('Error while fetching user Spotify data: ', err);
 			}
 
 		}

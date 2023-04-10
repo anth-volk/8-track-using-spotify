@@ -59,7 +59,7 @@ const Cart = require('./models/Cart')(sequelize);
 // Spotify auth setup
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
+const redirect_uri = 'http://localhost:8000/api/v1/user_auth/protected/spotify_auth/callback';
 
 // Middleware
 app.use(cors());
@@ -167,6 +167,137 @@ app.route('/api/v1/user_auth/protected/verify_spotify')
 		}
 
 	});
+
+app.route('/api/v1/user_auth/protected/spotify_auth')
+	// GET requests send users to first step in Spotify authorization
+	// process, whereby users are connected to Spotify Accounts Service,
+	// told what permissions this app is asking for, and are asked to log into
+	// Spotify itself; based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+	.get( (req, res) => {
+
+		// Set Spotify auth variables
+		// TODO: Write function to randomly generate this code
+		const state = 'jaw98ejff8j39f3lasdjf';
+		const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
+
+		// Construct redirect URL using URI and other data,
+		// then redirect to it
+		res.redirect('https://accounts.spotify.com/authorize?' +
+			querystring.stringify({
+				response_type: 'code',
+				client_id: client_id,
+				scope: scope,
+				redirect_uri: redirect_uri,
+				state: state
+			}));
+
+	});
+
+app.route('/api/v1/user_auth/protected/spotify_auth/callback')
+	// Callback route that Spotify will redirect to
+	// following user's successful login to Spotify's native
+	// auth services; based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
+	.get(async (req, res) => {
+
+		// Pull required authorization elements from req
+		const code = req.query.code || null;
+		const state = req.query.state || null;
+
+		// If state is null
+		// TODO: Create better handler for this case
+		if (state === null || req.query.error) {
+			res.redirect('/error');
+		} 
+		else {
+
+			// Store relevant form options in object
+			const spotifyAuthBody = {
+				'code': code,
+				'redirect_uri': redirect_uri,
+				'grant_type': 'authorization_code'
+			}
+
+			console.log(spotifyAuthBody);
+
+			// Manually construct form body
+			// TODO: convert this into async utility function
+			let formBody = Object.keys(spotifyAuthBody)
+				.reduce( (accu, key) => {
+					return accu.concat(encodeURIComponent(key) + '=' + encodeURIComponent(spotifyAuthBody[key]));
+				}, [])
+				.join('&');
+
+			// Using form body, fetch Spotify API token
+			const spotifyRequestRaw = await fetch(
+				'https://accounts.spotify.com/api/token',
+				{
+					method: 'POST',
+					headers: {
+						'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')),
+						'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+					},
+					body: formBody
+				}
+			);
+
+			// If token is successfully requested...
+			if (spotifyRequestRaw.ok) {
+
+				// Convert raw request data to JSON
+				const spotifyRequestJSON = await spotifyRequestRaw.json();
+
+				// Await input and/or updating of DB via separate controller
+				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
+				if (isSpotifyDataStored) {
+
+					// Send to cart library page
+					res.redirect('http://localhost:3000/');
+				}
+				else {
+
+					// TODO: Replace this placeholder
+					res.send('Error while trying to store Spotify authentication data');
+				}
+
+			} 
+			else {
+
+				// TODO: Replace this placeholder
+				res.status(500).redirect('/');
+			}
+
+		};
+	});
+
+
+
+//--------------------------------------------------------------------------
+
+/*
+
+				// Await input and/or updating of DB via separate controller
+				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
+				if (isSpotifyDataStored) {
+
+					// Send to cart library page
+					// TODO: Replace placeholder with the actual view
+					res.send('Placeholder for redirecting to cart library view');
+				}
+				else {
+
+					// TODO: Replace this placeholder
+					res.send('Error while trying to store Spotify authentication data');
+				}
+
+			} else {
+
+				// TODO: Replace this placeholder
+				res.send('Error in completing Spotify authentication');
+			}
+
+		};
+	});
+*/
 
 /*
 // TESTING route
