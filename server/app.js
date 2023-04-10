@@ -60,6 +60,7 @@ const Cart = require('./models/Cart')(sequelize);
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = 'http://localhost:8000/api/v1/user_auth/protected/spotify_auth/callback';
+const FRONTEND_URL = 'localhost:3000'
 
 // Middleware
 app.use(cors());
@@ -179,6 +180,9 @@ app.route('/api/v1/user_auth/protected/spotify_auth')
 		const state = 'jaw98ejff8j39f3lasdjf';
 		const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
 
+		// Write state var to cookie to verify during callback redirect
+		res.cookie('spotify_state', state);
+
 		// Construct redirect URL using URI and other data,
 		// then redirect to it
 		res.redirect('https://accounts.spotify.com/authorize?' +
@@ -204,7 +208,7 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 
 		// If state is null
 		// TODO: Create better handler for this case
-		if (state === null || req.query.error) {
+		if (state === null || req.cookies.spotify_state !== state || req.query.error) {
 			res.redirect('/error');
 		} 
 		else {
@@ -215,8 +219,6 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 				'redirect_uri': redirect_uri,
 				'grant_type': 'authorization_code'
 			}
-
-			console.log(spotifyAuthBody);
 
 			// Manually construct form body
 			// TODO: convert this into async utility function
@@ -245,17 +247,22 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 				// Convert raw request data to JSON
 				const spotifyRequestJSON = await spotifyRequestRaw.json();
 
+				// Grab user's JWT from browser cookie;
+				// doing it this way to avoid trying to parse redirect URL on front-end,
+				// as Spotify will not allow any meaningful front-end operations
+				const decodedUserData = jwt.verify(req.cookies.userAuth, process.env.JWT_SECRET);
+
 				// Await input and/or updating of DB via separate controller
-				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
+				const isSpotifyDataStored = await storeSpotifyData(decodedUserData.userId, spotifyRequestJSON);
 				if (isSpotifyDataStored) {
 
 					// Send to cart library page
-					res.redirect('http://localhost:3000/');
+					res.status(200).redirect(FRONTEND_URL);
 				}
 				else {
 
 					// TODO: Replace this placeholder
-					res.send('Error while trying to store Spotify authentication data');
+					res.status(500).send('Error while trying to store Spotify authentication data');
 				}
 
 			} 
