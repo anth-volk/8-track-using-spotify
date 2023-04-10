@@ -154,8 +154,45 @@ async function verifyUser(req) {
 
 }
 
+async function verifyUserSpotifyData(userData) {
+
+	// Pull user ID from passed data
+	const { userId } = userData;
+
+	// Query DB for Spotify user data
+	try {
+		const userSpotifyQuery = await User.findOne({
+			where: {
+				user_id: userId
+			}
+		});
+
+		if (userSpotifyQuery) {
+
+			const returnedData = userSpotifyQuery.dataValues;
+
+			return ({
+				user_id: returnedData.user_id,
+				spotify_access_token: returnedData.spotify_access_token,
+				spotify_access_token_updatedAt: returnedData.spotify_access_token_updatedAt,
+				spotify_access_token_age: returnedData.spotify_access_token_age,
+				spotify_refresh_token: returnedData.spotify_refresh_token
+			});
+		} 
+		
+		return null;
+
+	}
+	catch (err) {
+		console.error('Error while querying database for user Spotify data: ', err);
+	}
+
+
+}
+
 module.exports = {
 	createUser,
 	verifyJWT,
-	verifyUser
+	verifyUser,
+	verifyUserSpotifyData
 }

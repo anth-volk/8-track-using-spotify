@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 
 // Local imports
 const { logger } = require('./utilities/logger');
-const { createUser, verifyJWT, verifyUser } = require('./controllers/userAuth');
+const { createUser, verifyJWT, verifyUser, verifyUserSpotifyData } = require('./controllers/userAuth');
 const { storeSpotifyData } = require('./controllers/spotifyAuth');
 
 // Express setup
@@ -64,7 +64,7 @@ const redirect_uri = 'http://localhost:3000/testing/spotify_auth/callback';
 // Middleware
 app.use(cors());
 app.use('/api', bodyParser.json());
-app.use('/api/testing', verifyJWT);
+app.use('/api/v1/user_auth/protected', verifyJWT);
 
 
 app.route('/api/v1/user_auth/login')
@@ -145,9 +145,30 @@ app.route('/api/v1/user_auth/signup')
 
 		}
 
-
 	})
 
+app.route('/api/v1/user_auth/protected/verify_spotify')
+	// POST requests will pull server-side data about user
+	// regarding any previous Spotify connections
+	.post(async (req, res) => {
+
+		try {
+			const userSpotifyData = await verifyUserSpotifyData(req.user);
+
+			return res.status(200).json({
+				connection_status: 'success',
+				user_spotify_data: userSpotifyData
+			})
+
+		}
+		catch (err) {
+			console.error('Error while fetching user Spotify information: ', err);
+			return res.status(500);
+		}
+
+	});
+
+/*
 // TESTING route
 app.route('/api/testing')
 	.post( (req, res) => {
@@ -164,6 +185,7 @@ app.route('/api/testing')
 
 
 	})
+*/
 
 // Currently review all of the below routes in order to improve application
 //----------------------------------------------------------------

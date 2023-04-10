@@ -112,12 +112,8 @@ export default function Login() {
 				body: JSON.stringify(form)
 			});
 
-			console.log(res);
-
 			// Convert response to JSON
 			const resJSON = await res.json();
-
-			console.log(resJSON);
 
 			// If signup is successful per returned JSON object...
 			if (resJSON.connection_status === 'success' && resJSON.data_status === 'user_exists') {
