@@ -37,18 +37,6 @@ module.exports = (sequelize) => {
     last_name: {
 		type: DataTypes.STRING,
 		allowNull: false
-	},
-	spotify_access_token: {
-		type: DataTypes.STRING
-	},
-	spotify_access_token_updatedAt: {
-		type: DataTypes.DATE
-	},
-	spotify_access_token_age: {
-		type: DataTypes.BIGINT
-	},
-	spotify_refresh_token: {
-		type: DataTypes.STRING
 	}
   }, {
     sequelize,

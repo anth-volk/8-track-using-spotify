@@ -60,7 +60,7 @@ const Cart = require('./models/Cart')(sequelize);
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = 'http://localhost:8000/api/v1/user_auth/protected/spotify_auth/callback';
-const FRONTEND_URL = 'localhost:3000'
+const FRONTEND_URL = 'http://localhost:3000'
 
 // Middleware
 app.use(cors());
@@ -246,26 +246,28 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 
 				// Convert raw request data to JSON
 				const spotifyRequestJSON = await spotifyRequestRaw.json();
+				const { access_token, expires_in, refresh_token } = spotifyRequestJSON;
 
-				// Grab user's JWT from browser cookie;
-				// doing it this way to avoid trying to parse redirect URL on front-end,
-				// as Spotify will not allow any meaningful front-end operations
-				const decodedUserData = jwt.verify(req.cookies.userAuth, process.env.JWT_SECRET);
+				const maxAge = 60 * 60 * 24 * 30;
 
-				// Await input and/or updating of DB via separate controller
-				const isSpotifyDataStored = await storeSpotifyData(decodedUserData.userId, spotifyRequestJSON);
-				if (isSpotifyDataStored) {
-
-					// Send to cart library page
-					res.status(200).redirect(FRONTEND_URL);
-				}
-				else {
-
-					// TODO: Replace this placeholder
-					res.status(500).send('Error while trying to store Spotify authentication data');
-				}
-
-			} 
+				return res
+					.status(200)
+					.clearCookie('spotify_state')
+					.cookie(
+						'userSpotifyAuth',
+						{
+							'access_token': access_token,
+							'expires_in': expires_in,
+							'refresh_token': refresh_token,
+							'timestamp': Date.now()
+						},
+						{
+							path: '/',
+							maxAge: maxAge
+						}
+					)	
+					.redirect(FRONTEND_URL + '/library');
+			}
 			else {
 
 				// TODO: Replace this placeholder
@@ -683,9 +685,6 @@ app.route('/testing/spotify_auth')
 		// TODO: Write function to randomly generate this code
 		const state = 'jaw98ejff8j39f3lasdjf';
 		const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
-
-		// TESTING
-		console.log(redirect_uri);
 
 		res.redirect('https://accounts.spotify.com/authorize?' +
 			querystring.stringify({

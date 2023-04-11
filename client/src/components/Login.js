@@ -126,11 +126,11 @@ export default function Login() {
 				clearTimeout(timerRef.current);
 
 				// Set a positive submission message
-				setSubmissionMessage('Successfully logged in. Redirecting to home page...');
+				setSubmissionMessage('Successfully logged in. Redirecting to your library page...');
 				
 				// Wait 3 seconds, then navigate to '/' route
 				timerRef.current = setTimeout(() => {
-					navigate('/');
+					navigate('/library');
 				}, 3000);
 				
 			} 
@@ -164,7 +164,7 @@ export default function Login() {
 
 		}
 
-	}, [userToken])
+	}, [userToken, setCookie])
 
 	return(
 		<div className='Login'>

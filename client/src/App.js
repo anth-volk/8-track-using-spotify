@@ -1,6 +1,6 @@
 // External imports
 import { Fragment, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Component imports
@@ -9,6 +9,8 @@ import Home from './components/Home.js';
 import Login from './components/Login.js';
 import Signup from './components/Signup.js';
 import CartLibrary from './components/CartLibrary.js';
+import NoConnection from './components/NoConnection.js';
+import CartCreation from './components/CartCreation.js';
 
 
 // Style imports
@@ -25,16 +27,26 @@ function App() {
 
 	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
+		// Determine if userAuth token exists
+		console.log(cookies);
+		console.log(userAuthToken);
+		console.log(userSpotifyToken);
 
 		if(cookies.userAuth) {
 			setUserAuthToken(cookies.userAuth);
 		}
 
+		// Determine if userSpotifyAuth token exists & isn't expired
 		if (cookies.userSpotifyAuth) {
-			setUserSpotifyToken(cookies.userSpotifyAuth);
+			if (cookies.userSpotifyAuth.expires_in + cookies.userSpotifyAuth.timestamp < Date.now()) {
+				// Call route for renewing Spotify auth
+			}
+			else {
+				setUserSpotifyToken(cookies.userSpotifyAuth);
+			}
 		}
-
-	}, [])
+		
+	}, [cookies.userAuth, cookies.userSpotifyAuth])
 
 
 	return (
@@ -42,18 +54,21 @@ function App() {
 			<Navbar userAuthToken={userAuthToken} />
 
 			<Routes>
-				<Route 
-					path='/*' 
+				<Route path='/' element={<Home />} />
+				<Route path='/login' element={<Login />} />
+				<Route path='/signup' element={<Signup />} />
+				<Route
+					path='/library'
 					element={
-						userAuthToken ? (
-							<CartLibrary userAuthToken={userAuthToken}/>
+						userSpotifyToken ? (
+							<CartLibrary userAuthToken={userAuthToken} userSpotifyToken={userSpotifyToken} />
 						) : (
-							<Home />
+							<NoConnection userAuthToken={userAuthToken} />
 						)
 					}
 				/>
-				<Route path='/login' element={<Login />} />
-				<Route path='/signup' element={<Signup />} />
+				<Route path='/create_cart' element={<CartCreation userAuthToken={userAuthToken} userSpotifyToken={userSpotifyToken} />} />
+
 			</Routes>
 
 		</Fragment>

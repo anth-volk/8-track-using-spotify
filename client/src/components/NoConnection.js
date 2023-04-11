@@ -1,7 +1,4 @@
-// External imports
-import queryString from 'query-string';
-
-export default function CartLibraryNoConnection(props) {
+export default function NoConnection(props) {
 
 	return(
 		<section className="CartLibraryNoConnect">

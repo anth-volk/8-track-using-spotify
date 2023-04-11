@@ -5,5 +5,5 @@
 /server/other
 /server/sequelize_config
 /server/testing
-/server/.sequelizerc
+.sequelizerc
 .env

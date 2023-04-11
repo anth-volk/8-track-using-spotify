@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import '../styles/Navbar.css';
 
 export default function Navbar(props) {
-	if (!props.userToken) {
+	if (!props.userAuthToken) {
 		return (
 			<Fragment>
 				<nav>
@@ -33,6 +33,9 @@ export default function Navbar(props) {
 					<ul>
 						<li>
 							<NavLink to='/' className='active'>Home</NavLink>
+						</li>
+						<li>
+							<NavLink to='/library' className='active'>My Library</NavLink>
 						</li>
 						<li>
 							<NavLink to='/logout' className='active'>Log Out</NavLink>
