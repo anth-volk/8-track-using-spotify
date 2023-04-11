@@ -27,10 +27,6 @@ function App() {
 
 	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
-		// Determine if userAuth token exists
-		console.log(cookies);
-		console.log(userAuthToken);
-		console.log(userSpotifyToken);
 
 		if(cookies.userAuth) {
 			setUserAuthToken(cookies.userAuth);
