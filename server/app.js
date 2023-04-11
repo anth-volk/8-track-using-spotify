@@ -64,8 +64,8 @@ const FRONTEND_URL = 'http://localhost:3000'
 
 // Middleware
 app.use(cors());
-app.use('/api', bodyParser.json());
-app.use('/api/v1/user_auth/protected', verifyJWT);
+app.use(bodyParser.json());
+app.use('/api/v1/protected', verifyJWT);
 
 app.route('/api/v1/user_auth/login')
 	// POST requests will attempt to log user in;
@@ -147,7 +147,7 @@ app.route('/api/v1/user_auth/signup')
 
 	})
 
-app.route('/api/v1/user_auth/protected/verify_spotify')
+app.route('/api/v1/protected/user_auth/verify_spotify')
 	// POST requests will pull server-side data about user
 	// regarding any previous Spotify connections
 	.post(async (req, res) => {
@@ -168,7 +168,7 @@ app.route('/api/v1/user_auth/protected/verify_spotify')
 
 	});
 
-app.route('/api/v1/user_auth/protected/spotify_auth')
+app.route('/api/v1/protected/user_auth/spotify_auth')
 	// GET requests send users to first step in Spotify authorization
 	// process, whereby users are connected to Spotify Accounts Service,
 	// told what permissions this app is asking for, and are asked to log into
@@ -196,7 +196,7 @@ app.route('/api/v1/user_auth/protected/spotify_auth')
 
 	});
 
-app.route('/api/v1/user_auth/protected/spotify_auth/callback')
+app.route('/api/v1/protected/user_auth/spotify_auth/callback')
 	// Callback route that Spotify will redirect to
 	// following user's successful login to Spotify's native
 	// auth services; based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
@@ -277,7 +277,7 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 		};
 	});
 
-app.route('/api/v1/user_auth/protected/spotify_auth/refresh_token')
+app.route('/api/v1/protected/user_auth/spotify_auth/refresh_token')
 	.post( (req, res) => {
 
 		
