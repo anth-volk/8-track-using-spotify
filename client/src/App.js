@@ -17,18 +17,21 @@ import './styles/App.css';
 function App() {
 
 	// State variable for user object
-	const [userToken, setUserToken] = useState(null);
+	const [userAuthToken, setUserAuthToken] = useState(null);
+	const [userSpotifyToken, setUserSpotifyToken] = useState(null);
 
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
 
-	// Determine if user profile cookie is present
+	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
 
 		if(cookies.userAuth) {
+			setUserAuthToken(cookies.userAuth);
+		}
 
-			setUserToken(cookies.userAuth);
-
+		if (cookies.userSpotifyAuth) {
+			setUserSpotifyToken(cookies.userSpotifyAuth);
 		}
 
 	}, [])
@@ -36,14 +39,14 @@ function App() {
 
 	return (
 		<Fragment>
-			<Navbar userToken={userToken} />
+			<Navbar userAuthToken={userAuthToken} />
 
 			<Routes>
 				<Route 
 					path='/*' 
 					element={
-						userToken ? (
-							<CartLibrary userToken={userToken}/>
+						userAuthToken ? (
+							<CartLibrary userAuthToken={userAuthToken}/>
 						) : (
 							<Home />
 						)
