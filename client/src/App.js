@@ -40,7 +40,7 @@ function App() {
 
 			<Routes>
 				<Route 
-					path='/' 
+					path='/*' 
 					element={
 						userToken ? (
 							<CartLibrary userToken={userToken}/>

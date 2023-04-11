@@ -275,6 +275,13 @@ app.route('/api/v1/user_auth/protected/spotify_auth/callback')
 		};
 	});
 
+app.route('/api/v1/user_auth/protected/spotify_auth/refresh_token')
+	.post( (req, res) => {
+
+		
+
+	})
+
 
 
 //--------------------------------------------------------------------------

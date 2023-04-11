@@ -1,6 +1,7 @@
 // External imports
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 // Internal imports
 import CartLibraryNoConnection from './cartLibraryComponents/CartLibraryNoConnection.js';
@@ -10,7 +11,8 @@ import CartLibraryConnected from './cartLibraryComponents/CartLibraryConnected.j
 export default function CartLibrary(props) {
 
 	const SPOTIFY_NO_CONNECTION = 'spotify_no_connection';
-	const SPOTIFY_NO_PREMIUM = 'spotify_no_premium';
+	// To implement later
+	// const SPOTIFY_NO_PREMIUM = 'spotify_no_premium';
 	const SPOTIFY_CONNECTED = 'spotify_connected';
 
 	const [userSpotifyInfo, setUserSpotifyInfo] = useState(null);
@@ -26,7 +28,7 @@ export default function CartLibrary(props) {
 
 			try {
 
-				const userSpotifyData = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/protected/verify_spotify', {
+				const userSpotifyDataRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/protected/verify_spotify', {
 					method: 'POST',
 					headers: {
 						'Authorization': 'JWT ' + userToken,
@@ -35,14 +37,14 @@ export default function CartLibrary(props) {
 					}
 				});
 
-				if (userSpotifyData.ok) {
+				if (userSpotifyDataRaw.ok) {
 
-					const userSpotifyDataJSON = await userSpotifyData.json();
+					const userSpotifyDataJSON = await userSpotifyDataRaw.json();
 					setUserSpotifyInfo(userSpotifyDataJSON.user_spotify_data);
 
 				} 
 				else {
-					throw new Error('Connection error while fetching user Spotify data; HTTP status code: ', userSpotifyData.status);
+					throw new Error('Connection error while fetching user Spotify data; HTTP status code: ', userSpotifyDataRaw.status);
 				}
 
 			}
@@ -60,16 +62,15 @@ export default function CartLibrary(props) {
 	// user's current spotify connection status is
 	useEffect(() => {
 
-		// Define the function to call server-side token refresh route here
-
 		// If there is no Spotify info yet, don't do anything
 		if (!userSpotifyInfo) {
 			return;
 		}
 
 		// Otherwise, if token is expired, refresh it and reload this page
-		else if (userSpotifyInfo.spotify_access_token_updatedAt && userSpotifyInfo.spotify_access_token_updatedAt + userSpotifyInfo.spotify_access_token_age < Date.now()) {
+		else if (userSpotifyInfo.spotify_access_token_updatedAt && (userSpotifyInfo.spotify_access_token_updatedAt + userSpotifyInfo.spotify_access_token_age < Date.now())) {
 			// Call server-side token refresh route function
+
 
 			// Afterward, refresh this page
 			navigate('/');
@@ -78,9 +79,11 @@ export default function CartLibrary(props) {
 		else if (!userSpotifyInfo.spotify_access_token) {
 			setSpotifyConnectionStatus(SPOTIFY_NO_CONNECTION);
 		} 
+		/* To implement later
 		else if (!userSpotifyInfo.is_spotify_premium) {
 			setSpotifyConnectionStatus(SPOTIFY_NO_PREMIUM);
 		}
+		*/
 		else {
 			setSpotifyConnectionStatus(SPOTIFY_CONNECTED);
 		}
@@ -98,9 +101,9 @@ export default function CartLibrary(props) {
 
 	return(
 		<Fragment>
-			{spotifyConnectionStatus === SPOTIFY_NO_CONNECTION && <CartLibraryNoConnection userToken={props.userToken}/>}
-			{spotifyConnectionStatus === SPOTIFY_NO_PREMIUM && <CartLibraryNoPremium userToken={props.userToken} />}
-			{spotifyConnectionStatus === SPOTIFY_CONNECTED && <CartLibraryConnected userToken={props.userToken} />}
+			{spotifyConnectionStatus === SPOTIFY_NO_CONNECTION && <CartLibraryNoConnection />}
+			{/*{spotifyConnectionStatus === SPOTIFY_NO_PREMIUM && <CartLibraryNoPremium userToken={props.userToken} />}*/}
+			{spotifyConnectionStatus === SPOTIFY_CONNECTED && <CartLibraryConnected userToken={props.userToken} userSpotifyInfo={userSpotifyInfo}/>}
 		</Fragment>	
 	);
 
