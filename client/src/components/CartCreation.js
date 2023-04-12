@@ -2,6 +2,9 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
+// Internal imports
+import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
+
 export default function CartCreation(props) {
 
 	const [albumSearchParam, setAlbumSearchParam] = useState('');
@@ -43,24 +46,22 @@ export default function CartCreation(props) {
 		});
 
 		const responseObjectJSON = await responseObjectRaw.json();
-		console.log(responseObjectJSON);
 
-
-		/*
-		setClickedAlbum(albumResultObject[index]);
-		*/
+		setClickedAlbum(responseObjectJSON.result_object);
 	}
 
-	// TESTING
 	useEffect(() => {
-		console.log(albumResultObject);
-	}, [albumResultObject]);
+		//TESTING
+		if (clickedAlbum) {
+			const albumTracksArray = parseAlbumAndPullTracks(clickedAlbum);
+			const albumTracksDistributed = finalizeTracks(albumTracksArray);
 
-	// TESTING
-	useEffect(() => {
-		console.log(clickedAlbum);
+			// TESTING
+			console.log(albumTracksDistributed);
+
+		}
+
 	}, [clickedAlbum]);
-
 
 	return(
 		<Fragment>
