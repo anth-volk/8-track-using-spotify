@@ -51,10 +51,12 @@ export default function CartCreation(props) {
 		*/
 	}
 
+	// TESTING
 	useEffect(() => {
 		console.log(albumResultObject);
 	}, [albumResultObject]);
 
+	// TESTING
 	useEffect(() => {
 		console.log(clickedAlbum);
 	}, [clickedAlbum]);
