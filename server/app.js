@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyJWT, verifyUser, verifyUserSpotifyData } = require('./controllers/userAuth');
-const { storeSpotifyData } = require('./controllers/spotifyAuth');
+const { searchSpotifyForAlbum, spotifyAuthHeaders } = require('./controllers/spotify');
 
 // Express setup
 const express = require('express');
@@ -59,13 +59,14 @@ const Cart = require('./models/Cart')(sequelize);
 // Spotify auth setup
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = 'http://localhost:8000/api/v1/user_auth/protected/spotify_auth/callback';
+const redirect_uri = 'http://localhost:8000/api/v1/spotify_auth/callback';
 const FRONTEND_URL = 'http://localhost:3000'
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/v1/protected', verifyJWT);
+app.use('/api/v1/spotify', spotifyAuthHeaders);
 
 app.route('/api/v1/user_auth/login')
 	// POST requests will attempt to log user in;
@@ -147,6 +148,7 @@ app.route('/api/v1/user_auth/signup')
 
 	})
 
+/* (Likely) Inactive route
 app.route('/api/v1/protected/user_auth/verify_spotify')
 	// POST requests will pull server-side data about user
 	// regarding any previous Spotify connections
@@ -167,8 +169,9 @@ app.route('/api/v1/protected/user_auth/verify_spotify')
 		}
 
 	});
+	*/
 
-app.route('/api/v1/protected/user_auth/spotify_auth')
+app.route('/api/v1/spotify_auth')
 	// GET requests send users to first step in Spotify authorization
 	// process, whereby users are connected to Spotify Accounts Service,
 	// told what permissions this app is asking for, and are asked to log into
@@ -196,7 +199,7 @@ app.route('/api/v1/protected/user_auth/spotify_auth')
 
 	});
 
-app.route('/api/v1/protected/user_auth/spotify_auth/callback')
+app.route('/api/v1/spotify_auth/callback')
 	// Callback route that Spotify will redirect to
 	// following user's successful login to Spotify's native
 	// auth services; based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
@@ -277,61 +280,41 @@ app.route('/api/v1/protected/user_auth/spotify_auth/callback')
 		};
 	});
 
-app.route('/api/v1/protected/user_auth/spotify_auth/refresh_token')
+app.route('/api/v1/spotify_auth/refresh_token')
 	.post( (req, res) => {
 
 		
 
-	})
-
-
-
-//--------------------------------------------------------------------------
-
-/*
-
-				// Await input and/or updating of DB via separate controller
-				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
-				if (isSpotifyDataStored) {
-
-					// Send to cart library page
-					// TODO: Replace placeholder with the actual view
-					res.send('Placeholder for redirecting to cart library view');
-				}
-				else {
-
-					// TODO: Replace this placeholder
-					res.send('Error while trying to store Spotify authentication data');
-				}
-
-			} else {
-
-				// TODO: Replace this placeholder
-				res.send('Error in completing Spotify authentication');
-			}
-
-		};
 	});
-*/
 
-/*
-// TESTING route
-app.route('/api/testing')
-	.post( (req, res) => {
+app.route('/api/v1/spotify/search_album')
+	.get(async (req, res) => {
 
-		if (req.user) {
-			res.json({
-				user: req.user
-			});
-		} else {
-			res.json({
-				message: 'Error while processing request'
-			})
+		if (!req.query || ! req.query.album) {
+			return res
+				.status(400)
+				.json({
+					connection_status: 'failure',
+					error_message: 'No "album" query parameter provided'
+				});
+		}
+		else {
+
+			const resultObjectRaw = await searchSpotifyForAlbum(req.query.album, req.headers.authorization);
+			const resultObjectJSON = await resultObjectRaw.json();
+
+			return res
+				.status(200)
+				.json({
+					connection_status: 'success',
+					result_object: resultObjectJSON
+				});
 		}
 
 
 	})
-*/
+
+
 
 // Currently review all of the below routes in order to improve application
 //----------------------------------------------------------------
@@ -631,149 +614,6 @@ app.all('*', (req, res) => {
 	res.redirect('/error');
 });
 
-
-
-// Routes used for testing
-// ------------------------------------------------------------------------------------
-app.route('/testing')
-	.get( (req, res) => {
-
-		const session = req.session;
-
-		// If user is logged in, show logout link
-		if (session.userId) {
-			res.sendFile(__dirname + '/testing/user_auth_user_page.html');
-		} 
-		// Otherwise, show login form
-		else {
-			res.sendFile(__dirname + '/testing/user_auth_log_in.html');
-		}
-
-	})
-	.post( async (req, res) => {
-
-		const session = req.session;
-
-		// Create bool that is returned from async verification function
-		const userId = await verifyUser(req);
-
-		// If login successful, set session
-		if (userId) {
-			session.userId = userId;
-		}
-
-		// Redirect to GET request on the same route
-		res.redirect('/testing');
-	});
-
-app.route('/testing/createUser')
-	.get( (req, res) => {
-		res.sendFile(__dirname + '/testing/user_auth_create_user.html');
-	})
-	.post( async (req, res) => {
-		await createUser(req);
-		res.redirect('/testing');
-	});
-
-app.route('/testing/spotify_auth')
-	.get( (req, res) => {
-
-		// Based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
-		const session = req.session;
-
-		// Set Spotify auth variables
-		// TODO: Write function to randomly generate this code
-		const state = 'jaw98ejff8j39f3lasdjf';
-		const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
-
-		res.redirect('https://accounts.spotify.com/authorize?' +
-			querystring.stringify({
-				response_type: 'code',
-				client_id: client_id,
-				scope: scope,
-				redirect_uri: redirect_uri,
-				state: state
-			}));
-
-	})
-	.post()
-
-app.route('/testing/spotify_auth/callback')
-	.get( async (req, res) => {
-
-		const session = req.session;
-		// TESTING
-		console.log(req.session);
-
-		// Based on docs at https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
-
-		// Authorization elements from req
-		const code = req.query.code || null;
-		const state = req.query.state || null;
-
-		// If state is null
-		// TODO: Create better handler for this case
-		if (state === null || req.query.error) {
-			res.redirect('/error');
-		} else {
-
-			// Store relevant form options in object
-			const spotifyAuthBody = {
-				'code': code,
-				'redirect_uri': redirect_uri,
-				'grant_type': 'authorization_code'
-			}
-
-			// Manually construct form body
-			let formBody = Object.keys(spotifyAuthBody)
-				.reduce( (accu, key) => {
-					return accu.concat(encodeURIComponent(key) + '=' + encodeURIComponent(spotifyAuthBody[key]));
-				}, [])
-				.join('&');
-
-			const spotifyRequestRaw = await fetch(
-				'https://accounts.spotify.com/api/token',
-				{
-					method: 'POST',
-					headers: {
-						'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')),
-						'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-					},
-					body: formBody
-				}
-			);
-
-
-			if (spotifyRequestRaw.ok) {
-
-				// Convert raw request data to JSON
-				const spotifyRequestJSON = await spotifyRequestRaw.json();
-
-				// Await input and/or updating of DB via separate controller
-				const isSpotifyDataStored = await storeSpotifyData(session.userId, spotifyRequestJSON);
-				if (isSpotifyDataStored) {
-
-					// Send to cart library page
-					res.send('Placeholder for redirecting to cart library view');
-				}
-				else {
-					res.send('Error while trying to store Spotify authentication data');
-				}
-
-			} else {
-				res.send('Error in completing Spotify authentication');
-			}
-
-		};
-	});
-
-
-app.get('/testing/log_out', async (req, res) => {
-	req.session.destroy();
-	res.redirect('/testing');
-})
-
-// ------------------------------------------------------------------------------------
 
 app.listen(port, (err) => {
 	if (err) {
