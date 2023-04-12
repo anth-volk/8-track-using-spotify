@@ -21,43 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 		type: DataTypes.UUID,
 		allowNull: false
 	},
-    track1_id: {
-		type: DataTypes.UUID,
-		allowNull: false,
-		references: {
-			model: {
-				tableName: 'Tracks'
-			},
-			key: 'track_id'
-		}
-	},
-    track2_id: {
-		type: DataTypes.UUID,
-		references: {
-			model: {
-				tableName: 'Tracks'
-			},
-			key: 'track_id'
-		}
-	},
-    track3_id: {
-		type: DataTypes.UUID,
-		references: {
-			model: {
-				tableName: 'Tracks'
-			},
-			key: 'track_id'
-		}
-	},
-    track4_id: {
-		type: DataTypes.UUID,
-		references: {
-			model: {
-				tableName: 'Tracks'
-			},
-			key: 'track_id'
-		}
-	}
+	program_length_ms: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'Program',

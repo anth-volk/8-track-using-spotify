@@ -69,7 +69,6 @@ module.exports = (sequelize) => {
 			key: 'program_id'
 		}
 	},
-	program_length_seconds: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'Cart',
