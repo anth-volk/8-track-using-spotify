@@ -26,14 +26,29 @@ export default function CartCreation(props) {
 		});
 
 		const responseObjectJSON = await responseObjectRaw.json();
-		console.log(responseObjectJSON);
 
 		setAlbumResultObject(responseObjectJSON.result_object.albums.items);
 
 	}
 
-	function handleAlbumClick(index) {
+	async function handleAlbumClick(index) {
+
+		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify/get_album?album_id=' + albumResultObject[index].id, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'CORS': 'Access-Control-Allow-Origin',
+				'Authorization': 'Bearer ' + cookies.userSpotifyAuth.access_token
+			}
+		});
+
+		const responseObjectJSON = await responseObjectRaw.json();
+		console.log(responseObjectJSON);
+
+
+		/*
 		setClickedAlbum(albumResultObject[index]);
+		*/
 	}
 
 	useEffect(() => {

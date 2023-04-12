@@ -13,7 +13,9 @@ const jwt = require('jsonwebtoken');
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyJWT, verifyUser, verifyUserSpotifyData } = require('./controllers/userAuth');
-const { searchSpotifyForAlbum, spotifyAuthHeaders } = require('./controllers/spotify');
+const { getAlbumFromSpotify,
+	searchSpotifyForAlbum, 
+	spotifyAuthHeaders } = require('./controllers/spotify');
 
 // Express setup
 const express = require('express');
@@ -310,7 +312,31 @@ app.route('/api/v1/spotify/search_album')
 					result_object: resultObjectJSON
 				});
 		}
+	});
 
+app.route('/api/v1/spotify/get_album')
+	// GET request takes input data, executes Spotify request, then resolves to output
+	.get(async (req, res) => {
+
+		if (!req.query || !req.query.album_id) {
+			return res
+				.status(400)
+				.json({
+					connection_status: 'failure',
+					error_message: 'No "album ID" query parameter provided'
+				});
+		}
+		else {
+			const resultObjectRaw = await getAlbumFromSpotify(req.query.album_id, req.headers.authorization);
+			const resultObjectJSON = await resultObjectRaw.json();
+
+			return res
+				.status(200)
+				.json({
+					connection_status: 'success',
+					result_object: resultObjectJSON
+				});
+		}
 
 	})
 

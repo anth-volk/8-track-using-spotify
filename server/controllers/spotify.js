@@ -15,37 +15,6 @@ const sequelize = new Sequelize(
 // Configure ORM User model
 const User = require('../models/User')(sequelize);
 
-/*
-async function storeSpotifyData(sessionUserID, spotifyRequestJSON) {
-
-	try {
-
-		await User.update({ 
-			spotify_access_token: spotifyRequestJSON.access_token,
-			spotify_access_token_updatedAt: new Date(),
-			spotify_access_token_age: spotifyRequestJSON.expires_in,
-			spotify_refresh_token: spotifyRequestJSON.refresh_token
-		}, 
-		{
-			where: {
-				user_id: sessionUserID
-			}
-		});
-
-		return Promise.resolve(true);
-
-	} catch (err) {
-
-		console.error('Error while trying to store Spotify access token:', err);
-		return Promise.resolve(false);
-
-
-	}
-
-
-}
-*/
-
 /**
  * Middleware for ensuring that Spotify Bearer token is included in requests
  */
@@ -88,7 +57,20 @@ async function searchSpotifyForAlbum(searchString, authToken) {
 
 }
 
+async function getAlbumFromSpotify(albumId, authToken) {
+
+	return await fetch('https://api.spotify.com/v1/albums/' + albumId, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authToken
+		}
+	});
+
+}
+
 module.exports = {
+	getAlbumFromSpotify,
 	searchSpotifyForAlbum,
 	spotifyAuthHeaders
 };
