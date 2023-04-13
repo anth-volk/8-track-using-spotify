@@ -9,7 +9,7 @@ export function finalizeTracks(trackArray) {
 
 
 	// Sort tracks into an array of objects based on length
-	const sortedTrackArray = sortTracks(trackArray);
+	const sortedTrackArray = sortTracksByDuration(trackArray);
 
 	// Calculate the "ideal" time for each program by iterating
 	// over the trackArray and adding length to a sum var
@@ -18,17 +18,89 @@ export function finalizeTracks(trackArray) {
 	// Recursively take the longest and assign it either to the
 	// first program lacking a track, or if each has one, the one
 	// most deviated from ideal program time
-	const roughResultArray = distributeTracksToPrograms(sortedTrackArray, idealTime);
-
-	// TESTING
-	return roughResultArray;
+	const programArray = distributeTracksToPrograms(sortedTrackArray, idealTime);
 
 	// Reorder tracks in place based on track number
+	const programArraySorted = sortRoughResultArray(programArray);
 
-	// Calculate start and end times of each track; unclear what data struct
-	// to use
+	// Calculate start and end times of each track
+	const programArrayTimestamped = addTimestamps(programArraySorted);
 
-	// Return the output
+	return programArrayTimestamped;
+}
+
+function addTimestamps(programArraySorted)  {
+
+	// Iterate over programs and determine which is longest;
+	// save value as longestProgram; add 4000 for fade-in and fade-out
+	const FADE_IN_MS = 2000;
+	const FADE_OUT_MS = 2000;
+
+	const programLengthArray = programArraySorted.reduce( (accuArr, program) => {
+		return accuArr.concat(program.program_length);
+	}, []);
+
+	const longestProgram = Math.max(...programLengthArray);
+
+	// For each program...
+	return programArraySorted.map( (program) => {
+
+		// Calculate difference between program length and longestProgram
+		const programLengthDeficit = longestProgram - program.program_length;
+
+		// Average this difference over (number of tracks minus 1), casting to int,
+		// to determine between-track fade length
+		const fadeLength = Math.round(programLengthDeficit / (program.tracks.length - 1));
+
+		// Accumulated time starts with fade-in length
+		let accumulatedTime = FADE_IN_MS;
+
+		// For each track...
+		const tracksWithTimes = program.tracks.map( (track) => {
+
+			// Calculate a start_time_ms and end_time_ms val
+			// Start time is equal to any accumulated time on program, plus 1
+			const startTimeMs = accumulatedTime + 1;
+
+			// End time will be the start time, plus the track's duration
+			const endTimeMs = startTimeMs + track.duration_ms;
+
+			// Then, accumulated time will be updated to inclue this, 
+			// plus the inter-track fade length
+			accumulatedTime = endTimeMs + fadeLength;
+
+			return ({
+				...track,
+				start_time_ms: startTimeMs,
+				end_time_ms: endTimeMs
+			});
+		})
+
+		return({
+			...program,
+			tracks: tracksWithTimes
+		});
+	})
+
+
+
+
+
+
+	// return result
+
+
+}
+
+export function sortRoughResultArray(roughResultArray) {
+
+	return roughResultArray.map( (program) => {
+		const newTracks = sortTracksByNumber(program.tracks);
+		return {
+			...program,
+			tracks: newTracks
+		}
+	})
 
 }
 
@@ -104,9 +176,11 @@ export function distributeTracksToPrograms(sortedTrackArray, idealTime) {
  */
 export function calculateIdealTime(trackArray) {
 
+	const NUMBER_OF_PROGRAMS = 4;
+
 	return trackArray
 		.reduce( (total, track) => total + track.duration_ms, 0)
-		/ 4;
+		/ NUMBER_OF_PROGRAMS;
 
 }
 
@@ -116,11 +190,20 @@ export function calculateIdealTime(trackArray) {
  * @param {Array.<Object>} trackArray
  * @returns {Array.<Object>}
  */
-export function sortTracks(trackArray) {
+export function sortTracksByDuration(trackArray) {
 
 	return trackArray
 		.sort( (a, b) => {
 			return b.duration_ms - a.duration_ms
+		});
+
+}
+
+export function sortTracksByNumber(trackArray) {
+
+	return trackArray
+		.sort( (a, b) => {
+			return a.track_number - b.track_number
 		});
 
 }
@@ -136,8 +219,8 @@ export function parseAlbumAndPullTracks(spotifyAlbumObject) {
 
 	let resultArray = [];
 
-	spotifyAlbumObject.tracks.items.map( (track, index) => {
-		resultArray = [
+	spotifyAlbumObject.tracks.items.map( (track) => {
+		return resultArray = [
 			...resultArray,
 			{
 				track_number: track.track_number,

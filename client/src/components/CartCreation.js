@@ -10,6 +10,7 @@ export default function CartCreation(props) {
 	const [albumSearchParam, setAlbumSearchParam] = useState('');
 	const [albumResultObject, setAlbumResultObject] = useState(null);
 	const [clickedAlbum, setClickedAlbum] = useState(null);
+	const [distributedAlbum, setDistributedAlbum] = useState(null);
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -50,15 +51,15 @@ export default function CartCreation(props) {
 		setClickedAlbum(responseObjectJSON.result_object);
 	}
 
+	async function handleCartCreation() {
+		return;
+	}
+
 	useEffect(() => {
-		//TESTING
 		if (clickedAlbum) {
 			const albumTracksArray = parseAlbumAndPullTracks(clickedAlbum);
 			const albumTracksDistributed = finalizeTracks(albumTracksArray);
-
-			// TESTING
-			console.log(albumTracksDistributed);
-
+			setDistributedAlbum(albumTracksDistributed);
 		}
 
 	}, [clickedAlbum]);
@@ -88,13 +89,19 @@ export default function CartCreation(props) {
 					<h2>Cartridge Preview</h2>
 					<div className='CartPreview_container'>
 						{clickedAlbum && 
-						<Fragment>
-							<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
-							<p>{clickedAlbum.artists[0].name.toUpperCase()}</p>
-							<p>{clickedAlbum.name}</p>
-						</Fragment>
+							<Fragment>
+								<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
+								<p>{clickedAlbum.artists[0].name.toUpperCase()}</p>
+								<p>{clickedAlbum.name}</p>
+							</Fragment>
 						}
 					</div>
+					{clickedAlbum && !distributedAlbum &&
+						<p>Loading...</p>
+					}
+					{distributedAlbum &&
+						<button type='button' onSubmit={handleCartCreation}>Create New Cartridge</button>
+					}
 				</div>
 			</grid>
 		</Fragment>
