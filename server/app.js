@@ -340,12 +340,14 @@ app.route('/api/v1/spotify/get_album')
 
 	})
 
-// Currently review all of the below routes in order to improve application
-//----------------------------------------------------------------
-
 app.all('*', (req, res) => {
 	// For any routes not currently present: redirect to '/error'
-	res.redirect('/error');
+	return res
+		.status(404)
+		.json({
+			connection_status: 'failure',
+			error_message: 'Resource not found'
+		});
 });
 
 
