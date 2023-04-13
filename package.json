@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server:dev": "nodemon ./server/app.js",
-    "server:start": "node ./server/app.js",
-    "client:build": "cd ./client && npm run build",
-    "client:start": "cd ./client && npm run start",
+    "server:prod": "node ./server/app.js",
+    "client:prod": "cd ./client && npm run build",
+    "client:dev": "cd ./client && npm run start",
     "db:create": "sequelize-cli db:create",
     "db:migrate": "sequelize-cli db:migrate",
     "db:g:migration": "sequelize-cli migration:generate --name",
