@@ -81,15 +81,6 @@ function addTimestamps(programArraySorted)  {
 			tracks: tracksWithTimes
 		});
 	})
-
-
-
-
-
-
-	// return result
-
-
 }
 
 export function sortRoughResultArray(roughResultArray) {
@@ -150,16 +141,12 @@ export function distributeTracksToPrograms(sortedTrackArray, idealTime) {
 			resultArray[index].tracks = resultArray[index].tracks.concat(track);
 			varianceArray[index] = Math.abs(varianceArray[index] - track.duration_ms);
 			resultArray[index].program_length += track.duration_ms;
-			console.log(resultArray);
 		}
 		else {
-			console.log('varianceArray:');
-			console.log(varianceArray);
 			const j = varianceArray.indexOf(Math.max(...varianceArray));
 			resultArray[j].tracks = resultArray[j].tracks.concat(track);
 			varianceArray[j] = Math.abs(varianceArray[j] - track.duration_ms);
 			resultArray[j].program_length += track.duration_ms;
-			console.log(resultArray);
 		}
 	})
 
