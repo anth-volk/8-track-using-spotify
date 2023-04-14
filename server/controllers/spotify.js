@@ -1,20 +1,3 @@
-// ORM import
-const { Sequelize } = require('sequelize');
-
-// ORM configuration
-const sequelize = new Sequelize(
-	process.env.DB_NAME_DEV,
-	process.env.DB_USERNAME,
-	process.env.DB_PASSWORD,
-	{
-		host: process.env.DB_HOST,
-		dialect: 'postgres'
-	}
-);
-
-// Configure ORM User model
-const User = require('../models/User')(sequelize);
-
 /**
  * Middleware for ensuring that Spotify Bearer token is included in requests
  */

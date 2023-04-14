@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 // Local imports
 const { logger } = require('./utilities/logger');
 const { createUser, verifyJWT, verifyUser, verifyUserSpotifyData } = require('./controllers/userAuth');
+const { createCartridge } = require('./controllers/library');
 const { getAlbumFromSpotify,
 	searchSpotifyForAlbum, 
 	spotifyAuthHeaders } = require('./controllers/spotify');
@@ -54,9 +55,6 @@ const sequelize = new Sequelize(
 		dialect: 'postgres'
 	}
 );
-
-const User = require('./models/User')(sequelize);
-const Cart = require('./models/Cart')(sequelize);
 
 // Spotify auth setup
 const client_id = process.env.SPOTIFY_CLIENT_ID;
@@ -154,9 +152,28 @@ app.route('/api/v1/protected/library/create_cart')
 	// Route to create new cartridge within user's library
 	.post(async (req, res) => {
 
-		
+		try {
+			// TESTING
+			console.log(req.body);
 
-	})
+			const result = await createCartridge(req);
+			return res
+				.status(201)
+				.json({
+					connection_status: 'success',
+					created_cartridge: result
+				});
+		}
+		catch (err) {
+			console.error('Error while trying to store user-defined cartridge: ', err);
+			return res
+				.status(500)
+				.json({
+					connection_status: 'failure',
+					error_message: err
+				});
+		}
+	});
 
 /* (Likely) Inactive route
 app.route('/api/v1/protected/user_auth/verify_spotify')

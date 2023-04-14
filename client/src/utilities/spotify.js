@@ -45,7 +45,14 @@ function addFadeTimes(programArraySorted)  {
 
 		// Average this difference over (number of tracks minus 1), casting to int,
 		// to determine between-track fade length
-		const fadeLength = Math.round(programLengthDeficit / (program.tracks.length - 1));
+		let fadeLength = 0;
+
+		if (program.tracks.length > 1) {
+			fadeLength = Math.round(programLengthDeficit / (program.tracks.length - 1));
+		}
+		else {
+			fadeLength = programLengthDeficit;
+		};
 
 		// Add fade length, as well as total length (equal to 
 		// the length of the longest program) to the program object
@@ -215,6 +222,7 @@ export function parseAlbumAndPullTracks(spotifyAlbumObject) {
 		return resultArray = [
 			...resultArray,
 			{
+				name: track.name,
 				track_number: track.track_number,
 				id: track.id,
 				duration_ms: track.duration_ms

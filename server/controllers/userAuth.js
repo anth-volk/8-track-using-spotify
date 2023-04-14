@@ -186,8 +186,6 @@ async function verifyUserSpotifyData(userData) {
 	catch (err) {
 		console.error('Error while querying database for user Spotify data: ', err);
 	}
-
-
 }
 
 module.exports = {

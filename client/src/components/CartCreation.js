@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
-import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
+import { finalizeAlbum, finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
 
 export default function CartCreation(props) {
 
@@ -52,14 +52,46 @@ export default function CartCreation(props) {
 	}
 
 	async function handleCartCreation() {
-		return;
+
+		console.log('Accessing handleCartCreation');
+		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/create_cart', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'CORS': 'Access-Control-Allow-Origin',
+				'Authorization': 'JWT ' + cookies.userAuth
+			},
+			body: JSON.stringify(distributedAlbum)
+		});
+
+		console.log(responseObjectRaw);
+		
+		if (responseObjectRaw.ok) {
+
+			const responseObjectJSON = await responseObjectRaw.json();
+			console.log(responseObjectJSON);
+
+		}
+
 	}
 
 	useEffect(() => {
 		if (clickedAlbum) {
 			const albumTracksArray = parseAlbumAndPullTracks(clickedAlbum);
 			const albumTracksDistributed = finalizeTracks(albumTracksArray);
-			setDistributedAlbum(albumTracksDistributed);
+
+			const albumArtists = clickedAlbum.artists.map( (artist) => {
+				return artist.name;
+			});
+
+			const finalizedAlbum = {
+				name: clickedAlbum.name,
+				artists: albumArtists,
+				programs: albumTracksDistributed
+			};
+			console.log(finalizedAlbum);
+
+			setDistributedAlbum(finalizedAlbum);
 		}
 
 	}, [clickedAlbum]);
@@ -100,7 +132,7 @@ export default function CartCreation(props) {
 						<p>Loading...</p>
 					}
 					{distributedAlbum &&
-						<button type='button' onSubmit={handleCartCreation}>Create New Cartridge</button>
+						<button type='button' onClick={handleCartCreation}>Create New Cartridge</button>
 					}
 				</div>
 			</grid>
