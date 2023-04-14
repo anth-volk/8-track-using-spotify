@@ -150,6 +150,14 @@ app.route('/api/v1/user_auth/signup')
 
 	})
 
+app.route('/api/v1/protected/library/create_cart')
+	// Route to create new cartridge within user's library
+	.post(async (req, res) => {
+
+		
+
+	})
+
 /* (Likely) Inactive route
 app.route('/api/v1/protected/user_auth/verify_spotify')
 	// POST requests will pull server-side data about user
