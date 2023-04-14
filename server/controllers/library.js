@@ -23,9 +23,6 @@ async function createCartridge(req) {
 		const userId = req.user.userId;
 		const cartridge = req.body;
 
-		// TESTING
-		console.log(cartridge);
-
 		let programIdArr = [];
 
 		const result = await sequelize.transaction(async (t) => {
@@ -69,7 +66,6 @@ async function createCartridge(req) {
 			return resultCart;
 		})
 
-		console.log(result);
 		return result;
 	}
 	catch (err) {

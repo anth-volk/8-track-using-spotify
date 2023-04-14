@@ -97,8 +97,6 @@ export default function Login() {
 		// Validate form
 		const isFormValid = handleValidation();
 
-		console.log('isFormValid: ', isFormValid);
-
 		// If the form is valid...
 		if (isFormValid) {
 
@@ -118,8 +116,6 @@ export default function Login() {
 			// If signup is successful per returned JSON object...
 			if (resJSON.connection_status === 'success' && resJSON.data_status === 'user_exists') {
 
-				// TESTING
-				console.log(resJSON);
 				setUserToken(resJSON.user_token);
 
 				// Clear any existing timeout

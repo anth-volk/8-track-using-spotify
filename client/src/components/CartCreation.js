@@ -1,18 +1,28 @@
 // External imports
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
-import { finalizeAlbum, finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
+import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
 
 export default function CartCreation(props) {
 
 	const [albumSearchParam, setAlbumSearchParam] = useState('');
 	const [albumResultObject, setAlbumResultObject] = useState(null);
 	const [clickedAlbum, setClickedAlbum] = useState(null);
-	const [distributedAlbum, setDistributedAlbum] = useState(null);
+	const [programmedAlbum, setProgrammedAlbum] = useState(null);
+	const [cartridgeCreationMessage, setCartridgeCreationMessage] = useState('');
 
 	const [cookies, setCookie, removeCookie] = useCookies();
+
+	const timerRef = useRef(null);
+
+	function resetStateExceptCreationMessage() {
+		setAlbumSearchParam('');
+		setAlbumResultObject(null);
+		setClickedAlbum(null);
+		setProgrammedAlbum(null);
+	}
 
 	function handleSearchValueUpdate(event) {
 		setAlbumSearchParam(event.target.value);
@@ -53,7 +63,9 @@ export default function CartCreation(props) {
 
 	async function handleCartCreation() {
 
-		console.log('Accessing handleCartCreation');
+		const ERROR_MESSAGE = 'There was an error while trying to create your cartridge. Please try again.';
+		const SUCCESS_MESSAGE = 'Your cartridge was successfully added to your library!';
+
 		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/create_cart', {
 			method: 'POST',
 			headers: {
@@ -61,17 +73,27 @@ export default function CartCreation(props) {
 				'CORS': 'Access-Control-Allow-Origin',
 				'Authorization': 'JWT ' + cookies.userAuth
 			},
-			body: JSON.stringify(distributedAlbum)
+			body: JSON.stringify(programmedAlbum)
 		});
 
-		console.log(responseObjectRaw);
-		
-		if (responseObjectRaw.ok) {
+		const responseObjectJSON = await responseObjectRaw.json();
 
-			const responseObjectJSON = await responseObjectRaw.json();
-			console.log(responseObjectJSON);
+		if (responseObjectJSON.connection_status === 'success' && responseObjectJSON.created_cartridge) {
+			setCartridgeCreationMessage(SUCCESS_MESSAGE);
+			resetStateExceptCreationMessage();
 
 		}
+		else {
+			setCartridgeCreationMessage(ERROR_MESSAGE);
+		}
+
+		// Clear any existing timeout
+		clearTimeout(timerRef.current);
+
+		// Wait 3 seconds, then reset cartridge creation message
+		timerRef.current = setTimeout(() => {
+			setCartridgeCreationMessage('');
+		}, 2000);
 
 	}
 
@@ -89,12 +111,15 @@ export default function CartCreation(props) {
 				artists: albumArtists,
 				programs: albumTracksDistributed
 			};
-			console.log(finalizedAlbum);
-
-			setDistributedAlbum(finalizedAlbum);
+			setProgrammedAlbum(finalizedAlbum);
 		}
 
 	}, [clickedAlbum]);
+
+	// Clear any existing timeouts upon re-render
+	useEffect(() => {
+		return () => clearTimeout(timerRef.current);
+	}, [])
 
 	return(
 		<Fragment>
@@ -128,12 +153,13 @@ export default function CartCreation(props) {
 							</Fragment>
 						}
 					</div>
-					{clickedAlbum && !distributedAlbum &&
+					{clickedAlbum && !programmedAlbum &&
 						<p>Loading...</p>
 					}
-					{distributedAlbum &&
+					{programmedAlbum &&
 						<button type='button' onClick={handleCartCreation}>Create New Cartridge</button>
 					}
+					<p>{cartridgeCreationMessage}</p>
 				</div>
 			</grid>
 		</Fragment>

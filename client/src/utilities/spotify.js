@@ -24,7 +24,6 @@ export function finalizeTracks(trackArray) {
 	// Calculate intra-track fade times for each program
 	const programArrayFadeTimes = addFadeTimes(programArraySorted);
 
-	console.log(programArrayFadeTimes);
 	return programArrayFadeTimes;
 }
 
