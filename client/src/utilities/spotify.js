@@ -59,7 +59,7 @@ function addFadeTimes(programArraySorted)  {
 		return ({
 			...program,
 			intra_track_fade: fadeLength,
-			program_length: longestProgram
+			program_length_ms: longestProgram
 		});
 
 		/*

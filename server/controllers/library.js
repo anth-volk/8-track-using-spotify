@@ -49,7 +49,6 @@ async function createCartridge(req) {
 						program_id: programId,
 						program_position: index,
 						track_name: track.name,
-						artists_array: track.artists,
 						duration_ms: track.duration_ms
 					}, { transaction: t });
 
@@ -60,14 +59,18 @@ async function createCartridge(req) {
 				cart_id: crypto.randomUUID(),
 				user_id: userId,
 				cart_name: cartridge.name,
+				artists_array: cartridge.artists,
 				program1_id: programIdArr[0],
 				program2_id: programIdArr[1],
 				program3_id: programIdArr[2],
 				program4_id: programIdArr[3]
 			}, { transaction: t });
+
+			return resultCart;
 		})
 
-		return resultCart;
+		console.log(result);
+		return result;
 	}
 	catch (err) {
 		console.error('Error while inputting new cartridge into database: ', err);

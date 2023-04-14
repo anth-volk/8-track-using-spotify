@@ -30,7 +30,6 @@ module.exports = (sequelize) => {
 	},
 	program_position: DataTypes.BIGINT,
     track_name: DataTypes.STRING,
-    artists_array: DataTypes.ARRAY(DataTypes.STRING),
 	duration_ms: DataTypes.BIGINT
   }, {
     sequelize,

@@ -70,6 +70,7 @@ module.exports = (sequelize) => {
 			key: 'program_id'
 		}
 	},
+    artists_array: DataTypes.ARRAY(DataTypes.STRING)
   }, {
     sequelize,
     modelName: 'Cart',
