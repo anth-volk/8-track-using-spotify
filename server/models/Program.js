@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 		allowNull: false
 	},
 	program_length_ms: DataTypes.BIGINT,
+	intra_track_fade_length_ms: DataTypes.BIGINT
   }, {
     sequelize,
     modelName: 'Program',

@@ -28,10 +28,10 @@ module.exports = (sequelize, DataTypes) => {
 		type: DataTypes.UUID,
 		allowNull: false
 	},
+	program_position: DataTypes.BIGINT,
     track_name: DataTypes.STRING,
     artists_array: DataTypes.ARRAY(DataTypes.STRING),
-	start_time_ms: DataTypes.BIGINT,
-	end_time_ms: DataTypes.BIGINT
+	duration_ms: DataTypes.BIGINT
   }, {
     sequelize,
     modelName: 'Track',
