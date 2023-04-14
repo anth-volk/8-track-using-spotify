@@ -5,8 +5,6 @@
  * @returns {Object}
  */
 export function finalizeTracks(trackArray) {
-	// Define result object of four programs with flexible number of tracks
-
 
 	// Sort tracks into an array of objects based on length
 	const sortedTrackArray = sortTracksByDuration(trackArray);
@@ -15,7 +13,7 @@ export function finalizeTracks(trackArray) {
 	// over the trackArray and adding length to a sum var
 	const idealTime = calculateIdealTime(sortedTrackArray);
 
-	// Recursively take the longest and assign it either to the
+	// In a loop, take the longest and assign it either to the
 	// first program lacking a track, or if each has one, the one
 	// most deviated from ideal program time
 	const programArray = distributeTracksToPrograms(sortedTrackArray, idealTime);
@@ -23,19 +21,16 @@ export function finalizeTracks(trackArray) {
 	// Reorder tracks in place based on track number
 	const programArraySorted = sortRoughResultArray(programArray);
 
-	// Calculate start and end times of each track
-	const programArrayTimestamped = addTimestamps(programArraySorted);
+	// Calculate intra-track fade times for each program
+	const programArrayFadeTimes = addFadeTimes(programArraySorted);
 
-	return programArrayTimestamped;
+	console.log(programArrayFadeTimes);
+	return programArrayFadeTimes;
 }
 
-function addTimestamps(programArraySorted)  {
+function addFadeTimes(programArraySorted)  {
 
-	// Iterate over programs and determine which is longest;
-	// save value as longestProgram; add 4000 for fade-in and fade-out
-	const FADE_IN_MS = 2000;
-	const FADE_OUT_MS = 2000;
-
+	// Iterate over programs and determine which is longest
 	const programLengthArray = programArraySorted.reduce( (accuArr, program) => {
 		return accuArr.concat(program.program_length);
 	}, []);
@@ -52,6 +47,15 @@ function addTimestamps(programArraySorted)  {
 		// to determine between-track fade length
 		const fadeLength = Math.round(programLengthDeficit / (program.tracks.length - 1));
 
+		// Add fade length, as well as total length (equal to 
+		// the length of the longest program) to the program object
+		return ({
+			...program,
+			intra_track_fade: fadeLength,
+			program_length: longestProgram
+		});
+
+		/*
 		// Accumulated time starts with fade-in length
 		let accumulatedTime = FADE_IN_MS;
 
@@ -80,6 +84,7 @@ function addTimestamps(programArraySorted)  {
 			...program,
 			tracks: tracksWithTimes
 		});
+		*/
 	})
 }
 
