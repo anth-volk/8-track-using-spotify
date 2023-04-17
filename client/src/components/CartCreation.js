@@ -30,7 +30,7 @@ export default function CartCreation(props) {
 
 	async function handleSearchSubmission() {
 
-		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify/search_album?album=' + albumSearchParam, {
+		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify_api/search_album?album=' + albumSearchParam, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default function CartCreation(props) {
 
 	async function handleAlbumClick(index) {
 
-		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify/get_album?album_id=' + albumResultObject[index].id, {
+		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify_api/get_album?album_id=' + albumResultObject[index].id, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
