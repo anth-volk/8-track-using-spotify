@@ -16,7 +16,7 @@ const Program = require('../models/Program')(sequelize);
 const Cart = require('../models/Cart')(sequelize);
 const Track = require('../models/Track')(sequelize);
 
-async function createCartridge(req) {
+async function postCartridge(req, res) {
 
 	try {
 
@@ -66,13 +66,24 @@ async function createCartridge(req) {
 			return resultCart;
 		})
 
-		return result;
+		return res
+			.status(201)
+			.json({
+				connection_status: 'success',
+				created_cartridge: result
+			});
 	}
 	catch (err) {
 		console.error('Error while inputting new cartridge into database: ', err);
-	}
+		return res
+			.status(500)
+			.json({
+				connection_status: 'failure',
+				error_message: err
+			});
+		}
 }
 
 module.exports = {
-	createCartridge
+	postCartridge
 };

@@ -42,40 +42,7 @@ async function hashPassword(password) {
 	
 }
 
-// Based on tutorial at https://buddy.works/tutorials/securing-node-and-express-restful-api-with-json-web-token#updating-todo-api-folder-structure
-/**
- * Middleware for verifying JSON web tokens
- */
-function verifyJWT(req, res, next) {
-
-	try {
-
-		if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
-
-			const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET);
-
-			req.user = decodedData;
-		}
-
-		next();
-
-	} catch (err) {
-
-		console.error('Error while authenticating JWT: ', err);
-		req.user = undefined;
-		res.status(401).json({
-			message: 'User not found or token is expired'
-		});
-
-	}
-}
-
-/**
- * Function for creating user by adding them to underlying SQL database (via Sequelize)
- * @param {Object} req The HTTP request body
- * @returns {Object} Returns an object with data about the success or failure of the user creation
- */
-async function createUser(req) {
+async function createUser(req, res) {
 
 	try {
 		const passwordHash = await hashPassword(req.body.password);
@@ -88,32 +55,36 @@ async function createUser(req) {
 			last_name: req.body.lname
 		});
 
-		return ({
-			status: 'success'
-		});
-
+		return res
+			.status(201)
+			.json({
+				status: 'success',
+				user: newUser
+			});
 
 	} catch (err) {
 		console.error(`Error while trying to create new user: ${err}`);
-		return ({
-			status: 'failure',
-			error: err
-		});
-
+		return res
+			.status(500)
+			.json({
+				status: 'failure',
+				error: err
+			});
 	}
-
 }
 
-/**
- * Function for verifying a user's account
- * @param {Object} req The HTTP request body
- * @returns {(JsonWebKey|null)} Returns either a JSON web token, or null if the user could not be found
- */
-async function verifyUser(req) {
+async function verifyUser(req, res) {
+
+	// Define a user object prototype for emission,
+	// as well as default values for its key-value pairs
+	let userObjectToEmit = {};
+	let connectionStatus = 'failure';
+	let dataStatus = null;
+	let userToken = null;
+	let httpCode = null;
 
 	const submittedEmail = req.body.email;
 	const submittedPassword = req.body.password;
-	let userId = null;
 
 	try {
 
@@ -133,64 +104,60 @@ async function verifyUser(req) {
 					userId: userQuery.dataValues.user_id
 				}
 
-				return jwt.sign(
+				userToken = jwt.sign(
 					userObject, 
 					process.env.JWT_SECRET,
 					{
 						expiresIn: 60 * 60 * 24 * 14
 					});
 
+
+				// Update connection status after successful querying
+				connectionStatus = 'success';
+
+				// If login successful, set JSON object key-values
+				if (userToken) {
+					// Update data status
+					dataStatus = 'user_exists';
+					httpCode = 200;
+				} 
+				else {
+					// Otherwise, add detail to emitted object indicating that user doesn't exist
+					dataStatus = 'user_not_found';
+					httpCode = 401;
+				}
+
+				userObjectToEmit = {
+					connection_status: connectionStatus,
+					data_status: dataStatus,
+					user_token: userToken
+				};
+
+				return res.status(httpCode).json(userObjectToEmit);
 			}
-
 		} 
+		return res
+			.status(404)
+			.json({
+				connection_status: 'success',
+				error_message: 'No user found containing provided credentials'
+			})
 
-		return null;
 		
 	} catch (err) {
-
-		throw new Error(`Error while verifying user: ${err}`);
+		console.error('Error while trying to verify user within database: ', err);
+		return res
+			.status(500)
+			.json({
+				connection_status: 'failure',
+				error_message: err
+			});
 
 	} 
 
 }
 
-async function verifyUserSpotifyData(userData) {
-
-	// Pull user ID from passed data
-	const { userId } = userData;
-
-	// Query DB for Spotify user data
-	try {
-		const userSpotifyQuery = await User.findOne({
-			where: {
-				user_id: userId
-			}
-		});
-
-		if (userSpotifyQuery) {
-
-			const returnedData = userSpotifyQuery.dataValues;
-
-			return ({
-				user_id: returnedData.user_id,
-				spotify_access_token: returnedData.spotify_access_token,
-				spotify_access_token_updatedAt: returnedData.spotify_access_token_updatedAt,
-				spotify_access_token_age: returnedData.spotify_access_token_age,
-				spotify_refresh_token: returnedData.spotify_refresh_token
-			});
-		} 
-		
-		return null;
-
-	}
-	catch (err) {
-		console.error('Error while querying database for user Spotify data: ', err);
-	}
-}
-
 module.exports = {
 	createUser,
-	verifyJWT,
 	verifyUser,
-	verifyUserSpotifyData
 }
