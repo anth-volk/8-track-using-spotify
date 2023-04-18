@@ -37,16 +37,9 @@ async function spotifyAuthCallback(req, res) {
 	const code = req.query.code || null;
 	const state = req.query.state || null;
 
-	console.log(code);
-	console.log(state);
-	console.log('Entered spotifyAuthCallback');
-
-	console.log(req.query);
-
 	// If state is null
 	// TODO: Create better handler for this case
 	if (state === null || req.cookies.spotify_state !== state || req.query.error) {
-		console.log('Entering error route 1');
 		res.redirect('/error');
 	} 
 	else {
@@ -58,8 +51,6 @@ async function spotifyAuthCallback(req, res) {
 			'grant_type': 'authorization_code'
 		}
 
-		console.log(spotifyAuthBody);
-
 		// Manually construct form body
 		// TODO: convert this into async utility function
 		let formBody = Object.keys(spotifyAuthBody)
@@ -67,8 +58,6 @@ async function spotifyAuthCallback(req, res) {
 				return accu.concat(encodeURIComponent(key) + '=' + encodeURIComponent(spotifyAuthBody[key]));
 			}, [])
 			.join('&');
-
-		console.log(formBody);
 
 		// Using form body, fetch Spotify API token
 		const spotifyRequestRaw = await fetch(
@@ -83,12 +72,8 @@ async function spotifyAuthCallback(req, res) {
 			}
 		);
 
-		console.log(spotifyRequestRaw);
-
 		// If token is successfully requested...
 		if (spotifyRequestRaw.ok) {
-
-			console.log('spotifyRequestRaw ok');
 
 			// Convert raw request data to JSON
 			const spotifyRequestJSON = await spotifyRequestRaw.json();

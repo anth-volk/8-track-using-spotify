@@ -12,9 +12,7 @@ const sequelize = new Sequelize(
 	}
 );
 
-const Program = require('../models/Program')(sequelize);
-const Cart = require('../models/Cart')(sequelize);
-const Track = require('../models/Track')(sequelize);
+const { Program, Cart, Track } = require('../models');
 
 async function getLibrary(req, res) {
 
@@ -32,14 +30,116 @@ async function getLibrary(req, res) {
 					exclude: [
 						'user_id',
 						'createdAt',
-						'updatedAt'
+						'updatedAt',
+						'program1_id',
+						'program2_id',
+						'program3_id',
+						'program4_id'
 					]
 				},
-				group: 'createdAt',
-				include: Program
+				order: [
+					'createdAt'
+				],
+				include: [
+					{
+						model: Program,
+						as: 'program1',
+						attributes: {
+							exclude: [
+								'program_id',
+								'createdAt',
+								'updatedAt'
+							]
+						},
+						include: [
+							{
+								model: Track,
+								attributes: {
+									exclude: [
+										'track_id',
+										'program_id',
+										'createdAt',
+										'updatedAt'
+									]
+								}
+							}
+						],
+					},
+					{
+						model: Program,
+						as: 'program2',
+						attributes: {
+							exclude: [
+								'program_id',
+								'createdAt',
+								'updatedAt'
+							]
+						},
+						include: [
+							{
+								model: Track,
+								attributes: {
+									exclude: [
+										'track_id',
+										'program_id',
+										'createdAt',
+										'updatedAt'
+									]
+								}
+							}
+						],
+					},
+					{
+						model: Program,
+						as: 'program3',
+						attributes: {
+							exclude: [
+								'program_id',
+								'createdAt',
+								'updatedAt'
+							]
+						},
+						include: [
+							{
+								model: Track,
+								attributes: {
+									exclude: [
+										'track_id',
+										'program_id',
+										'createdAt',
+										'updatedAt'
+									]
+								}
+							}
+						],
+					},
+					{
+						model: Program,
+						as: 'program4',
+						attributes: {
+							exclude: [
+								'program_id',
+								'createdAt',
+								'updatedAt'
+							]
+						},
+						include: [
+							{
+								model: Track,
+								attributes: {
+									exclude: [
+										'track_id',
+										'program_id',
+										'createdAt',
+										'updatedAt'
+									]
+								}
+							}
+						],
+					}
+				]
 			});
 
-			console.log(resultLibrary);
 			return resultLibrary;
 
 		})

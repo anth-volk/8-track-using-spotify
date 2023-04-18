@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
 		dialect: 'postgres'
 	}
 );
-const User = require('../models/User')(sequelize);
+const { User } = require('../models');
 
 // bcrypt configuration
 const SALT_ROUNDS = 10;

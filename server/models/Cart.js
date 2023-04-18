@@ -11,8 +11,39 @@ module.exports = (sequelize) => {
      */
     static associate(models) {
       // define association here
-	  Cart.hasMany(Program);
-	  Cart.belongsTo(User);
+	  this.hasOne(models.Program, {
+		as: 'program1',
+		sourceKey: 'program1_id',
+		foreignKey: 'program_id'
+	  });
+	  this.hasOne(models.Program, {
+		as: 'program2',
+		sourceKey: 'program2_id',
+		foreignKey: 'program_id'
+	  });
+	  this.hasOne(models.Program, {
+		as: 'program3',
+		sourceKey: 'program3_id',
+		foreignKey: 'program_id'
+	  });
+	  this.hasOne(models.Program, {
+		as: 'program4',
+		sourceKey: 'program4_id',
+		foreignKey: 'program_id'
+	  });
+	  /*
+	  this.hasOne(models.Program, {
+		as: 'program1',
+		foreignKey: 'program_id'
+	  });
+	  this.hasOne(models.Program, {
+		as: 'program2',
+		foreignKey: 'program_id'
+	  });
+	  this.belongsTo(models.User, {
+		foreignKey: 'user_id'
+	  });
+	  */
 	  
     }
   }
