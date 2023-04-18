@@ -16,6 +16,53 @@ const Program = require('../models/Program')(sequelize);
 const Cart = require('../models/Cart')(sequelize);
 const Track = require('../models/Track')(sequelize);
 
+async function getLibrary(req, res) {
+
+	try {
+
+		const userId = req.user.userId;
+
+		const result = await sequelize.transaction(async (t) => {
+
+			const resultLibrary = await Cart.findAll({
+				where: {
+					user_id: userId
+				},
+				attributes: {
+					exclude: [
+						'user_id',
+						'createdAt',
+						'updatedAt'
+					]
+				},
+				group: 'createdAt',
+				include: Program
+			});
+
+			console.log(resultLibrary);
+			return resultLibrary;
+
+		})
+
+		return res
+			.status(200)
+			.json({
+				connection_status: 'success',
+				library: result
+			});
+
+	}
+	catch (err) {
+		console.error('Error while fetching user cart library: ', err);
+		return res
+			.status(500)
+			.json({
+				connection_status: 'failure',
+				error_message: err
+			});
+	}
+}
+
 async function postCartridge(req, res) {
 
 	try {
@@ -85,5 +132,6 @@ async function postCartridge(req, res) {
 }
 
 module.exports = {
+	getLibrary,
 	postCartridge
 };

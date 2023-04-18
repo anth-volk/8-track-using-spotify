@@ -41,6 +41,7 @@ function verifyJWT(req, res, next) {
 			const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET);
 
 			req.user = decodedData;
+			console.log(req.user);
 		}
 
 		next();
