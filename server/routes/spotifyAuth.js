@@ -1,5 +1,9 @@
+// External imports
 const express = require('express');
 const router = express.Router();
+
+// Internal imports
+const { spotifyAuth, spotifyAuthCallback } = require('../controllers/spotifyAuth.js');
 
 router.route('/')
 	// GET requests send users to first step in Spotify authorization

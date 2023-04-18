@@ -4,10 +4,7 @@ require('dotenv').config();
 // Other package imports
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const querystring = require('querystring');
-const fetch = require('node-fetch');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 
 // Local imports
 const { spotifyAuthHeaders, verifyJWT } = require('./customMiddleware.js');
@@ -43,6 +40,11 @@ const sequelize = new Sequelize(
 	}
 );
 
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use('/api/v1/protected', verifyJWT);
+app.use('/api/v1/spotify_api', spotifyAuthHeaders);
 
 // Routes
 app.use('/api/v1/user_auth', userAuthRoutes);
@@ -50,12 +52,6 @@ app.use('/api/v1/spotify_auth', spotifyAuthRoutes);
 app.use('/api/v1/spotify_api', spotifyAPIRoutes);
 app.use('/api/v1/protected/library', libraryRoutes);
 app.use('*', errorRoutes);
-
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use('/api/v1/protected', verifyJWT);
-app.use('/api/v1/spotify', spotifyAuthHeaders);
 
 app.listen(port, (err) => {
 	if (err) {

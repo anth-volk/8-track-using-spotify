@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 /**
  * Middleware for ensuring that Spotify Bearer token is included in requests
  */

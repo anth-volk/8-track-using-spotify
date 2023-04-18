@@ -1,3 +1,8 @@
+// External imports
+require('dotenv').config();
+const querystring = require('querystring');
+const fetch = require('node-fetch');
+
 // Spotify auth setup
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -19,9 +24,9 @@ function spotifyAuth(req, res) {
 	res.redirect('https://accounts.spotify.com/authorize?' +
 		querystring.stringify({
 			response_type: 'code',
-			CLIENT_ID: CLIENT_ID,
+			client_id: CLIENT_ID,
 			scope: scope,
-			REDIRECT_URI: REDIRECT_URI,
+			redirect_uri: REDIRECT_URI,
 			state: state
 		}));
 }
@@ -32,9 +37,16 @@ async function spotifyAuthCallback(req, res) {
 	const code = req.query.code || null;
 	const state = req.query.state || null;
 
+	console.log(code);
+	console.log(state);
+	console.log('Entered spotifyAuthCallback');
+
+	console.log(req.query);
+
 	// If state is null
 	// TODO: Create better handler for this case
 	if (state === null || req.cookies.spotify_state !== state || req.query.error) {
+		console.log('Entering error route 1');
 		res.redirect('/error');
 	} 
 	else {
@@ -42,9 +54,11 @@ async function spotifyAuthCallback(req, res) {
 		// Store relevant form options in object
 		const spotifyAuthBody = {
 			'code': code,
-			'REDIRECT_URI': REDIRECT_URI,
+			'redirect_uri': REDIRECT_URI,
 			'grant_type': 'authorization_code'
 		}
+
+		console.log(spotifyAuthBody);
 
 		// Manually construct form body
 		// TODO: convert this into async utility function
@@ -54,6 +68,8 @@ async function spotifyAuthCallback(req, res) {
 			}, [])
 			.join('&');
 
+		console.log(formBody);
+
 		// Using form body, fetch Spotify API token
 		const spotifyRequestRaw = await fetch(
 			'https://accounts.spotify.com/api/token',
@@ -61,14 +77,18 @@ async function spotifyAuthCallback(req, res) {
 				method: 'POST',
 				headers: {
 					'Authorization': 'Basic ' + (new Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
-					'Content-Type': 'router.ication/x-www-form-urlencoded;charset=UTF-8'
+					'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
 				},
 				body: formBody
 			}
 		);
 
+		console.log(spotifyRequestRaw);
+
 		// If token is successfully requested...
 		if (spotifyRequestRaw.ok) {
+
+			console.log('spotifyRequestRaw ok');
 
 			// Convert raw request data to JSON
 			const spotifyRequestJSON = await spotifyRequestRaw.json();

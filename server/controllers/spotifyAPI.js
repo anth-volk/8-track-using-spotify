@@ -1,4 +1,6 @@
 
+const fetch = require('node-fetch');
+
 async function getAlbum(req, res) {
 
 	const albumId = req.query.album_id;

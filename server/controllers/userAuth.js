@@ -17,11 +17,10 @@ const sequelize = new Sequelize(
 		dialect: 'postgres'
 	}
 );
+const User = require('../models/User')(sequelize);
 
 // bcrypt configuration
 const SALT_ROUNDS = 10;
-
-const User = require('../models/User')(sequelize);
 
 /**
  * Function for creating password hashes using bcrypt
