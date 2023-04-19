@@ -3,11 +3,15 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
+// Internal imports
+import CartPlayer from './CartPlayer.js';
+
 export default function CartLibrary(props) {
 
 	// Note: userAuth and userSpotifyAuth stored in props
 	const [userLibrary, setUserLibrary] = useState(null);
 	const [userLibraryView, setUserLibraryView] = useState(null);
+	const [activeCart, setActiveCart] = useState(null);
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -15,8 +19,8 @@ export default function CartLibrary(props) {
 		return;
 	}
 
-	function handleCartridgePlay(cart_id) {
-		console.log(cart_id);
+	function handleCartridgeSelection(cart) {
+		setActiveCart(cart);
 	}
 
 	useEffect(() => {
@@ -42,16 +46,14 @@ export default function CartLibrary(props) {
 	useEffect(() => {
 
 		if (userLibrary) {
-			console.log(userLibrary);
 			const userLibraryIterated = userLibrary.map( (album) => {
 				return (
-					<div className="CartLibrary_album" key={album.cart_id} onClick={ (e) => {handleCartridgePlay(album.cart_id)}}>
+					<div className="CartLibrary_album" key={album.cart_id} onClick={ (e) => {handleCartridgeSelection(album)}}>
 						<p className="CartLibrary_album_title">{album.cart_name}</p>
 						<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
 					</div>
 				);
 			})
-			console.log(userLibraryIterated);
 			setUserLibraryView(userLibraryIterated);
 		}
 
@@ -62,9 +64,7 @@ export default function CartLibrary(props) {
 			<h1>Cart Library Placeholder</h1>
 			<section className="CartLibrary_playerContainer">
 				{/*Drawing of 8-track player*/}
-				<svg>
-					<g className="CartLibrary_player"></g>
-				</svg>
+				<CartPlayer activeCart={activeCart} />
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
 				<svg>
 					<g className="CartLibrary_controls"></g>
