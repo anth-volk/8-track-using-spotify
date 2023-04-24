@@ -54,6 +54,7 @@ async function getLibrary(req, res) {
 						include: [
 							{
 								model: Track,
+								as: 'tracks',
 								attributes: {
 									exclude: [
 										'track_id',
@@ -78,6 +79,7 @@ async function getLibrary(req, res) {
 						include: [
 							{
 								model: Track,
+								as: 'tracks',
 								attributes: {
 									exclude: [
 										'track_id',
@@ -102,6 +104,7 @@ async function getLibrary(req, res) {
 						include: [
 							{
 								model: Track,
+								as: 'tracks',
 								attributes: {
 									exclude: [
 										'track_id',
@@ -126,6 +129,7 @@ async function getLibrary(req, res) {
 						include: [
 							{
 								model: Track,
+								as: 'tracks',
 								attributes: {
 									exclude: [
 										'track_id',

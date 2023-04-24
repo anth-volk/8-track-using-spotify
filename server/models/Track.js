@@ -12,7 +12,8 @@ module.exports = (sequelize) => {
     static associate(models) {
       // define association here
 	  this.belongsTo(models.Program, {
-		foreignKey: 'program_id'
+		foreignKey: 'program_id',
+		as: 'tracks'
 	  });
     }
   }
