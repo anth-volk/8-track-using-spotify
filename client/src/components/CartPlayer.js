@@ -54,37 +54,6 @@ export default function CartPlayer(props) {
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
 	const activeTracks = useRef(activeTracksArray);
-		/*
-		([
-		{
-			audio: effects.FADE_IN,
-			type: EFFECT,
-			end_timestamp: FADE_IN_LENGTH_MS,
-			next_spotify_track_index: activeCart ? 0 : null,
-			intra_track_fade_length: activeCart ? activeCart.program1.intra_track_fade_length : null
-		},
-		{
-			audio: effects.FADE_IN,
-			type: EFFECT,
-			end_timestamp: FADE_IN_LENGTH_MS,
-			next_spotify_track_index: activeCart ? 0 : null,
-			intra_track_fade_length: activeCart ? activeCart.program2.intra_track_fade_length : null
-		},
-		{
-			audio: effects.FADE_IN,
-			type: EFFECT,
-			end_timestamp: FADE_IN_LENGTH_MS,
-			next_spotify_track_index: activeCart ? 0 : null,
-			intra_track_fade_length: activeCart ? activeCart.program3.intra_track_fade_length : null
-		},
-		{
-			audio: effects.FADE_IN,
-			type: EFFECT,
-			end_timestamp: FADE_IN_LENGTH_MS,
-			next_spotify_track_index: activeCart ? 0 : null,
-			intra_track_fade_length: activeCart ? activeCart.program4.intra_track_fade_length : null
-		}
-	]);*/
 
 	function handleCartridgePlay() {
 		console.log(activeCart);
@@ -104,6 +73,19 @@ export default function CartPlayer(props) {
 
 			console.log('Cart playing');
 
+			activeTracks.current = activeTracks.current.map( (program, index) => {
+				const programNumber = 'program'.concat(index + 1);
+				if (!program.intra_track_fade_length_ms) {
+					return ({
+						...program,
+						intra_track_fade_length_ms: parseInt(activeCart[programNumber].intra_track_fade_length_ms)
+					})
+				}
+				else {
+					return program;
+				}
+			});
+
 			intervalRef.current = setInterval(() => {
 				//Every second, map over everything (at end of setInterval)
 				console.log('Active time:');
@@ -117,31 +99,6 @@ export default function CartPlayer(props) {
 					activeTime.current = 0;
 					activeTracks.current = activeTracksArray;
 					
-					/*
-					[
-						{
-							audio: effects.FADE_IN,
-							type: EFFECT,
-							end_timestamp: FADE_IN_LENGTH_MS,
-							next_spotify_track_index: 0,
-
-						},
-						{
-							audio: effects.FADE_IN,
-							type: EFFECT,
-							end_timestamp: FADE_IN_LENGTH_MS
-						},
-						{
-							audio: effects.FADE_IN,
-							type: EFFECT,
-							end_timestamp: FADE_IN_LENGTH_MS
-						},
-						{
-							audio: effects.FADE_IN,
-							type: EFFECT,
-							end_timestamp: FADE_IN_LENGTH_MS
-						}
-					];*/
 				}
 				// If we've reached the end of the fade-out, set all
 				// to player arm audio
@@ -218,34 +175,6 @@ export default function CartPlayer(props) {
 				activeTime.current = activeTime.current + 1;
 			}, 1);
 
-			/*
-			else {
-
-				// Set the four "active" tracks for each program 
-				// based on intervalRef.current
-				activeTracks.current.map( (program) => {
-					if (activeTime.current === program.end_timestamp) {
-						// If we've reached the end of the program (minus transition),
-						// set all programs to the selector arm noise
-
-						// If it's a Spotify track and there is inter-track fade time,
-						// change to that
-
-						// If it's a Spotify track and there's no fade time, or it's an
-						// effect, switch to that
-
-						// If 
-
-
-
-					}
-				})
-
-				intervalRef.current = setInterval(() => {
-					activeTime.current = activeTime.current + 1;
-				}, 1);
-			}
-			*/
 		}
 		else {
 			console.log('Cart not playing');
