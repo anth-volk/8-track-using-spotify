@@ -1,12 +1,10 @@
 // External imports
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { useCookies } from 'react-cookie';
 
 export default function CartPlayer(props) {
 
 	const activeCart = props.activeCart || null;
-
-	console.log('Active cart:');
-	console.log(activeCart);
 
 	const NUMBER_OF_PROGRAMS = 4;
 
@@ -34,7 +32,6 @@ export default function CartPlayer(props) {
 	const activeTracksArray = new Array(NUMBER_OF_PROGRAMS);
 	for (let i = 0; i < activeTracksArray.length; i++) {
 		const programNumber = 'program'.concat(i + 1);
-		console.log(programNumber);
 
 		activeTracksArray[i] = 	{
 			audio: effects.FADE_IN,
@@ -45,18 +42,36 @@ export default function CartPlayer(props) {
 		}
 	}
 
-	console.log('Active track array:');
-	console.log(activeTracksArray);
-
 	const [isCartPlaying, setIsCartPlaying] = useState(false);
 	const [activeProgram, setActiveProgram] = useState(1);
+
+	const track = {
+		name: "",
+		album: {
+			images: [
+				{ url: "" }
+			]
+		},
+		artists: [
+			{ name: "" }
+		]
+	}
+
+	const [player, setPlayer] = useState(null);
+	const [isPaused, setIsPaused] = useState(false);
+	const [isPlaybackActive, setIsPlaybackActive] = useState(false);
+	const [currentTrack, setCurrentTrack] = useState(track);
+	const [deviceId, setDeviceId] = useState(null);
+
+	const [cookies, setCookie, removeCookie] = useCookies();
+
+	const spotifyAccessToken = cookies.userSpotifyAuth.access_token;
 
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
 	const activeTracks = useRef(activeTracksArray);
 
 	function handleCartridgePlay() {
-		console.log(activeCart);
 		setIsCartPlaying(true);
 	}
 
@@ -70,8 +85,6 @@ export default function CartPlayer(props) {
 		clearInterval(intervalRef.current);
 
 		if (isCartPlaying) {
-
-			console.log('Cart playing');
 
 			activeTracks.current = activeTracks.current.map( (program, index) => {
 				const programNumber = 'program'.concat(index + 1);
@@ -88,14 +101,10 @@ export default function CartPlayer(props) {
 
 			intervalRef.current = setInterval(() => {
 				//Every second, map over everything (at end of setInterval)
-				console.log('Active time:');
-				console.log(activeTime.current);
-				console.log('Active tracks:');
-				console.log(activeTracks.current);
+
 				// If activeTime.current reached program length
 				// (including program selector sound), reset all
 				if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS + FADE_OUT_LENGTH_MS + PROGRAM_SELECTOR_LENGTH_MS) {
-					console.log('Routine 0');
 					activeTime.current = 0;
 					activeTracks.current = activeTracksArray;
 					
@@ -103,7 +112,6 @@ export default function CartPlayer(props) {
 				// If we've reached the end of the fade-out, set all
 				// to player arm audio
 				else if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS + FADE_OUT_LENGTH_MS) {
-					console.log('Routine 1');
 					activeTracks.current = activeTracks.current.map( (program) => {
 						return ({
 							...program,
@@ -116,7 +124,6 @@ export default function CartPlayer(props) {
 				// If we've reached the last-track timestamp, set all 
 				// to fade-out audio
 				else if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS) {
-					console.log('Routine 2');
 					activeTracks.current = activeTracks.current.map( (program) => {
 						return ({
 							...program,
@@ -129,16 +136,13 @@ export default function CartPlayer(props) {
 				// Otherwise...
 				else {
 
-					console.log('Routine 3');
 					// Map over all tracks
 					activeTracks.current = activeTracks.current.map ( (program, index) => {
 						const programNumber = 'program'.concat(index + 1);
 						// If activeTime.current === program.end_timestamp for any...
 						if (activeTime.current === program.end_timestamp) {
-							console.log('Routine 3a');
 							// If that track is of type Spotify song and there's an inter-track fade length, switch to that
 							if (program.type === SPOTIFY_TRACK && program.intra_track_fade_length_ms > 0) {
-								console.log('Routine 3a1');
 								return ({
 									...program,
 									audio: effects.INTRA_TRACK_FADE,
@@ -148,7 +152,6 @@ export default function CartPlayer(props) {
 							}
 							// Otherwise...
 							else {
-								console.log('Routine 3a2');
 								// Switch to next Spotify track	
 								// Load track using Spotify ID
 								return ({
@@ -169,15 +172,9 @@ export default function CartPlayer(props) {
 					})
 				}
 
-				console.log('activeTracks.current at end of routine:');
-				console.log(activeTracks.current);
-
 				activeTime.current = activeTime.current + 1;
 			}, 1);
 
-		}
-		else {
-			console.log('Cart not playing');
 		}
 
 	}, [isCartPlaying, activeProgram]);
@@ -187,11 +184,131 @@ export default function CartPlayer(props) {
 		return () => clearInterval(intervalRef.current);
 	}, []);
 
+	// Spotify SDK hook
+	useEffect(() => {
+
+		const script = document.createElement("script");
+		script.src = "https://sdk.scdn.co/spotify-player.js";
+		script.async = true;
+	
+		document.body.appendChild(script);
+	
+		window.onSpotifyWebPlaybackSDKReady = () => {
+	
+			const player = new window.Spotify.Player({
+				name: 'Web Playback SDK',
+				getOAuthToken: cb => { cb(spotifyAccessToken); },
+				volume: 0.5
+			});
+
+			setPlayer(player);
+
+			player.addListener('ready', ({ device_id }) => {
+				console.log('Ready with Device ID', device_id);
+				setDeviceId(device_id);
+			});
+	
+			player.addListener('not_ready', ({ device_id }) => {
+				console.log('Device ID has gone offline', device_id);
+			});
+	
+			player.addListener('player_state_changed', ( state => {
+
+                if (!state) {
+                    return;
+                }
+
+                setCurrentTrack(state.track_window.current_track);
+                setIsPaused(state.paused);
+
+                player.getCurrentState().then( state => { 
+                    (!state)? setIsPlaybackActive(false) : setIsPlaybackActive(true) 
+                });
+
+            }));
+
+			player.on('playback_error', ({message}) => {
+				console.error('Failed to perform playback', message);
+			})
+
+			player.connect();
+	
+		};
+
+	}, []);
+
+	useEffect(() => {
+
+		async function transferPlayback() {
+
+			await fetch('https://api.spotify.com/v1/me/player', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + cookies.userSpotifyAuth.access_token
+				},
+				body: JSON.stringify({
+					device_ids: [
+						deviceId
+					],
+					play: true
+				})
+			});
+
+		}
+
+		if (deviceId) {
+			transferPlayback();
+		}
+
+	}, [deviceId])
+
+	if (!isPlaybackActive) { 
+        return (
+            <>
+                <div className="container">
+                    <div className="main-wrapper">
+                        <b> Instance not active. Transfer your playback using your Spotify app </b>
+                    </div>
+                </div>
+            </>)
+    } else {
+        return (
+            <>
+                <div className="container">
+                    <div className="main-wrapper">
+
+                        <img src={currentTrack.album.images[0].url} className="now-playing__cover" alt="" />
+
+                        <div className="now-playing__side">
+                            <div className="now-playing__name">{currentTrack.name}</div>
+                            <div className="now-playing__artist">{currentTrack.artists[0].name}</div>
+
+                            <button className="btn-spotify" onClick={() => { player.previousTrack() }} >
+                                &lt;&lt;
+                            </button>
+
+                            <button className="btn-spotify" onClick={() => { player.togglePlay() }} >
+                                { isPaused ? "PLAY" : "PAUSE" }
+                            </button>
+
+                            <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
+                                &gt;&gt;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+	/*
 	return (
 		<Fragment>
 			<button type="button" onClick={handleCartridgePlay}>Play</button>
 			<button type="button" onClick={handleCartridgePause}>Pause</button>
 		</Fragment>
 	)
+	*/
 
 }

@@ -14,7 +14,7 @@ function spotifyAuth(req, res) {
 	// Set Spotify auth variables
 	// TODO: Write function to randomly generate this code
 	const state = 'jaw98ejff8j39f3lasdjf';
-	const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming';
+	const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming user-read-email user-read-private';
 
 	// Write state var to cookie to verify during callback redirect
 	res.cookie('spotify_state', state);
