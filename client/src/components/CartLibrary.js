@@ -5,7 +5,6 @@ import { useCookies } from 'react-cookie';
 
 // Internal imports
 import CartPlayer from './CartPlayer.js';
-import WebPlayback from './CartPlayerBoilerplate.js';
 
 export default function CartLibrary(props) {
 
@@ -67,8 +66,7 @@ export default function CartLibrary(props) {
 			<h1>Cart Library Placeholder</h1>
 			<section className="CartLibrary_playerContainer">
 				{/*Drawing of 8-track player*/}
-				{/*<CartPlayer activeCart={activeCart} />*/}
-				<WebPlayback token={spotifyUserAuthToken}/>
+				<CartPlayer activeCart={activeCart} />
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
 				<svg>
 					<g className="CartLibrary_controls"></g>
