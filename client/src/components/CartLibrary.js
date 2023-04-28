@@ -66,7 +66,7 @@ export default function CartLibrary(props) {
 			<h1>Cart Library Placeholder</h1>
 			<section className="CartLibrary_playerContainer">
 				{/*Drawing of 8-track player*/}
-				<CartPlayer activeCart={activeCart} />
+				<CartPlayer activeCart={activeCart} authToken={spotifyUserAuthToken}/>
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
 				<svg>
 					<g className="CartLibrary_controls"></g>
