@@ -38,6 +38,7 @@ export default function CartPlayer(props) {
 
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
+	const playingSpotifyTrack = useRef(false);
 
 	const spotifyPlayer = useRef(null);
 	const deviceId = useRef(null);
@@ -45,6 +46,7 @@ export default function CartPlayer(props) {
 	function handlePlayPause() {
 		if (activeCart) {
 			setIsCartPlaying(prev => !prev);
+
 		}
 	}
 
@@ -145,7 +147,8 @@ export default function CartPlayer(props) {
 	
 	}, [spotifyUserAuthToken]);
 
-	/*
+	// Function to transfer playback to local context;
+	// commented out for time being to enable easier code writing
 	useEffect(() => {
 
 		async function transferPlayback() {
@@ -199,8 +202,6 @@ export default function CartPlayer(props) {
 		}
 
 	}, [deviceId, activeCart, isPlaybackActive]);
-	*/
-
 
 	// Effect hook to construct a cart object representation
 	// when user selects a cart
@@ -366,6 +367,28 @@ export default function CartPlayer(props) {
 		setActiveTrack(newActiveTrack);
 
 	}, [activeProgramNumber, cartArray, activeCart]);
+
+	// Effect hook for when activeTrack itself changes
+	useEffect(() => {
+
+		if (!activeTrack) {
+			return;
+		}
+
+		if (activeTrack.type === EFFECT) {
+			// Play effect audio
+			return;
+		}
+		else {
+			const uri = activeTrack.audio;
+			const startTime = activeTime.current - activeTrack.start_timestamp;
+
+			startSpotifyPlayback(uri, startTime);
+
+			playingSpotifyTrack.current = true;
+		}
+
+	}, [activeTrack])
 
 	return (
 		<Fragment>
