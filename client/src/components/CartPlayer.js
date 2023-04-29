@@ -9,15 +9,10 @@ export default function CartPlayer(props) {
 	const NUMBER_OF_PROGRAMS = 4;
 
 	const FADE_IN_TIMESTAMP_MS = 0;
-	const FIRST_TRACK_START_TIMESTAMP_MS = 2001;
 
 	const FADE_IN_LENGTH_MS = 2000;
 	const FADE_OUT_LENGTH_MS = 2000;
 	const PROGRAM_SELECTOR_LENGTH_MS = 0;
-
-	const LAST_TRACK_END_TIMESTAMP_MS = activeCart
-		? activeCart.program1.program_length_ms + FADE_IN_LENGTH_MS
-		: null;
 
 	const EFFECT = 'EFFECT';
 	const SPOTIFY_TRACK = 'SPOTIFY_TRACK';
@@ -29,25 +24,12 @@ export default function CartPlayer(props) {
 		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
 	}
 
-	const activeTracksArray = new Array(NUMBER_OF_PROGRAMS);
-	for (let i = 0; i < activeTracksArray.length; i++) {
-		const programNumber = 'program'.concat(i + 1);
-
-		activeTracksArray[i] = 	{
-			audio: effects.FADE_IN,
-			type: EFFECT,
-			length: FADE_IN_LENGTH_MS,
-			end_timestamp: FADE_IN_LENGTH_MS,
-			next_spotify_track_index: 0,
-			intra_track_fade_length_ms: activeCart ? parseInt(activeCart[programNumber].intra_track_fade_length_ms) : null
-		}
-	}
-
-	const [isCartPlaying, setIsCartPlaying] = useState(false);
 	// Note that activeProgram will select 0-3; when rendered, if the actual
 	// number is needed, it is imperative to add 1
-	const [activeProgram, setActiveProgram] = useState(0);
-	const [playingAudio, setPlayingAudio] = useState(null);
+	const [activeProgramNumber, setActiveProgramNumber] = useState(0);
+	const [cartArray, setCartArray] = useState(null);
+	const [activeTrack, setActiveTrack] = useState(null);
+	const [isCartPlaying, setIsCartPlaying] = useState(false);
 
 	const [isPaused, setIsPaused] = useState(false);
 	const [isPlaybackActive, setIsPlaybackActive] = useState(false);
@@ -56,7 +38,6 @@ export default function CartPlayer(props) {
 
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
-	const activeTracks = useRef(activeTracksArray);
 
 	const spotifyPlayer = useRef(null);
 	const deviceId = useRef(null);
@@ -65,6 +46,23 @@ export default function CartPlayer(props) {
 		if (activeCart) {
 			setIsCartPlaying(prev => !prev);
 		}
+	}
+
+	function handleProgramChange() {
+		setActiveProgramNumber( (prev) => {
+			console.log('prev: ', prev);
+
+			// 1 is subtracted to ensure programs run 
+			// from #0 to #3 internally
+			if (prev < NUMBER_OF_PROGRAMS - 1) {
+				return prev += 1;
+			}
+			else {
+				return 0;
+			}
+		})
+
+		console.log('Last program: ', activeProgramNumber);
 	}
 
 	async function startSpotifyPlayback(uri, startTime) {
@@ -145,8 +143,9 @@ export default function CartPlayer(props) {
 		
 		};
 	
-	}, []);
+	}, [spotifyUserAuthToken]);
 
+	/*
 	useEffect(() => {
 
 		async function transferPlayback() {
@@ -164,7 +163,7 @@ export default function CartPlayer(props) {
 						device_ids: [
 							deviceId.current
 						],
-						play: false
+						play: true
 					})
 				});
 				if (!fetchResponseRaw.ok) {
@@ -200,162 +199,173 @@ export default function CartPlayer(props) {
 		}
 
 	}, [deviceId, activeCart, isPlaybackActive]);
+	*/
+
+
+	// Effect hook to construct a cart object representation
+	// when user selects a cart
+	useEffect(() => {
+
+		if (!activeCart) {
+			return;
+		}
+		let cartArray = [];
+		let startTimestamp = FADE_IN_TIMESTAMP_MS;
+
+		for (let i = 0; i < NUMBER_OF_PROGRAMS; i++) {
+			// Set programNumber
+			const programNumber = 'program'.concat(i + 1);
+
+			// Create array for program
+			let programArray = [];
+
+			// First, add the fade-in time
+			programArray = [
+				...programArray,
+				{
+					audio: effects.FADE_IN,
+					type: EFFECT,
+					length: FADE_IN_LENGTH_MS,
+					start_timestamp: startTimestamp,
+					end_timestamp: FADE_IN_LENGTH_MS,
+				}
+			];
+
+			startTimestamp = FADE_IN_LENGTH_MS + 1;
+
+			// Then, add each cart, followed by intra-track fade (if necessary)
+			for (let j = 0; j < activeCart[programNumber].tracks.length; j++) {
+				const track = activeCart[programNumber].tracks[j];
+				const intraTrackFadeLength = parseInt(activeCart[programNumber].intra_track_fade_length_ms);
+
+				programArray = [
+					...programArray,
+					{
+						audio: track.spotify_track_id,
+						type: SPOTIFY_TRACK,
+						length: track.duration_ms,
+						start_timestamp: startTimestamp,
+						end_timestamp: startTimestamp + parseInt(track.duration_ms)
+					}
+				];
+
+				startTimestamp = startTimestamp + parseInt(track.duration_ms) + 1;
+
+				// If program has intra-track fade length and we haven't reached last track
+				// (no intra-track fade after the last track)...
+
+				// Note the odd math: this appears to be due to the fact that the first second
+				// of fade is actually second #0
+				if (intraTrackFadeLength && j < (activeCart[programNumber].tracks.length - 1)) {
+					programArray = [
+						...programArray,
+						{
+							audio: effects.INTRA_TRACK_FADE,
+							type: EFFECT,
+							length: intraTrackFadeLength - 1,
+							start_timestamp: startTimestamp,
+							end_timestamp: startTimestamp + intraTrackFadeLength - 1
+						}
+					];
+
+					startTimestamp = startTimestamp + intraTrackFadeLength;
+
+				}
+			}
+
+			// Then, add fade-out
+			programArray = [
+				...programArray,
+				{
+					audio: effects.FADE_OUT,
+					type: EFFECT,
+					length: FADE_OUT_LENGTH_MS,
+					start_timestamp: startTimestamp,
+					end_timestamp: startTimestamp + FADE_OUT_LENGTH_MS,
+				}
+			];
+
+			startTimestamp = startTimestamp + FADE_OUT_LENGTH_MS + 1;
+
+			// Finally, add program selector arm
+			programArray = [
+				...programArray,
+				{
+					audio: effects.PROGRAM_SELECTOR,
+					type: EFFECT,
+					length: PROGRAM_SELECTOR_LENGTH_MS,
+					start_timestamp: startTimestamp,
+					end_timestamp: startTimestamp + PROGRAM_SELECTOR_LENGTH_MS,
+				}
+			];
+
+			// Finally, concat finished programArray to cartArray
+			cartArray = [
+				...cartArray,
+				programArray
+			];
+		};
+
+		// Set this array as state
+		setCartArray(cartArray);
+
+		// Set first item on current program as activeTrack
+		setActiveTrack(cartArray[activeProgramNumber][0]);
+
+	}, [activeCart, activeProgramNumber, effects.FADE_IN, effects.INTRA_TRACK_FADE, effects.FADE_OUT, effects.PROGRAM_SELECTOR]);
 
 	useEffect(() => {
+
+		if (!cartArray || !isCartPlaying) {
+			return;
+		}
 
 		// Clear any existing timeout
 		clearInterval(intervalRef.current);
 
-		if (isCartPlaying) {
+		// Every ms, check to see if active track
+		// has reached its end
+		intervalRef.current = setInterval(() => {	
 
-			// Add intra track fade lengths to tracks object
-			activeTracks.current = activeTracks.current.map( (program, index) => {
-				const programNumber = 'program'.concat(index + 1);
-				if (!program.intra_track_fade_length_ms) {
-					return ({
-						...program,
-						intra_track_fade_length_ms: parseInt(activeCart[programNumber].intra_track_fade_length_ms)
-					})
-				}
-				else {
-					return program;
-				}
-			});
-			setPlayingAudio(activeTracks.current[activeProgram]);
+			if (activeTime.current === activeTrack.end_timestamp) {
+				// Find index of activeTrack in cartArray
+				const index = cartArray[activeProgramNumber].indexOf(activeTrack);
 
-			//Every second, map over everything (at end of setInterval)
-			intervalRef.current = setInterval(() => {
-
-				// If activeTime.current reached program length
-				// (including program selector sound), reset all
-				if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS + FADE_OUT_LENGTH_MS + PROGRAM_SELECTOR_LENGTH_MS) {
-					activeTime.current = 0;
-					activeTracks.current = activeTracksArray;
-					setPlayingAudio(activeTracks.current[activeProgram]);
-					
-				}
-				// If we've reached the end of the fade-out, set all
-				// to player arm audio
-				else if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS + FADE_OUT_LENGTH_MS) {
-					activeTracks.current = activeTracks.current.map( (program) => {
-						return ({
-							...program,
-							audio: effects.PROGRAM_SELECTOR,
-							type: EFFECT,
-							length: PROGRAM_SELECTOR_LENGTH_MS,
-							end_timestamp: program.end_timestamp + PROGRAM_SELECTOR_LENGTH_MS
-						});
-					});
-					setPlayingAudio(activeTracks.current[activeProgram]);
-				}
-				// If we've reached the last-track timestamp, set all 
-				// to fade-out audio
-				else if (activeTime.current === LAST_TRACK_END_TIMESTAMP_MS) {
-					activeTracks.current = activeTracks.current.map( (program) => {
-						return ({
-							...program,
-							audio: effects.FADE_OUT,
-							type: EFFECT,
-							length: FADE_OUT_LENGTH_MS,
-							end_timestamp: program.end_timestamp + FADE_OUT_LENGTH_MS
-						});
-					});
-					setPlayingAudio(activeTracks.current[activeProgram]);
-
-				}
-				// Otherwise...
-				else {
-
-					let currentProgramChanged = false;
-
-					// Map over all tracks
-					activeTracks.current = activeTracks.current.map ( (program, index) => {
-						const programNumber = 'program'.concat(index + 1);
-						// If activeTime.current === program.end_timestamp for any...
-						if (activeTime.current === program.end_timestamp) {
-							if (index === activeProgram) {
-								currentProgramChanged = true;
-							}
-							// If that track is of type Spotify song and there's an inter-track fade length, switch to that
-							if (program.type === SPOTIFY_TRACK && program.intra_track_fade_length_ms > 0) {
-								return ({
-									...program,
-									audio: effects.INTRA_TRACK_FADE,
-									type: EFFECT,
-									length: program.intra_track_fade_length_ms,
-									end_timestamp: program.end_timestamp + program.intra_track_fade_length_ms
-								})
-							}
-							// Otherwise...
-							else {
-								// Switch to next Spotify track	
-								// Load track using Spotify ID
-								return ({
-									...program,
-									audio: activeCart[programNumber].tracks[program.next_spotify_track_index].spotify_track_id,
-									type: SPOTIFY_TRACK,
-									length: parseInt(activeCart[programNumber].tracks[program.next_spotify_track_index].duration_ms),
-									end_timestamp: program.end_timestamp + parseInt(activeCart[programNumber].tracks[program.next_spotify_track_index].duration_ms),
-									next_spotify_track_index: program.next_spotify_track_index === activeCart[programNumber].tracks.length ? 0 : program.next_spotify_track_index + 1
-								});
-							}
-						}
-						// Otherwise, return what was there before
-						else {
-							return ({
-								...program
-							})
-						}
-					})
-
-					if (currentProgramChanged) {
-						setPlayingAudio(activeTracks.current[activeProgram]);
-					}
-				}
-
-				console.log('activeTime: ', activeTime.current);
-				console.log('activeTracks.current: ', activeTracks.current);
-				activeTime.current = activeTime.current + 1;
-
-			}, 1);
-
-		}
-
-	}, [isCartPlaying, activeProgram]);
-
-	useEffect(() => {
-		setPlayingAudio(activeTracks.current[activeProgram]);
-	}, [activeProgram]);
-
-	useEffect(() => {
-
-		console.log('Playing audio re-rendered');
-		console.log(playingAudio);
-
-		if (isCartPlaying && playingAudio) {
-			// Calculate start timestamp
-			const startingTime = activeTime.current - (playingAudio.end_timestamp - playingAudio.length);
-
-			if (playingAudio.type === EFFECT) {
-				// Play audio file of relevant effect audio
-				return;
+				// Set activeTrack to be next object
+				setActiveTrack(cartArray[activeProgramNumber][index + 1]);
 			}
-			else {
 
-				// Load song on Spotify
-				startSpotifyPlayback(playingAudio.audio, startingTime);
+			activeTime.current += 1;
 
-				// Play song
+			console.log('activeTime.current: ', activeTime.current);
+			console.log('Last activeTrack: ', activeTrack);
 
-			}
-		}
+		}, 1)
 
-	}, [playingAudio, isCartPlaying]);
-
-	// Clear any existing timeouts upon re-render
-	useEffect(() => {
 		return () => clearInterval(intervalRef.current);
-	}, []);
+
+
+	}, [cartArray, isCartPlaying, activeTrack, activeProgramNumber]);
+
+	// Effect hook for when active program number is changed
+	useEffect(() => {
+		// Iterate through cartArray at new active program number
+		// and determine which track correctly fits activeTime
+		if (!activeCart || !cartArray) {
+			return;
+		}
+
+		const newActiveTrack = cartArray[activeProgramNumber]
+			.find( (track) => {
+				return (
+					track.start_timestamp <= activeTime.current &&
+					track.end_timestamp >= activeTime.current
+				)
+			});
+
+		setActiveTrack(newActiveTrack);
+
+	}, [activeProgramNumber, cartArray, activeCart]);
 
 	return (
 		<Fragment>
@@ -369,6 +379,7 @@ export default function CartPlayer(props) {
 				<button type='button' className={`playbackButton ${activeCart && isPlaybackActive && !playbackMessage ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
 					{ isCartPlaying ? 'PAUSE' : 'PLAY'}
 				</button>
+				<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>
 			</div>
 		</Fragment>
 	)
