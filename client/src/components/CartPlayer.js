@@ -1,5 +1,5 @@
 // External imports
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
 export default function CartPlayer(props) {
 
@@ -92,6 +92,54 @@ export default function CartPlayer(props) {
 		}
 	}
 
+	const getSpotifyPlayerState = useCallback( async() => {
+		try {
+			const responseRaw = await fetch('https://api.spotify.com/v1/me/player', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + spotifyUserAuthToken
+				}
+			});
+			const responseJSON = await responseRaw.json();
+			if (!responseRaw.ok) {
+				console.error('Network-related error while fetching Spotify player state', responseJSON);
+			}
+			else {
+				return responseJSON;
+			}
+			
+		}
+		catch (err) {
+			console.error('Error while fetching Spotify player state:', err);
+		}
+	}, [spotifyUserAuthToken]);
+
+	/*
+	async function getSpotifyPlayerState() {
+		try {
+			const responseRaw = await fetch('https://api.spotify.com/v1/me/player', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + spotifyUserAuthToken
+				}
+			});
+			const responseJSON = await responseRaw.json();
+			if (!responseRaw.ok) {
+				console.error('Network-related error while fetching Spotify player state', responseJSON);
+			}
+			else {
+				return responseJSON;
+			}
+			
+		}
+		catch (err) {
+			console.error('Error while fetching Spotify player state:', err);
+		}
+	}
+	*/
+
 	// Spotify SDK hook
 	useEffect(() => {
 
@@ -147,8 +195,7 @@ export default function CartPlayer(props) {
 	
 	}, [spotifyUserAuthToken]);
 
-	// Function to transfer playback to local context;
-	// commented out for time being to enable easier code writing
+	// Function to transfer playback to local context
 	useEffect(() => {
 
 		async function transferPlayback() {
@@ -338,8 +385,8 @@ export default function CartPlayer(props) {
 
 			activeTime.current += 1;
 
-			console.log('activeTime.current: ', activeTime.current);
-			console.log('Last activeTrack: ', activeTrack);
+			// console.log('activeTime.current: ', activeTime.current);
+			// console.log('Last activeTrack: ', activeTrack);
 
 		}, 1)
 
@@ -348,6 +395,54 @@ export default function CartPlayer(props) {
 
 	}, [cartArray, isCartPlaying, activeTrack, activeProgramNumber]);
 
+	// Effect hook for when active program number is changed, v2
+	useEffect(() => {
+
+		if (!cartArray || !activeCart) {
+			return;
+		}
+
+		// Store current active track to local variable
+		const oldActiveTrack = activeTrack;
+
+		console.log('oAT: ', oldActiveTrack);
+
+		// If current active track is Spotify...
+		if (oldActiveTrack.type === SPOTIFY_TRACK) {
+
+			getSpotifyPlayerState()
+				.then( (state) => {
+
+					console.log('state:', state);
+
+					// Calculate overall cart timestamp
+					const cartTimestamp = oldActiveTrack.start_timestamp + state.progress_ms;
+					console.log('activeTime in program hook: ', cartTimestamp);
+
+					// Set current time as cartTimestamp
+					activeTime.current = cartTimestamp;
+					
+					const newActiveTrack = cartArray[activeProgramNumber]
+					.find( (track) => {
+						return (
+							track.start_timestamp <= activeTime.current &&
+							track.end_timestamp >= activeTime.current
+						)
+					});
+		
+				setActiveTrack(newActiveTrack);
+
+				});
+			}
+		// Otherwise, if it's a local sound...
+		else {
+			// TODO: Build out
+			return;
+		}
+
+	}, [activeProgramNumber, activeCart, cartArray, activeTrack, getSpotifyPlayerState])
+
+	/*
 	// Effect hook for when active program number is changed
 	useEffect(() => {
 		// Iterate through cartArray at new active program number
@@ -367,6 +462,7 @@ export default function CartPlayer(props) {
 		setActiveTrack(newActiveTrack);
 
 	}, [activeProgramNumber, cartArray, activeCart]);
+	*/
 
 	// Effect hook for when activeTrack itself changes
 	useEffect(() => {
@@ -382,6 +478,8 @@ export default function CartPlayer(props) {
 		else {
 			const uri = activeTrack.audio;
 			const startTime = activeTime.current - activeTrack.start_timestamp;
+			console.log('activeTime in track change hook: ', activeTime.current);
+			console.log('sT: ', startTime);
 
 			startSpotifyPlayback(uri, startTime);
 
