@@ -47,6 +47,27 @@ export default function CartPlayer(props) {
 		if (activeCart) {
 			setIsCartPlaying(prev => !prev);
 
+			// If active track is a Spotify one...
+			if (activeTrack.type === SPOTIFY_TRACK) {
+				toggleSpotifyPlayback();
+				/*
+				getSpotifyPlayerState()
+					.then( (state) => {
+						if (state.is_playing) {
+							pauseSpotifyPlayback();
+						}
+						else {
+							// TODO: Update timing function
+							startSpotifyPlayback(activeTrack.audio, 0)
+						}
+					})
+				*/
+			}
+			// Otherwise, if track is local audio...
+			else {
+				return;
+			}
+
 		}
 	}
 
@@ -92,6 +113,20 @@ export default function CartPlayer(props) {
 		}
 	}
 
+	const toggleSpotifyPlayback = useCallback( async() => {
+		try {
+			spotifyPlayer.current.togglePlay()
+				.then(() => {
+					console.log('Toggled play');
+				});
+		}
+		catch (err) {
+			console.error('Error while pausing audio: ', err);
+		}
+	}, [spotifyPlayer]);
+
+	/*
+	// Working API state method
 	const getSpotifyPlayerState = useCallback( async() => {
 		try {
 			const responseRaw = await fetch('https://api.spotify.com/v1/me/player', {
@@ -114,6 +149,45 @@ export default function CartPlayer(props) {
 			console.error('Error while fetching Spotify player state:', err);
 		}
 	}, [spotifyUserAuthToken]);
+	*/
+
+	// Most recent SDK state fetch
+	const getSpotifyPlayerState = useCallback( async() => {
+		try {
+			const state = await spotifyPlayer.current.getCurrentState();
+			if (!state) {
+				console.error('Error while obtaining Spotify player state: music not currently playing through SDK');
+				return;
+			}
+			else {
+				console.log('State from fetch function: ', state);
+				return state;
+			}
+		}
+		catch (err) {
+			console.error('Error while obtaining Spotify player state: ', err);
+		}
+	}, [])
+
+	/*
+	const getSpotifyPlayerState = useCallback( async() => {
+		try {
+			spotifyPlayer.current.getCurrentState()
+				.then( (state) => {
+					if (!state) {
+						console.error('Error while obtaining Spotify player state: music not currently playing through SDK');
+						return;
+					}
+					else {
+						return state;
+					}
+				});
+		}
+		catch (err) {
+			console.error('Error while obtaining Spotify player state: ', err);
+		}
+	}, [])
+	*/
 
 	/*
 	async function getSpotifyPlayerState() {
@@ -213,7 +287,7 @@ export default function CartPlayer(props) {
 						device_ids: [
 							deviceId.current
 						],
-						play: true
+						play: false
 					})
 				});
 				if (!fetchResponseRaw.ok) {
@@ -362,6 +436,7 @@ export default function CartPlayer(props) {
 
 	}, [activeCart, activeProgramNumber, effects.FADE_IN, effects.INTRA_TRACK_FADE, effects.FADE_OUT, effects.PROGRAM_SELECTOR]);
 
+	// Effect hook to calculate active time
 	useEffect(() => {
 
 		if (!cartArray || !isCartPlaying) {
@@ -385,8 +460,8 @@ export default function CartPlayer(props) {
 
 			activeTime.current += 1;
 
-			// console.log('activeTime.current: ', activeTime.current);
-			// console.log('Last activeTrack: ', activeTrack);
+			console.log('activeTime.current: ', activeTime.current);
+			console.log('Last activeTrack: ', activeTrack);
 
 		}, 1)
 
@@ -395,10 +470,12 @@ export default function CartPlayer(props) {
 
 	}, [cartArray, isCartPlaying, activeTrack, activeProgramNumber]);
 
-	// Effect hook for when active program number is changed, v2
+	// Effect hook for when active program number is changed
 	useEffect(() => {
 
-		if (!cartArray || !activeCart) {
+		console.log('activeTrack in program hook:', activeTrack);
+
+		if (!cartArray || !activeCart || !activeTrack) {
 			return;
 		}
 
@@ -416,7 +493,7 @@ export default function CartPlayer(props) {
 					console.log('state:', state);
 
 					// Calculate overall cart timestamp
-					const cartTimestamp = oldActiveTrack.start_timestamp + state.progress_ms;
+					const cartTimestamp = oldActiveTrack.start_timestamp + state.position;
 					console.log('activeTime in program hook: ', cartTimestamp);
 
 					// Set current time as cartTimestamp
