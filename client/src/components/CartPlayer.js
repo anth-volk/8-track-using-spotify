@@ -35,6 +35,7 @@ export default function CartPlayer(props) {
 	const [isPlaybackActive, setIsPlaybackActive] = useState(false);
 	const [currentTrack, setCurrentTrack] = useState(null);
 	const [playbackMessage, setPlaybackMessage] = useState('');
+	const [isSpotifyTrackEnded, setIsSpotifyTrackEnded] = useState(false);
 
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
@@ -258,6 +259,22 @@ export default function CartPlayer(props) {
 				});
 	
 			}));
+
+			// Listener for track end, taken from comment at 
+			// https://github.com/spotify/web-playback-sdk/issues/35
+			spotifyPlayer.current.addListener('player_state_changed', (state) => {
+
+				if (
+					state
+					&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
+					&& state.paused
+				) {
+					console.log('Track ended');
+					setIsSpotifyTrackEnded(true);
+
+				}
+
+			});
 	
 			spotifyPlayer.current.on('playback_error', ({message}) => {
 				console.error('Failed to perform playback', message);
@@ -540,6 +557,20 @@ export default function CartPlayer(props) {
 
 	}, [activeProgramNumber, cartArray, activeCart]);
 	*/
+
+	// The below segment is buggy
+	// Effect hook for dealing with Spotify track end
+	useEffect(() => {
+		if (activeCart && activeTrack && activeTrack.type === SPOTIFY_TRACK && isSpotifyTrackEnded) {
+
+			// Find index of activeTrack in cartArray
+			const index = cartArray[activeProgramNumber].indexOf(activeTrack);
+
+			// Set active track to be next item
+			setActiveTrack(cartArray[activeProgramNumber][index + 1]);
+			setIsSpotifyTrackEnded(false);
+		}
+	}, [isSpotifyTrackEnded, activeCart, activeTrack, activeProgramNumber, cartArray]);
 
 	// Effect hook for when activeTrack itself changes
 	useEffect(() => {
