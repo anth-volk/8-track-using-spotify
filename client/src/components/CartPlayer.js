@@ -1,6 +1,9 @@
 // External imports
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
+// Internal imports
+import tapeHissAudio from '../audio_files/tape_hiss.mp3';
+
 export default function CartPlayer(props) {
 
 	const spotifyUserAuthToken = props.authToken || null;
@@ -16,13 +19,6 @@ export default function CartPlayer(props) {
 
 	const EFFECT = 'EFFECT';
 	const SPOTIFY_TRACK = 'SPOTIFY_TRACK';
-
-	const effects = {
-		FADE_IN: 'FADE_IN',
-		FADE_OUT: 'FADE_OUT',
-		INTRA_TRACK_FADE: 'INTRA_TRACK_FADE',
-		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
-	}
 
 	// Note that activeProgram will select 0-3; when rendered, if the actual
 	// number is needed, it is imperative to add 1
@@ -41,8 +37,17 @@ export default function CartPlayer(props) {
 	const intervalRef = useRef(null);
 	const playingSpotifyTrack = useRef(false);
 
+	const tapeHissAudioRef = useRef(null);
+
 	const spotifyPlayer = useRef(null);
 	const deviceId = useRef(null);
+
+	const effects = {
+		FADE_IN: tapeHissAudioRef.current,
+		FADE_OUT: tapeHissAudioRef.current,
+		INTRA_TRACK_FADE: tapeHissAudioRef.current,
+		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
+	}
 
 	function handlePlayPause() {
 		if (activeCart) {
@@ -517,12 +522,12 @@ export default function CartPlayer(props) {
 					activeTime.current = cartTimestamp;
 					
 					const newActiveTrack = cartArray[activeProgramNumber]
-					.find( (track) => {
-						return (
-							track.start_timestamp <= activeTime.current &&
-							track.end_timestamp >= activeTime.current
-						)
-					});
+						.find( (track) => {
+							return (
+								track.start_timestamp <= activeTime.current &&
+								track.end_timestamp >= activeTime.current
+							)
+						});
 		
 				setActiveTrack(newActiveTrack);
 
@@ -531,7 +536,27 @@ export default function CartPlayer(props) {
 		// Otherwise, if it's a local sound...
 		else {
 			// TODO: Build out
-			return;
+
+			// Pause and reset old active track
+			oldActiveTrack.audio.pause();
+			oldActiveTrack.audio.currentTime = 0;
+
+			// Fetch currentTime and calculate overall cart timestamp
+			const cartTimestamp = oldActiveTrack.start_timestamp + oldActiveTrack.audio.currentTime;
+
+			// Set current time as cartTimestamp (write separate method?)
+			activeTime.current = cartTimestamp;
+
+			// Set new active track akin to above
+			const newActiveTrack = cartArray[activeProgramNumber]
+				.find( (track) => {
+					return (
+						track.start_timestamp <= activeTime.current &&
+						track.end_timestamp >= activeTime.current
+					)
+				});
+
+			setActiveTrack(newActiveTrack);
 		}
 
 	}, [activeProgramNumber, activeCart, cartArray, activeTrack, getSpotifyPlayerState])
@@ -599,6 +624,9 @@ export default function CartPlayer(props) {
 	return (
 		<Fragment>
 			<div className='container'>
+				<div className='audioFiles'>
+					<audio src={tapeHissAudio} ref={tapeHissAudioRef} type='audio/mp3' loop/>
+				</div>
 				<div className='main-wrapper'>
 					{/*Empty 8-track player visual*/}
 					{/*Inside of that: activeCart details, if present*/}
