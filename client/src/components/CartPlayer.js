@@ -524,7 +524,7 @@ export default function CartPlayer(props) {
 
 		console.log('activeTrack in program hook:', activeTrack);
 
-		if (!cartArray || !activeCart || !activeTrack || !isCartPlaying) {
+		if (!cartArray || !activeCart || !activeTrack || !isCartPlaying || isSpotifyTrackEnded) {
 			return;
 		}
 
