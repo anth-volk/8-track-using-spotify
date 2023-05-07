@@ -42,6 +42,8 @@ export default function CartPlayer(props) {
 	const [playbackMessage, setPlaybackMessage] = useState('');
 	const [isSpotifyTrackEnded, setIsSpotifyTrackEnded] = useState(false);
 
+	// Create a ref for the index of the current track within its array
+
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
 	const timeoutRef = useRef(null);
@@ -59,6 +61,23 @@ export default function CartPlayer(props) {
 		FADE_OUT: tapeHissRef.current,
 		INTRA_TRACK_FADE: tapeHissRef.current,
 		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
+	}
+
+	function obtainCartTimestamp() {
+		if (!activeCart || !isCartPlaying) {
+			return 0;
+		}
+		else {
+			if (activeTrack.type === SPOTIFY_TRACK) {
+				getSpotifyPlayerState()
+					.then( (state) => {
+						return activeTrack.start_timestamp + state.position;
+					});
+			}
+			else {
+				return convertToMS(localAudioRef.current.currentTime);
+			}
+		}
 	}
 
 	function handlePlayPause() {
@@ -551,8 +570,8 @@ export default function CartPlayer(props) {
 					const newActiveTrack = cartArray[activeProgramNumber]
 						.find( (track) => {
 							return (
-								track.start_timestamp <= activeTime.current &&
-								track.end_timestamp >= activeTime.current
+								track.start_timestamp <= activeTime.current + 1 &&
+								track.end_timestamp >= activeTime.current + 1
 							)
 						});
 		
@@ -586,8 +605,8 @@ export default function CartPlayer(props) {
 			const newActiveTrack = cartArray[activeProgramNumber]
 				.find( (track) => {
 					return (
-						track.start_timestamp <= activeTime.current &&
-						track.end_timestamp >= activeTime.current
+						track.start_timestamp <= activeTime.current + 1 &&
+						track.end_timestamp >= activeTime.current + 1
 					)
 				});
 
