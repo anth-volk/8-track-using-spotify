@@ -2,7 +2,16 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
 // Internal imports
-import tapeHissAudio from '../audio_files/tape_hiss.mp3';
+import {localAudio} from '../audio_files/audio.js';
+import tapeHiss from '../audio_files/tape_hiss.mp3';
+
+function convertToMS(arg) {
+	return parseInt(arg * 1000);
+}
+
+function convertToSeconds(arg) {
+	return arg / 1000;
+}
 
 export default function CartPlayer(props) {
 
@@ -35,17 +44,20 @@ export default function CartPlayer(props) {
 
 	const activeTime = useRef(0);
 	const intervalRef = useRef(null);
+	const timeoutRef = useRef(null);
+	const localAudioRef = useRef(null);
 	const playingSpotifyTrack = useRef(false);
+	const playingLocalAudio = useRef(null);
 
-	const tapeHissAudioRef = useRef(null);
+	const tapeHissRef = useRef(null);
 
 	const spotifyPlayer = useRef(null);
 	const deviceId = useRef(null);
 
 	const effects = {
-		FADE_IN: tapeHissAudioRef.current,
-		FADE_OUT: tapeHissAudioRef.current,
-		INTRA_TRACK_FADE: tapeHissAudioRef.current,
+		FADE_IN: tapeHissRef.current,
+		FADE_OUT: tapeHissRef.current,
+		INTRA_TRACK_FADE: tapeHissRef.current,
 		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
 	}
 
@@ -71,7 +83,13 @@ export default function CartPlayer(props) {
 			}
 			// Otherwise, if track is local audio...
 			else {
-				return;
+				if (activeTrack.audio.paused) {
+					localAudioRef.current = activeTrack.audio;
+					activeTrack.audio.play();
+				}
+				else {
+					activeTrack.audio.pause();
+				}
 			}
 
 		}
@@ -353,6 +371,9 @@ export default function CartPlayer(props) {
 		if (!activeCart) {
 			return;
 		}
+
+		activeTime.current = 0;
+
 		let cartArray = [];
 		let startTimestamp = FADE_IN_TIMESTAMP_MS;
 
@@ -370,7 +391,7 @@ export default function CartPlayer(props) {
 					audio: effects.FADE_IN,
 					type: EFFECT,
 					length: FADE_IN_LENGTH_MS,
-					start_timestamp: startTimestamp,
+					start_timestamp: FADE_IN_TIMESTAMP_MS,
 					end_timestamp: FADE_IN_LENGTH_MS,
 				}
 			];
@@ -458,6 +479,11 @@ export default function CartPlayer(props) {
 
 	}, [activeCart, activeProgramNumber, effects.FADE_IN, effects.INTRA_TRACK_FADE, effects.FADE_OUT, effects.PROGRAM_SELECTOR]);
 
+	// TESTING
+	useEffect(() => {
+		console.log('cartArray:', cartArray);
+	}, [cartArray])
+
 	// Effect hook to calculate active time
 	useEffect(() => {
 
@@ -465,7 +491,7 @@ export default function CartPlayer(props) {
 			return;
 		}
 
-		// Clear any existing timeout
+		// Clear any existing interval
 		clearInterval(intervalRef.current);
 
 		// Every ms, check to see if active track
@@ -484,6 +510,7 @@ export default function CartPlayer(props) {
 
 			console.log('activeTime.current: ', activeTime.current);
 			console.log('Last activeTrack: ', activeTrack);
+			console.log('lAR: ', localAudioRef.current);
 
 		}, 1)
 
@@ -497,7 +524,7 @@ export default function CartPlayer(props) {
 
 		console.log('activeTrack in program hook:', activeTrack);
 
-		if (!cartArray || !activeCart || !activeTrack) {
+		if (!cartArray || !activeCart || !activeTrack || !isCartPlaying) {
 			return;
 		}
 
@@ -535,17 +562,25 @@ export default function CartPlayer(props) {
 			}
 		// Otherwise, if it's a local sound...
 		else {
-			// TODO: Build out
+			// TESTING
+			console.log(oldActiveTrack.audio);
+
+			console.log('lAR current time: ', oldActiveTrack.audio.currentTime);
+
+			// This number is converted from seconds to ms
+			const stopTime = convertToMS(oldActiveTrack.audio.currentTime);
+			console.log('stopTime: ', stopTime);
 
 			// Pause and reset old active track
-			oldActiveTrack.audio.pause();
-			oldActiveTrack.audio.currentTime = 0;
+			localAudioRef.current.pause();
+			// localAudioRef.current.currentTime = 0;
 
 			// Fetch currentTime and calculate overall cart timestamp
-			const cartTimestamp = oldActiveTrack.start_timestamp + oldActiveTrack.audio.currentTime;
+			const cartTimestamp = oldActiveTrack.start_timestamp + stopTime;
 
 			// Set current time as cartTimestamp (write separate method?)
 			activeTime.current = cartTimestamp;
+			console.log('activeTime.current: ', activeTime.current);
 
 			// Set new active track akin to above
 			const newActiveTrack = cartArray[activeProgramNumber]
@@ -600,19 +635,57 @@ export default function CartPlayer(props) {
 	// Effect hook for when activeTrack itself changes
 	useEffect(() => {
 
-		if (!activeTrack) {
+		console.log('activeTrack change hook triggered');
+
+		if (!activeTrack || !isCartPlaying) {
+			console.log('Returning from aT hook');
 			return;
 		}
 
 		if (activeTrack.type === EFFECT) {
+
+			/*
+			// Pause and 'rewind' any existing local audio
+			localAudioRef.current.pause();
+			localAudioRef.current.currentTime = 0;
+			*/
+
+			console.log('aT effect-type routine');
+
+			// Pause any existing Spotify audio
+			spotifyPlayer.current.pause();
+
+			// Set some sort of length for track to play
+
+			/*
 			// Play effect audio
-			return;
+			localAudioRef.current.currentTime = 0;
+			localAudioRef.current.play();
+			*/
+
+			// Determine track start time
+			const startTime = convertToSeconds(activeTime.current - activeTrack.start_timestamp);
+
+			// Play effect audio
+			activeTrack.audio.currentTime = startTime;
+			activeTrack.audio.play();
+
+			// Set effect audio as localAudioRef
+			localAudioRef.current = activeTrack.audio;
+			console.log('lAR: ', localAudioRef.current);
 		}
 		else {
+
+			// Pause and 'rewind' any local audio
+			localAudioRef.current.pause();
+			localAudioRef.current.currentTime = 0;
+
 			const uri = activeTrack.audio;
 			const startTime = activeTime.current - activeTrack.start_timestamp;
 			console.log('activeTime in track change hook: ', activeTime.current);
 			console.log('sT: ', startTime);
+
+			// playingLocalAudio.current.pause();
 
 			startSpotifyPlayback(uri, startTime);
 
@@ -625,7 +698,7 @@ export default function CartPlayer(props) {
 		<Fragment>
 			<div className='container'>
 				<div className='audioFiles'>
-					<audio src={tapeHissAudio} ref={tapeHissAudioRef} type='audio/mp3' loop/>
+					<audio src={tapeHiss} ref={tapeHissRef} />
 				</div>
 				<div className='main-wrapper'>
 					{/*Empty 8-track player visual*/}
