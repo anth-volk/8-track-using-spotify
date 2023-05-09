@@ -18,16 +18,17 @@ export default function SpotifyPlayer(props) {
 
 	const activeCart = props.activeCart;
 	const setSpotifyStatus = props.setSpotifyStatus;
-	const setTrackChangeEvent = props.setTrackChangeEvent;
+	const setTrackChangeEventQueue = props.setTrackChangeEventQueue;
 
-	const trackChangeEvent = props.trackChangeEvent;
 	const spotifyUserAuthToken = props.spotifyUserAuthToken;
 	const activeTrack = props.activeTrack;
 	const isCartPlaying = props.isCartPlaying;
 	const SPOTIFY_STATUSES = props.SPOTIFY_STATUSES;
 	const TRACK_EVENT_TYPES = props.TRACK_EVENT_TYPES;
+	const cartTimestamp = props.cartTimestamp;
 
 	const [isPlaybackActive, setIsPlaybackActive] = useState(false);
+	const [activeSpotifyAudio, setActiveSpotifyAudio] = useState(null);
 	const [deviceId, setDeviceId] = useState(null);
 
 	const spotifyPlayer = useRef(null);
@@ -40,9 +41,10 @@ export default function SpotifyPlayer(props) {
 	const TEST_START_TIMESTAMP_MS = 0;
 
 	// Function for handling new play (i.e., connection via Spotify)
-	const startSpotifyPlayback = useCallback(async (track, startTime) => {
+	const startSpotifyPlayback = useCallback(async (track, cartTimestamp) => {
 
 		const uri = track.audio;
+		const startTime = cartTimestamp - track.start_timestamp + 1;
 
 		try {
 			const responseRaw = await fetch('https://api.spotify.com/v1/me/player/play', {
@@ -62,11 +64,61 @@ export default function SpotifyPlayer(props) {
 				const responseJSON = await responseRaw.json();
 				console.error('Network-related error while initiating Spotify playback: ', responseJSON);
 			}
+			else {
+				return uri;
+			}
 		}
 		catch (err) {
 			console.error('Error while initiating Spotify playback: ', err);
 		}
 	}, [spotifyUserAuthToken]);
+
+	// Function for fetching Spotify player state via SDk
+	const getSpotifyPlayerState = useCallback( async() => {
+		try {
+			const state = await spotifyPlayer.current.getCurrentState();
+			if (!state) {
+				console.error('Error while obtaining Spotify player state: music not currently playing through SDK');
+				return;
+			}
+			else {
+				console.log('State from fetch function: ', state);
+				return state;
+			}
+		}
+		catch (err) {
+			console.error('Error while obtaining Spotify player state: ', err);
+		}
+	}, [])
+
+	// Function for calculating overall cart timestamp using track position
+	const getCartTimestamp = useCallback((track) => {
+		getSpotifyPlayerState()
+			.then( (state) => {
+				return track.start_timestamp + state.position;
+			})
+	}, []);
+
+	const handleTrackEnd = useCallback(() => {
+
+		// Calculate cartTimestamp
+		console.log('aT inside handleTrackEnd: ', activeTrack);
+		const newCartTimestamp = getCartTimestamp(activeTrack);
+
+		// Emit a track end 'event'
+		console.log('Emitting track change event from Spotify player');
+		setTrackChangeEventQueue( (prev) => {
+			return ([
+				...prev,
+				{
+					activeTrack: activeTrack,
+					cartTimestamp: newCartTimestamp,
+					type: TRACK_EVENT_TYPES.TRACK_END
+				}
+			])
+		});
+
+	}, [activeTrack, getCartTimestamp, setTrackChangeEventQueue, TRACK_EVENT_TYPES.TRACK_END]);
 
 	// Spotify SDK hook
 	useEffect(() => {
@@ -121,7 +173,9 @@ export default function SpotifyPlayer(props) {
 					&& state.paused
 				) {
 					console.log('Track ended');
-					setIsSpotifyTrackEnded(true);
+					// setIsSpotifyTrackEnded(true);
+					console.log('aT inside end listener: ', activeTrack);
+					handleTrackEnd();
 
 				}
 
@@ -212,22 +266,20 @@ export default function SpotifyPlayer(props) {
 		// Otherwise, if activeTrack is of type Spotify...
 		else if (activeTrack.type === SPOTIFY_TRACK) {
 
-			// Pull overall cart timestamp from last emitted 'event' (if it exists)
-			const cartTimestamp = trackChangeEvent
-				? trackChangeEvent.cartTimestamp + 1
-				: 0;
-
 			// Fetch new (via function)
-			startSpotifyPlayback(activeTrack, cartTimestamp);
+			startSpotifyPlayback(activeTrack, cartTimestamp)
+				.then( (uri) => {
+					setActiveSpotifyAudio(uri);
+				});
 		}
 
-	}, [activeTrack, trackChangeEvent, isCartPlaying])
+	}, [activeTrack, isCartPlaying, cartTimestamp, startSpotifyPlayback])
 
 	// Spotify play and pause handler
 	useEffect(() => {
 
 		// If no activeTrack, return
-		if (!activeTrack || !deviceId) {
+		if (!activeTrack || !deviceId || !activeSpotifyAudio) {
 			return;
 		}
 
@@ -242,7 +294,7 @@ export default function SpotifyPlayer(props) {
 			spotifyPlayer.current.pause();
 		}
 
-	}, [isCartPlaying, activeTrack, deviceId, isCartPlaying])
+	}, [isCartPlaying, activeTrack, deviceId, isCartPlaying, activeSpotifyAudio])
 
 	// Spotify track end handler, where on end, could it launch a callback? Except the event often occurs multiple times...
 

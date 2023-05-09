@@ -14,12 +14,13 @@ export default function LocalPlayer(props) {
 
 	const EFFECT = 'EFFECT';
 
-	const setTrackChangeEvent = props.setTrackChangeEvent;
+	const setTrackChangeEventQueue = props.setTrackChangeEventQueue;
 
 	const trackChangeEvent = props.trackChangeEvent;
 	const activeTrack = props.activeTrack;
 	const isCartPlaying = props.isCartPlaying;
 	const TRACK_EVENT_TYPES = props.TRACK_EVENT_TYPES;
+	const cartTimestamp = props.cartTimestamp;
 
 	const audioRef = useRef(null);
 	const fileLengthRef = useRef(null);
@@ -37,9 +38,9 @@ export default function LocalPlayer(props) {
 		return ms / 1000;
 	}
 
-	const getCartTimestamp = useCallback( (track, activeTime) => {
+	const getCartTimestamp = useCallback( (track, remainingTime) => {
 
-		return track.start_timestamp + activeTime;
+		return track.end_timestamp - remainingTime;
 
 	}, []);
 
@@ -114,14 +115,19 @@ export default function LocalPlayer(props) {
 
 			// Calculate cartTimestamp
 			console.log('aT in hPE3: ', activeTrack);
-			const cartTimestamp = getCartTimestamp(activeTrack, audioRef.current.duration);
+			const newCartTimestamp = getCartTimestamp(activeTrack, remainingPlayLengthRef.current);
 
 			// Emit a track end 'event'
-			console.log('Emitting track change event');
-			setTrackChangeEvent({
-				activeTrack: activeTrack,
-				cartTimestamp: cartTimestamp,
-				type: TRACK_EVENT_TYPES.TRACK_END
+			console.log('Emitting track change event from local player');
+			setTrackChangeEventQueue( (prev) => {
+				return ([
+					...prev,
+					{
+						activeTrack: activeTrack,
+						cartTimestamp: newCartTimestamp,
+						type: TRACK_EVENT_TYPES.TRACK_END
+					}
+				])
 			});
 		}
 
