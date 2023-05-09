@@ -52,11 +52,19 @@ export default function CartPlayer(props) {
 		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
 	}
 
-	const DEFAULT_TRACK_CHANGE_EVENT = {
-		activeTrack: null,
-		cartTimestamp: null,
-		type: null
-	}
+	// This is set up as a queue because the Spotify SDK has no native
+	// way of handling track end events, and the best workaround I have found
+	// usually fires 2-4 times at track end; the track event queue will be used
+	// so that the most recent event can be compared against the previous
+	/*
+	const DEFAULT_TRACK_CHANGE_EVENT_QUEUE = [
+		{
+			activeTrack: null,
+			cartTimestamp: null,
+			type: null
+		}
+	]
+	*/
 
 	// Note that activeProgram will select 0-3; when rendered, if the 
 	// number to be displayed is needed, it is imperative to add 1
@@ -66,7 +74,9 @@ export default function CartPlayer(props) {
 	const [activeProgramNumber, setActiveProgramNumber] = useState(0);
 	const [isCartPlaying, setIsCartPlaying] = useState(false);
 	const [playbackMessage, setPlaybackMessage] = useState('');
-	const [trackChangeEvent, setTrackChangeEvent] = useState(DEFAULT_TRACK_CHANGE_EVENT);
+	const [trackChangeEventQueue, setTrackChangeEventQueue] = useState([]);
+
+	const cartTimestamp = useRef(0);
 
 	// Spotify SDK effect hooks
 	const [spotifyStatus, setSpotifyStatus] = useState(SPOTIFY_STATUSES.NOT_STARTED);
@@ -249,14 +259,28 @@ export default function CartPlayer(props) {
 	// updating activeTrack
 	useEffect(() => {
 
-		if (!trackChangeEvent || !activeCart || !cartArray) {
+		if (!trackChangeEventQueue || !activeCart || !cartArray) {
 			return;
 		}
+
+		const currentTrackChange = trackChangeEventQueue[trackChangeEventQueue.length - 1];
+		const previousTrackChange = trackChangeEventQueue[trackChangeEventQueue.length - 2] || null;
+
+		console.log(currentTrackChange);
+		console.log(previousTrackChange);
+
+		// Set cartTimestamp based on track change 'event'
+		cartTimestamp.current = currentTrackChange.cartTimestamp;
 
 		// Find index of activeTrack in cartArray
 		const index = cartArray[activeProgramNumber].indexOf(activeTrack);
 
-		if (trackChangeEvent.type = TRACK_EVENT_TYPES.TRACK_END) {
+		if (
+			currentTrackChange.type === TRACK_EVENT_TYPES.TRACK_END 
+			&& (previousTrackChange === null
+				|| currentTrackChange.activeTrack.audio !== previousTrackChange.activeTrack.audio
+				)
+			) {
 			// Set activeTrack to be next object
 			setActiveTrack(cartArray[activeProgramNumber][index + 1]);
 		}
@@ -266,12 +290,17 @@ export default function CartPlayer(props) {
 
 		}
 
-	}, [trackChangeEvent, activeCart])
+	}, [trackChangeEventQueue, activeCart])
 
 	// TESTING
 	useEffect(() => {
 		console.log('cartArray: ', cartArray);
 	}, [cartArray])
+
+	// TESTING
+	useEffect(() => {
+		console.log('tCEQ: ', trackChangeEventQueue);
+	}, [trackChangeEventQueue])
 
 	return (
 		<Fragment>
@@ -290,19 +319,19 @@ export default function CartPlayer(props) {
 				activeCart={activeCart}
 				spotifyUserAuthToken={spotifyUserAuthToken}
 				setSpotifyStatus={setSpotifyStatus}
-				setTrackChangeEvent={setTrackChangeEvent}
-				trackChangeEvent={trackChangeEvent}
+				setTrackChangeEventQueue={setTrackChangeEventQueue}
 				activeTrack={activeTrack}
 				isCartPlaying={isCartPlaying}
 				SPOTIFY_STATUSES={SPOTIFY_STATUSES}
 				TRACK_EVENT_TYPES={TRACK_EVENT_TYPES}
+				cartTimestamp={cartTimestamp.current}
 			/>
 			<LocalPlayer
-				setTrackChangeEvent={setTrackChangeEvent}
-				trackChangeEvent={trackChangeEvent}
+				setTrackChangeEventQueue={setTrackChangeEventQueue}
 				activeTrack={activeTrack}
 				isCartPlaying={isCartPlaying}
 				TRACK_EVENT_TYPES={TRACK_EVENT_TYPES}
+				cartTimestamp={cartTimestamp.current}
 			/>
 			<div className='audioElements'>
 				<audio src={tapeHiss} ref={tapeHissRef} />
