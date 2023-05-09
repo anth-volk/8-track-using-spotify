@@ -97,7 +97,11 @@ export default function SpotifyPlayer(props) {
 			.then( (state) => {
 				return track.start_timestamp + state.position;
 			})
+<<<<<<< HEAD
 	}, [getSpotifyPlayerState]);
+=======
+	}, []);
+>>>>>>> 9659f99ab43a6c8d99f0ce3d40e8edb3fa5f1b90
 
 	const handleTrackEnd = useCallback(() => {
 
@@ -323,7 +327,11 @@ export default function SpotifyPlayer(props) {
 			spotifyPlayer.current.pause();
 		}
 
+<<<<<<< HEAD
 	}, [isCartPlaying, activeTrack, deviceId, activeSpotifyAudio])
+=======
+	}, [isCartPlaying, activeTrack, deviceId, isCartPlaying, activeSpotifyAudio])
+>>>>>>> 9659f99ab43a6c8d99f0ce3d40e8edb3fa5f1b90
 
 	// Spotify track end handler, where on end, could it launch a callback? Except the event often occurs multiple times...
 
