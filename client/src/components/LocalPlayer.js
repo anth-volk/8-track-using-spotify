@@ -7,9 +7,6 @@ import {
 	useState
 } from 'react';
 
-// Internal imports
-import tapeHiss from '../audio_files/tape_hiss.mp3';
-
 export default function LocalPlayer(props) {
 
 	const EFFECT = 'EFFECT';
@@ -25,10 +22,6 @@ export default function LocalPlayer(props) {
 	const audioRef = useRef(null);
 	const fileLengthRef = useRef(null);
 	const remainingPlayLengthRef = useRef(null);
-
-	// Local play start/stop handler based on isCartPlaying and program number (& activeTrack?)
-	// Needs to somehow set up custom loop length while initiating playback
-	// Could request animation frame?
 
 	function convertToMS(seconds) {
 		return parseInt(seconds * 1000);
@@ -61,6 +54,8 @@ export default function LocalPlayer(props) {
 		remainingPlayLengthRef.current = playLength;
 
 		// Not the best way of doing this, but this is aimed at the tape hiss track
+		// When remainingLength is less than fileLength, play until set point, 
+		// then pause and 'rewind'
 		if (playLength < fileLength) {
 			console.log('tL < aL');
 			console.log(fileLength);
@@ -69,6 +64,8 @@ export default function LocalPlayer(props) {
 			remainingPlayLengthRef.current = 0;
 		}
 		else {
+			// While the remaining playLength is greater than fileLength,
+			// keep playing, pausing, rewinding, then deducting from remainingLength
 			console.log('tL !< aL');
 			audioRef.current.currentTime = 0;
 			remainingPlayLengthRef.current -= convertToMS(audioRef.current.duration);
@@ -77,12 +74,6 @@ export default function LocalPlayer(props) {
 		console.log('currentTime: ', audioRef.current.currentTime);
 
 		audioRef.current.play();
-
-		// While the remaining playLength is greater than fileLength,
-		// keep playing, pausing, rewinding, then deducting from remainingLength
-
-		// When remainingLength is less than fileLength, play until set point, 
-		// then pause and 'rewind'
 
 	}, [activeTrack])
 
@@ -133,29 +124,6 @@ export default function LocalPlayer(props) {
 
 	}, [activeTrack]);
 
-	/*
-	// Effect hook for listening for track end and updating remaining length
-	useEffect(() => {
-		if (isCartPlaying && activeTrack.type === EFFECT) {
-
-			console.log('Creating audioRef listener');
-
-			audioRef.current.addEventListener('ended', (event) => {
-				console.log('Audio ended');
-				handlePlaybackEnd();
-			})
-		}
-
-		return () => {
-			if (audioRef.current) {
-				audioRef.current.removeEventListener('ended', (event) => {
-					handlePlaybackEnd();
-				})
-			}
-		}
-	}, [isCartPlaying, activeTrack]);
-	*/
-
 	// Effect hook for initiating playback on change of activeTrack
 	useEffect(() => {
 
@@ -202,13 +170,6 @@ export default function LocalPlayer(props) {
 
 	// Effect hook for playing and pausing audio
 
-
-	// Some sort of callback to execute on end?
-
-	// What if we emitted an "event" on end that set some piece of state?
-
-
-	
 	return (
 		<h1>Placeholder for LocalPlayer</h1>
 	)

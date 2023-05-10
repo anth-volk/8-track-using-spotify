@@ -52,20 +52,6 @@ export default function CartPlayer(props) {
 		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
 	}
 
-	// This is set up as a queue because the Spotify SDK has no native
-	// way of handling track end events, and the best workaround I have found
-	// usually fires 2-4 times at track end; the track event queue will be used
-	// so that the most recent event can be compared against the previous
-	/*
-	const DEFAULT_TRACK_CHANGE_EVENT_QUEUE = [
-		{
-			activeTrack: null,
-			cartTimestamp: null,
-			type: null
-		}
-	]
-	*/
-
 	// Note that activeProgram will select 0-3; when rendered, if the 
 	// number to be displayed is needed, it is imperative to add 1
 	const [cartArray, setCartArray] = useState(null);
@@ -83,10 +69,6 @@ export default function CartPlayer(props) {
 
 	// Likely to delete this hook
 	const [isSpotifyTrackEnded, setIsSpotifyTrackEnded] = useState(false);
-
-	// For testing
-	// const intervalRef = useRef(null);
-
 
 	function handlePlayPause() {
 		if (activeCart) {
@@ -108,19 +90,6 @@ export default function CartPlayer(props) {
 			}
 		})
 	}
-
-	/*
-	// For testing
-	useEffect(() => {
-
-		intervalRef.current = setInterval(() => {
-			console.log(activeTrack);
-		}, 20)
-
-		return ()=> clearInterval(intervalRef.current);
-
-	}, []);
-	*/
 
 	// Effect hook for setting playback message
 	useEffect(() => {
@@ -263,6 +232,10 @@ export default function CartPlayer(props) {
 			return;
 		}
 
+		// This is set up as a queue because the Spotify SDK has no native
+		// way of handling track end events, and the best workaround I have found
+		// usually fires 2-4 times at track end; the track event queue will be used
+		// so that the most recent event can be compared against the previous
 		const currentTrackChange = trackChangeEventQueue[trackChangeEventQueue.length - 1];
 		const previousTrackChange = trackChangeEventQueue[trackChangeEventQueue.length - 2] || null;
 
