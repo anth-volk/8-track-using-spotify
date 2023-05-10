@@ -47,7 +47,7 @@ export default function SpotifyPlayer(props) {
 		const startTime = cartTimestamp - track.start_timestamp + 1;
 
 		try {
-			const responseRaw = await fetch('https://api.spotify.com/v1/me/player/play', {
+			const responseRaw = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceId, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function SpotifyPlayer(props) {
 		catch (err) {
 			console.error('Error while initiating Spotify playback: ', err);
 		}
-	}, [spotifyUserAuthToken]);
+	}, [spotifyUserAuthToken, deviceId]);
 
 	// Function for fetching Spotify player state via SDk
 	const getSpotifyPlayerState = useCallback( async() => {
@@ -91,19 +91,123 @@ export default function SpotifyPlayer(props) {
 		}
 	}, [])
 
+	// gCT with then's
 	// Function for calculating overall cart timestamp using track position
-	const getCartTimestamp = useCallback((track) => {
-		getSpotifyPlayerState()
-			.then( (state) => {
-				return track.start_timestamp + state.position;
-			})
+	const getCartTimestamp = useCallback((track, isTrackEnd = false) => {
+
+		let position = 0;
+
+		// This is written this way because the method for measuring
+		// track end using Spotify SDK requires the track to be at position=0,
+		// thereby simulating the beginning of the track
+		if (isTrackEnd) {
+			return track.end_timestamp;
+		}
+		else {
+			console.log('track inside gCT: ', track);
+			getSpotifyPlayerState()
+				.then( (state) => {
+					console.log('track inside gSPS: ', track);
+					position = state.position;
+					// return track.start_timestamp + state.position;
+				})
+		
+			console.log('position: ', position);
+			console.log('position: ', position);
+
+
+			return track.start_timestamp + position;
+		}
 	}, [getSpotifyPlayerState]);
 
-	const handleTrackEnd = useCallback(() => {
+	/*
+	// gCT with async/await
+	// Function for calculating overall cart timestamp using track position
+	const getCartTimestamp = useCallback(async (track) => {
+
+		console.log('track inside gCT: ', track);
+		const state = await getSpotifyPlayerState();
+		console.log(track.start_timestamp);
+		console.log(state.position);
+		return track.start_timestamp + state.position;
+
+	}, [getSpotifyPlayerState]);
+	*/
+
+	/*
+	// gCT without useCallback
+	function getCartTimestamp(track) {
+
+		console.log('track inside gCT: ', track);
+		getSpotifyPlayerState()
+			.then( (state) => {
+				console.log('track inside gSPS: ', track);
+				return track.start_timestamp + state.position;
+			})
+	}
+	*/
+
+	/*
+	// Track end handler with series of then's
+	const handleTrackEnd = useCallback((track) => {
+
+		// Calculate cartTimestamp
+		console.log('aT inside handleTrackEnd: ', activeTrack);
+		console.log('track inside handleTrackEnd: ', activeTrack);
+		getCartTimestamp(track)
+			.then( (newCartTimestamp) => {
+				console.log('nCT: ', newCartTimestamp);
+
+				// Emit a track end 'event'
+				console.log('Emitting track change event from Spotify player');
+				setTrackChangeEventQueue( (prev) => {
+					return ([
+						...prev,
+						{
+							activeTrack: activeTrack,
+							cartTimestamp: newCartTimestamp,
+							type: TRACK_EVENT_TYPES.TRACK_END
+						}
+					])
+				});	
+			})
+
+	}, [activeTrack, getCartTimestamp, setTrackChangeEventQueue, TRACK_EVENT_TYPES.TRACK_END]);
+	*/
+
+	// Track end handler with useCallback and async/await
+	const handleTrackEnd = useCallback((track) => {
+
+		// Calculate cartTimestamp
+		console.log('track param inside handleTrackEnd: ', track);
+		const newCartTimestamp = getCartTimestamp(track, true);
+
+		console.log('nCT: ', newCartTimestamp);
+
+		// Emit a track end 'event'
+		console.log('Emitting track change event from Spotify player');
+		setTrackChangeEventQueue( (prev) => {
+			return ([
+				...prev,
+				{
+					activeTrack: track,
+					cartTimestamp: newCartTimestamp,
+					type: TRACK_EVENT_TYPES.TRACK_END
+				}
+			])
+		});
+
+	}, [getCartTimestamp, setTrackChangeEventQueue, TRACK_EVENT_TYPES.TRACK_END]);
+
+	/*
+	// Track end handler, but without useCallback
+	function handleTrackEnd() {
 
 		// Calculate cartTimestamp
 		console.log('aT inside handleTrackEnd: ', activeTrack);
 		const newCartTimestamp = getCartTimestamp(activeTrack);
+
+		console.log('nCT: ', newCartTimestamp);
 
 		// Emit a track end 'event'
 		console.log('Emitting track change event from Spotify player');
@@ -118,8 +222,9 @@ export default function SpotifyPlayer(props) {
 			])
 		});
 
-	}, [activeTrack, getCartTimestamp, setTrackChangeEventQueue, TRACK_EVENT_TYPES.TRACK_END]);
-
+	}
+	*/
+	
 	// Spotify SDK hook
 	useEffect(() => {
 
@@ -163,6 +268,7 @@ export default function SpotifyPlayer(props) {
 	
 			}));
 
+			/*
 			// Listener for track end, taken from comment at 
 			// https://github.com/spotify/web-playback-sdk/issues/35
 			spotifyPlayer.current.addListener('player_state_changed', (state) => {
@@ -180,6 +286,7 @@ export default function SpotifyPlayer(props) {
 				}
 
 			});
+			*/
 	
 			spotifyPlayer.current.on('playback_error', ({message}) => {
 				console.error('Failed to perform playback', message);
@@ -189,27 +296,35 @@ export default function SpotifyPlayer(props) {
 		
 		};
 	
-	}, [spotifyUserAuthToken, setSpotifyStatus, handleTrackEnd]);
+	}, [spotifyUserAuthToken, setSpotifyStatus]);
 
-	/*
 	// Effect hook to create listener for track end
 	useEffect(() => {
 
-		window.onSpotifyWebPlaybackSDKReady = () => {
+		if (deviceId 
+			&& activeTrack
+			&& activeTrack.type === SPOTIFY_TRACK
+		) {
 
 			// Listener for track end, taken from comment at 
 			// https://github.com/spotify/web-playback-sdk/issues/35
 			spotifyPlayer.current.addListener('player_state_changed', (state) => {
 
+				const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
+				console.log('aTURI: ', activeTrackURI);
+
 				if (
 					state
 					&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
 					&& state.paused
+					// && state.uri === activeTrackURI
+					&& state.track_window.current_track.id === activeTrack.audio
 				) {
+					console.log('state inside end listener: ', state);
 					console.log('Track ended');
 					// setIsSpotifyTrackEnded(true);
-					console.log('aT inside end listener: ', activeTrack);
-					handleTrackEnd();
+					console.log('aT inside Spotify song end listener: ', activeTrack);
+					handleTrackEnd(activeTrack);
 
 				}
 
@@ -217,8 +332,7 @@ export default function SpotifyPlayer(props) {
 
 		}
 
-	}, [activeTrack]);
-	*/
+	}, [deviceId, handleTrackEnd, activeTrack]);
 
 	// Function to transfer playback to local context
 	useEffect(() => {
@@ -281,8 +395,6 @@ export default function SpotifyPlayer(props) {
 		}
 
 	}, [activeCart, deviceId, isPlaybackActive, SPOTIFY_STATUSES.CONNECTED, SPOTIFY_STATUSES.ERROR, SPOTIFY_STATUSES.RATE_LIMITS, spotifyUserAuthToken, setSpotifyStatus]);
-
-	// Util function for calculating activeTime?
 
 	// Spotify playback initialization handler
 	useEffect(() => {

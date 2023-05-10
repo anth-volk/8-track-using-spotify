@@ -282,6 +282,7 @@ export default function CartPlayer(props) {
 				)
 			) {
 			// Set activeTrack to be next object
+			console.log('Changing track in CartPlayer');
 			setActiveTrack(cartArray[activeProgramNumber][index + 1]);
 		}
 		else {
