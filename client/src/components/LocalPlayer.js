@@ -19,6 +19,8 @@ export default function LocalPlayer(props) {
 	const TRACK_EVENT_TYPES = props.TRACK_EVENT_TYPES;
 	const cartTimestamp = props.cartTimestamp;
 
+	const [isEffectPlaying, setIsEffectPlaying] = useState(false);
+
 	const audioRef = useRef(null);
 	const fileLengthRef = useRef(null);
 	const remainingPlayLengthRef = useRef(null);
@@ -74,6 +76,7 @@ export default function LocalPlayer(props) {
 		console.log('currentTime: ', audioRef.current.currentTime);
 
 		audioRef.current.play();
+		setIsEffectPlaying(true);
 
 	}, [activeTrack])
 
@@ -102,6 +105,7 @@ export default function LocalPlayer(props) {
 			console.log('Entering hPE routine 3');
 			// Pause and 'rewind' audio
 			audioRef.current.pause();
+			setIsEffectPlaying(false);
 			audioRef.current.currentTime = 0;
 
 			// Calculate cartTimestamp
@@ -130,7 +134,7 @@ export default function LocalPlayer(props) {
 		console.log('Initiating track initiation hook local player');
 
 		// If no activeTrack or not playing, return
-		if (!activeTrack || !isCartPlaying) {
+		if (!activeTrack || !isCartPlaying || isEffectPlaying) {
 			console.log('No aT, no isPlaying');
 			return;
 		}
@@ -169,6 +173,25 @@ export default function LocalPlayer(props) {
 	}, [activeTrack, isCartPlaying, startLocalPlayback, trackChangeEvent]);
 
 	// Effect hook for playing and pausing audio
+	useEffect(() => {
+		// If no activeTrack, return
+		if (!activeTrack || !audioRef.current || !isEffectPlaying) {
+			return;
+		}
+		
+		// If isCartPlaying is true, execute play
+		else if (isCartPlaying && activeTrack.type === EFFECT) {
+			console.log('activeTrack: ', activeTrack);
+			console.log('currentTime in play/pause: ', audioRef.current.currentTime);
+			audioRef.current.play();
+		}
+		// If isCartPlaying is false, execute pause
+		else if (activeTrack.type === EFFECT) {
+			console.log('activeTrack: ', activeTrack);
+			audioRef.current.pause();
+		}
+		
+	}, [isCartPlaying, activeTrack, isEffectPlaying])
 
 	return (
 		<h1>Placeholder for LocalPlayer</h1>
