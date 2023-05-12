@@ -3,7 +3,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
-import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/spotify.js';
+import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreation.js';
 
 export default function CartCreation(props) {
 
