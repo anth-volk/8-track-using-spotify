@@ -10,6 +10,7 @@ import {
 // Local function imports
 import {
 	handlePlayPauseSpotify,
+	getCartTimestampSpotify,
 	startSpotifyPlayback
 } from '../utilities/spotifyPlayback.js';
 
@@ -502,6 +503,46 @@ export default function CartPlayer(props) {
 		}
 	}, [isActiveLocalAudio])
 
+	// Effect hook to create listener for Spotify track end
+	useEffect(() => {
+
+		if (deviceId 
+			&& activeTrack
+			&& activeTrack.type === SPOTIFY_TRACK
+		) {
+
+			// Listener for track end, taken from comment at 
+			// https://github.com/spotify/web-playback-sdk/issues/35
+			spotifyPlayer.current.addListener('player_state_changed', (state) => {
+
+				const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
+				console.log('aTURI: ', activeTrackURI);
+
+				if (
+					state
+					&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
+					&& state.paused
+					// && state.uri === activeTrackURI
+					&& state.track_window.current_track.id === activeTrack.audio
+				) {
+					console.log('state inside end listener: ', state);
+					console.log('Track ended');
+					// setIsSpotifyTrackEnded(true);
+					console.log('aT inside Spotify song end listener: ', activeTrack);
+					cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
+					console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
+					console.log('tI.c before: ', trackIndex.current);
+					trackIndex.current += 1;
+					console.log('tI.c after: ', trackIndex.current);
+					setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+
+				}
+
+			});
+
+		}
+
+	}, [deviceId, activeTrack]);
 
 	return (
 		<Fragment>
