@@ -171,7 +171,7 @@ export default function CartPlayer(props) {
 
 	}
 
-	function handleProgramChange() {
+	async function handleProgramChange() {
 
 		// Set new program number
 		const newProgramNumber = activeProgramNumber === NUMBER_OF_PROGRAMS - 1
@@ -190,18 +190,29 @@ export default function CartPlayer(props) {
 			// Based on activeTrack type, get current cart timestamp
 			// Afterward, end current track
 			if (activeTrack.type === SPOTIFY_TRACK) {
-				newCartTimestamp = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false);
+				newCartTimestamp = await getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false);
+				console.log('nCT in Spotify program handler: ', newCartTimestamp);
 				cartTimestamp.current = newCartTimestamp;
 
-				localAudioRef.current.pause();
-				localAudioRef.current.currentTime = 0;
+				spotifyPlayer.current.pause();
+				/*
+				getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false)
+					.then( (timestamp) => {
+						newCartTimestamp = timestamp;
+						cartTimestamp.current = newCartTimestamp;
+
+						spotifyPlayer.current.pause();
+					});
+				*/
+
 			}
 			else {
 				newCartTimestamp = getCartTimestampLocal(activeTrack, localAudioRef.current, localRemainingPlayLength.current);
 				console.log('nCT on local in program hook: ', newCartTimestamp);
 				cartTimestamp.current = newCartTimestamp;
 
-				spotifyPlayer.current.pause();
+				localAudioRef.current.pause();
+				localAudioRef.current.currentTime = 0;
 			}
 
 			// Find new activeTrack
@@ -256,7 +267,7 @@ export default function CartPlayer(props) {
 
 	const checkPlaybackEndSpotify = useCallback( (state) => {
 		const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
-		console.log('aTURI: ', activeTrackURI);
+		// console.log('aTURI: ', activeTrackURI);
 
 		if (
 			state

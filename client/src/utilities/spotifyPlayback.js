@@ -1,5 +1,5 @@
 // Function for calculating overall cart timestamp using track position
-export function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd=false) {
+export async function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd=false) {
 
 	let position = 0;
 
@@ -9,19 +9,31 @@ export function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd=f
 	if (isTrackEnd) {
 		return activeTrack.end_timestamp;
 	}
+	/*
 	else {
 		console.log('track inside gCT: ', activeTrack);
 		getSpotifyPlayerState(spotifyPlayer)
 			.then( (state) => {
 				console.log('track inside gSPS: ', activeTrack);
 				position = state.position;
+				console.log('position inside gSPS: ', position);
+				return activeTrack.start_timestamp + position;
 				// return track.start_timestamp + state.position;
 			})
-	
+	*/
+		/*
 		console.log('position: ', position);
 		console.log('position: ', position);
 
 		console.log('Spotify timestamp return: ', activeTrack.start_timestamp + position);
+		return activeTrack.start_timestamp + position;
+		*/
+	/*
+	}
+	*/
+	else {
+		const state = await getSpotifyPlayerState(spotifyPlayer);
+		const position = state.position;
 		return activeTrack.start_timestamp + position;
 	}
 }
