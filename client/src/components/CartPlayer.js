@@ -257,13 +257,7 @@ export default function CartPlayer(props) {
 			localRemainingPlayLength.current
 		);
 
-		// The second check is done because, despite placing the function in 
-		// useCallback, adding that to the useEffect deps array, and ensuring 
-		// that the effect is unmounting, I am still unable to remove the local
-		// playback end event listener on effect unmount (later in the code) 
-		// at this time
 		if (playbackObject.playbackState === false) {
-			// && activeTrack.audio !== lastTrackEndAudio.current) {
 			// This will require debugging at end of program
 			console.log('playbackState is false');
 			trackIndex.current = trackIndex.current + 1;
