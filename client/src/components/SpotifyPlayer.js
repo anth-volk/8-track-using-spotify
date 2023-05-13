@@ -326,3 +326,46 @@ export default function SpotifyPlayer(props) {
 		<h1>Placeholder for SpotifyPlayer</h1>
 	)
 }
+
+useEffect(() => {
+
+	if (deviceId 
+		&& activeTrack
+		&& activeTrack.type === SPOTIFY_TRACK
+	) {
+
+		// Listener for track end, taken from comment at 
+		// https://github.com/spotify/web-playback-sdk/issues/35
+		spotifyPlayer.current.addListener('player_state_changed', (state) => {
+
+			const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
+			console.log('aTURI: ', activeTrackURI);
+
+			if (
+				state
+				&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
+				&& state.paused
+				// && state.uri === activeTrackURI
+				&& state.track_window.current_track.id === activeTrack.audio
+			) {
+				console.log('state inside end listener: ', state);
+				console.log('Track ended');
+				// setIsSpotifyTrackEnded(true);
+				console.log('aT inside Spotify song end listener: ', activeTrack);
+				cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
+				console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
+				if (lastTrackEndAudio.current !== activeTrack.audio) {
+					console.log('tI.c before: ', trackIndex.current);
+					trackIndex.current += 1;
+					console.log('tI.c after: ', trackIndex.current);
+					lastTrackEndAudio.current = activeTrack.audio;
+					setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+				}
+
+			}
+
+		});
+
+	}
+
+}, [deviceId, activeTrack]);

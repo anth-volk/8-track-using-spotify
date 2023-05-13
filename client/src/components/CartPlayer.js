@@ -57,6 +57,7 @@ export default function CartPlayer(props) {
 	const [playbackMessage, setPlaybackMessage] = useState('');
 	const cartTimestamp = useRef(0);
 	const trackIndex = useRef(0);
+	const lastTrackEndAudio = useRef(null);
 
 	// State and refs for Spotify playback
 	const [isSpotifyReady, setIsSpotifyReady] = useState(false);
@@ -182,7 +183,7 @@ export default function CartPlayer(props) {
 		console.log('prev aPN: ', activeProgramNumber);
 	}
 
-	function checkPlaybackEndLocal() {
+	const checkPlaybackEndLocal = useCallback(() => {
 		const playbackObject = handleTrackEndLocal(
 			activeTrack,
 			localAudioRef.current,
@@ -190,12 +191,19 @@ export default function CartPlayer(props) {
 			localRemainingPlayLength.current
 		);
 
-		if (playbackObject.playbackState === false) {
+		// The second check is done because, despite placing the function in 
+		// useCallback, adding that to the useEffect deps array, and ensuring 
+		// that the effect is unmounting, I am still unable to remove the local
+		// playback end event listener on effect unmount (later in the code) 
+		// at this time
+		if (playbackObject.playbackState === false
+			&& activeTrack.audio !== lastTrackEndAudio.current) {
 			// This will require debugging at end of program
 			console.log('playbackState is false');
 			trackIndex.current = trackIndex.current + 1;
 			console.log('New track index:', trackIndex.current);
 			setIsActiveLocalAudio(false);
+			lastTrackEndAudio.current = activeTrack.audio;
 			setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
 		}
 		else {
@@ -204,7 +212,35 @@ export default function CartPlayer(props) {
 		}
 
 		cartTimestamp.current = playbackObject.cartTimestamp;
-	}
+	}, [activeProgramNumber, activeTrack, cartArray]);
+
+	const checkPlaybackEndSpotify = useCallback( (state) => {
+		const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
+		console.log('aTURI: ', activeTrackURI);
+
+		if (
+			state
+			&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
+			&& state.paused
+			// && state.uri === activeTrackURI
+			&& state.track_window.current_track.id === activeTrack.audio
+		) {
+			console.log('state inside end listener: ', state);
+			console.log('Track ended');
+			// setIsSpotifyTrackEnded(true);
+			console.log('aT inside Spotify song end listener: ', activeTrack);
+			cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
+			console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
+			if (lastTrackEndAudio.current !== activeTrack.audio) {
+				console.log('tI.c before: ', trackIndex.current);
+				trackIndex.current += 1;
+				console.log('tI.c after: ', trackIndex.current);
+				lastTrackEndAudio.current = activeTrack.audio;
+				setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+			}
+
+		}
+	}, [activeProgramNumber, activeTrack, cartArray])
 
 	const transferSpotifyPlayback = useCallback(async (deviceId) => {
 		try {
@@ -495,13 +531,14 @@ export default function CartPlayer(props) {
 			})
 			
 			return () => {
+				console.log('Removing local track end event listener');
 				localAudioRef.current.removeEventListener('ended', (event) => {
 					console.log('Audio ended');
 					checkPlaybackEndLocal();
 				})
 			}
 		}
-	}, [isActiveLocalAudio])
+	}, [isActiveLocalAudio, checkPlaybackEndLocal])
 
 	// Effect hook to create listener for Spotify track end
 	useEffect(() => {
@@ -515,6 +552,7 @@ export default function CartPlayer(props) {
 			// https://github.com/spotify/web-playback-sdk/issues/35
 			spotifyPlayer.current.addListener('player_state_changed', (state) => {
 
+				/*
 				const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
 				console.log('aTURI: ', activeTrackURI);
 
@@ -531,18 +569,30 @@ export default function CartPlayer(props) {
 					console.log('aT inside Spotify song end listener: ', activeTrack);
 					cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
 					console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
-					console.log('tI.c before: ', trackIndex.current);
-					trackIndex.current += 1;
-					console.log('tI.c after: ', trackIndex.current);
-					setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+					if (lastTrackEndAudio.current !== activeTrack.audio) {
+						console.log('tI.c before: ', trackIndex.current);
+						trackIndex.current += 1;
+						console.log('tI.c after: ', trackIndex.current);
+						lastTrackEndAudio.current = activeTrack.audio;
+						setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+					}
 
 				}
+				*/
+				checkPlaybackEndSpotify(state);
 
 			});
 
 		}
 
-	}, [deviceId, activeTrack]);
+		return () => {
+			console.log('Removing Spotify track end event listener');
+			spotifyPlayer.current.removeListener('player_state_changed', (state) => {
+				checkPlaybackEndSpotify(state);
+			});
+		}
+
+	}, [deviceId, activeTrack, checkPlaybackEndSpotify]);
 
 	return (
 		<Fragment>
