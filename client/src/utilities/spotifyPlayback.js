@@ -116,6 +116,12 @@ export async function startSpotifyPlayback(track, cartTimestamp, deviceId, spoti
 		if (!responseRaw.ok) {
 			const responseJSON = await responseRaw.json();
 			console.error('Network-related error while initiating Spotify playback: ', responseJSON);
+
+			if (responseJSON.error.status === 502) {
+				console.log('Re-requesting Spotify track');
+				await startSpotifyPlayback(track, cartTimestamp, deviceId, spotifyUserAuthToken);
+			}
+
 			return false;
 		}
 		else {
