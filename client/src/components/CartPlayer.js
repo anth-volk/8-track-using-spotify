@@ -23,6 +23,7 @@ import {
 
 // Local audio imports
 import tapeHiss from '../audio_files/tape_hiss.mp3';
+import programClick from '../audio_files/program_click.mp3';
 
 export default function CartPlayer(props) {
 
@@ -32,13 +33,14 @@ export default function CartPlayer(props) {
 
 	// Audio refs
 	const tapeHissRef = useRef(null);
+	const programClickRef = useRef(null);
 
 	// Playback constants
 	const NUMBER_OF_PROGRAMS = 4;
 	const FADE_IN_TIMESTAMP_MS = 0;
 	const FADE_IN_LENGTH_MS = 2000;
 	const FADE_OUT_LENGTH_MS = 2000;
-	const PROGRAM_SELECTOR_LENGTH_MS = 0;
+	const PROGRAM_SELECTOR_LENGTH_MS = programClickRef.duration || 0;
 	const EFFECT = 'EFFECT';
 	const SPOTIFY_TRACK = 'SPOTIFY_TRACK';
 
@@ -47,7 +49,7 @@ export default function CartPlayer(props) {
 		FADE_IN: tapeHissRef.current,
 		FADE_OUT: tapeHissRef.current,
 		INTRA_TRACK_FADE: tapeHissRef.current,
-		PROGRAM_SELECTOR: 'PROGRAM_SELECTOR'
+		PROGRAM_SELECTOR: programClickRef.current
 	}
 
 	// State for overall playback
@@ -667,6 +669,7 @@ export default function CartPlayer(props) {
 			<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>
 			<div className='audioElements'>
 				<audio src={tapeHiss} ref={tapeHissRef} />
+				<audio src={programClick} ref={programClickRef} />
 			</div>
 		</div>
 	</Fragment>
