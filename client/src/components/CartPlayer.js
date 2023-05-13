@@ -81,6 +81,14 @@ export default function CartPlayer(props) {
 	const localCancelController = new AbortController();
 	const { signal: localCancelSignal } = localCancelController;
 
+	function calculateProgramNumber(currentProgramNumber) {
+		const newProgramNumber = currentProgramNumber === NUMBER_OF_PROGRAMS - 1
+		? 0
+		: currentProgramNumber + 1
+
+		return newProgramNumber
+	}
+
 	function handleTrackChange() {
 		// If track is of type Spotify...
 		if (activeTrack.type === SPOTIFY_TRACK) {
@@ -182,10 +190,15 @@ export default function CartPlayer(props) {
 
 	async function handleProgramChange() {
 
+		/*
 		// Set new program number
 		const newProgramNumber = activeProgramNumber === NUMBER_OF_PROGRAMS - 1
 			? 0
 			: activeProgramNumber + 1
+		*/
+
+		// Set new program number
+		const newProgramNumber = calculateProgramNumber(activeProgramNumber);
 
 		console.log('nPN: ', newProgramNumber);
 
@@ -246,9 +259,23 @@ export default function CartPlayer(props) {
 				);
 			});
 
+			// Find index of this track
+			const newTrackIndex = cartArray[newProgramNumber].findIndex( (element) => {
+				return element.start_timestamp === newTrack.start_timestamp;
+			});
+
+			/*
 			console.log('nCT: ', newCartTimestamp);
 			console.log('cT.c: ', cartTimestamp.current);
 			console.log('nAT: ', newTrack);
+			*/
+
+			console.log('nT.s_t: ', newTrack.start_timestamp);
+
+			// Set new index
+			trackIndex.current = newTrackIndex;
+			console.log('newTrackIndex: ', newTrackIndex);
+			console.log('tI.c: ', trackIndex.current);
 
 			// Set new activeTrack
 			setActiveTrack(newTrack);
@@ -268,11 +295,22 @@ export default function CartPlayer(props) {
 		if (playbackObject.playbackState === false) {
 			// This will require debugging at end of program
 			console.log('playbackState is false');
-			trackIndex.current = trackIndex.current + 1;
-			console.log('New track index:', trackIndex.current);
+
 			setIsActiveLocalAudio(false);
-			lastTrackEndAudio.current = activeTrack.audio;
-			setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+			// If we've reached end of program...
+			if (trackIndex.current + 1 === cartArray[activeProgramNumber].length) {
+				trackIndex.current = 0;
+				const newProgramNumber = calculateProgramNumber(activeProgramNumber);
+				setActiveTrack(cartArray[newProgramNumber][0]);
+				setActiveProgramNumber(newProgramNumber);
+			}
+			else {
+				trackIndex.current = trackIndex.current + 1;
+				console.log('New track index:', trackIndex.current);
+				lastTrackEndAudio.current = activeTrack.audio;
+				setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
+			}
+
 		}
 		else {
 			localFileLength.current = playbackObject.fileLength;
@@ -514,6 +552,8 @@ export default function CartPlayer(props) {
 			startTimestamp = startTimestamp + FADE_OUT_LENGTH_MS + 1;
 
 			// Finally, add program selector arm
+
+			// Calculate program selector length here to ensure audio ref is fully loaded
 			const programSelectorLengthMS = programClickRef.current.duration * 1000;
 
 			programArray = [
