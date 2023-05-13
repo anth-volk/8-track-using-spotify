@@ -195,6 +195,7 @@ export default function CartPlayer(props) {
 				cartTimestamp.current = newCartTimestamp;
 
 				spotifyPlayer.current.pause();
+				setIsActiveSpotifyAudio(false);
 				/*
 				getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false)
 					.then( (timestamp) => {
@@ -213,6 +214,10 @@ export default function CartPlayer(props) {
 
 				localAudioRef.current.pause();
 				localAudioRef.current.currentTime = 0;
+				localAudioRef.current.removeEventListener('ended',(event) => {
+					checkPlaybackEndLocal();
+				}, {once: true}); 
+				setIsActiveLocalAudio(false);
 			}
 
 			// Find new activeTrack
@@ -265,7 +270,7 @@ export default function CartPlayer(props) {
 		cartTimestamp.current = playbackObject.cartTimestamp;
 	}, [activeProgramNumber, activeTrack, cartArray]);
 
-	const checkPlaybackEndSpotify = useCallback( (state) => {
+	const checkPlaybackEndSpotify = useCallback(async (state) => {
 		const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
 		// console.log('aTURI: ', activeTrackURI);
 
@@ -280,7 +285,7 @@ export default function CartPlayer(props) {
 			console.log('Track ended');
 			// setIsSpotifyTrackEnded(true);
 			console.log('aT inside Spotify song end listener: ', activeTrack);
-			cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
+			cartTimestamp.current = await getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
 			console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
 			// This check is necessary because the track end handler inexplicably fires at least twice,
 			// as documented elsewhere in Spotify developer forums
@@ -579,17 +584,17 @@ export default function CartPlayer(props) {
 			console.log('Creating audioRef listener');
 
 			localAudioRef.current.addEventListener('ended', (event) => {
-				console.log('Audio ended');
 				checkPlaybackEndLocal();
-			})
+			}, {once: true});
 			
+			/*
 			return () => {
 				console.log('Removing local track end event listener');
 				localAudioRef.current.removeEventListener('ended', (event) => {
-					console.log('Audio ended');
 					checkPlaybackEndLocal();
 				})
 			}
+			*/
 		}
 	}, [isActiveLocalAudio, checkPlaybackEndLocal])
 

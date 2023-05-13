@@ -33,6 +33,7 @@ export async function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrac
 	*/
 	else {
 		const state = await getSpotifyPlayerState(spotifyPlayer);
+		console.log('awaited state: ', state);
 		const position = state.position;
 		return activeTrack.start_timestamp + position;
 	}
