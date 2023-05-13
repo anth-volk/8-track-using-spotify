@@ -40,7 +40,7 @@ export default function CartPlayer(props) {
 	const FADE_IN_TIMESTAMP_MS = 0;
 	const FADE_IN_LENGTH_MS = 2000;
 	const FADE_OUT_LENGTH_MS = 2000;
-	const PROGRAM_SELECTOR_LENGTH_MS = programClickRef.duration || 0;
+	// const PROGRAM_SELECTOR_LENGTH_MS = programClickRef.duration * 1000;
 	const EFFECT = 'EFFECT';
 	const SPOTIFY_TRACK = 'SPOTIFY_TRACK';
 
@@ -191,6 +191,12 @@ export default function CartPlayer(props) {
 
 		// Set new activeProgramNumber
 		setActiveProgramNumber(newProgramNumber);
+
+		// Play program switch audio
+		if (programClickRef.current) {
+			programClickRef.current.currentTime = 0;
+			programClickRef.current.play();
+		}
 		
 		if (activeTrack && isCartPlaying) {
 
@@ -508,14 +514,18 @@ export default function CartPlayer(props) {
 			startTimestamp = startTimestamp + FADE_OUT_LENGTH_MS + 1;
 
 			// Finally, add program selector arm
+			const programSelectorLengthMS = programClickRef.current.duration * 1000;
+
 			programArray = [
 				...programArray,
 				{
 					audio: effects.PROGRAM_SELECTOR,
 					type: EFFECT,
-					length: PROGRAM_SELECTOR_LENGTH_MS,
+					// length: PROGRAM_SELECTOR_LENGTH_MS,
+					length: programSelectorLengthMS,
 					start_timestamp: startTimestamp,
-					end_timestamp: startTimestamp + PROGRAM_SELECTOR_LENGTH_MS,
+					// end_timestamp: startTimestamp + PROGRAM_SELECTOR_LENGTH_MS,
+					end_timestamp: startTimestamp + programSelectorLengthMS
 				}
 			];
 
@@ -568,6 +578,18 @@ export default function CartPlayer(props) {
 		handleTrackChange();
 
 	}, [activeTrack])
+
+	/*
+	// Effect hook for playing program change sound
+	useEffect(() => {
+
+		if (isCartPlaying) {
+			programClickRef.current.currentTime = 0;
+			programClickRef.current.play();
+		}
+
+	}, [activeProgramNumber, isCartPlaying])
+	*/
 
 	/*
 	useEffect(() => {
