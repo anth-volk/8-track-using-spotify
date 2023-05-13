@@ -183,7 +183,7 @@ export default function CartPlayer(props) {
 		console.log('prev aPN: ', activeProgramNumber);
 	}
 
-	const checkPlaybackEndLocal = useCallback(() => {
+	const checkPlaybackEndLocal = useCallback((activeTrack, activeProgramNumber, cartArray) => {
 		const playbackObject = handleTrackEndLocal(
 			activeTrack,
 			localAudioRef.current,
@@ -231,6 +231,8 @@ export default function CartPlayer(props) {
 			console.log('aT inside Spotify song end listener: ', activeTrack);
 			cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
 			console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
+			// This check is necessary because the track end handler inexplicably fires at least twice,
+			// as documented elsewhere in Spotify developer forums
 			if (lastTrackEndAudio.current !== activeTrack.audio) {
 				console.log('tI.c before: ', trackIndex.current);
 				trackIndex.current += 1;
