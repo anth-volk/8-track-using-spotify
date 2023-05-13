@@ -72,6 +72,13 @@ export default function CartPlayer(props) {
 	const localFileLength = useRef(null);
 	const localRemainingPlayLength = useRef(null);
 
+	// Signals for cancelling event listeners
+	const spotifyCancelController = new AbortController();
+	const { signal: spotifyCancelSignal } = spotifyCancelController;
+
+	const localCancelController = new AbortController();
+	const { signal: localCancelSignal } = localCancelController;
+
 	function handleTrackChange() {
 		// If track is of type Spotify...
 		if (activeTrack.type === SPOTIFY_TRACK) {
@@ -214,9 +221,12 @@ export default function CartPlayer(props) {
 
 				localAudioRef.current.pause();
 				localAudioRef.current.currentTime = 0;
+				/*
 				localAudioRef.current.removeEventListener('ended',(event) => {
 					checkPlaybackEndLocal();
 				}, {once: true}); 
+				*/
+				localCancelController.abort();
 				setIsActiveLocalAudio(false);
 			}
 
@@ -252,8 +262,8 @@ export default function CartPlayer(props) {
 		// that the effect is unmounting, I am still unable to remove the local
 		// playback end event listener on effect unmount (later in the code) 
 		// at this time
-		if (playbackObject.playbackState === false
-			&& activeTrack.audio !== lastTrackEndAudio.current) {
+		if (playbackObject.playbackState === false) {
+			// && activeTrack.audio !== lastTrackEndAudio.current) {
 			// This will require debugging at end of program
 			console.log('playbackState is false');
 			trackIndex.current = trackIndex.current + 1;
@@ -585,7 +595,7 @@ export default function CartPlayer(props) {
 
 			localAudioRef.current.addEventListener('ended', (event) => {
 				checkPlaybackEndLocal();
-			}, {once: true});
+			}, { signal: localCancelSignal, once: true });
 			
 			/*
 			return () => {
