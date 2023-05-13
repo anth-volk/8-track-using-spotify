@@ -17,6 +17,7 @@ import {
 import {
 	handlePlayPauseLocal,
 	handleTrackEndLocal,
+	getCartTimestampLocal,
 	startLocalPlayback
 } from '../utilities/localPlayback.js';
 
@@ -112,7 +113,7 @@ export default function CartPlayer(props) {
 	function handlePlayPause() {
 
 		// If there is no deviceId, do nothing
-		if (!deviceId) {
+		if (!deviceId || !cartArray) {
 			return;
 		}
 
@@ -171,19 +172,58 @@ export default function CartPlayer(props) {
 	}
 
 	function handleProgramChange() {
-		setActiveProgramNumber( (prev) => {
-			if (prev === 3) {
-				return 0;
+
+		// Set new program number
+		const newProgramNumber = activeProgramNumber === NUMBER_OF_PROGRAMS - 1
+			? 0
+			: activeProgramNumber + 1
+
+		console.log('nPN: ', newProgramNumber);
+
+		// Set new activeProgramNumber
+		setActiveProgramNumber(newProgramNumber);
+		
+		if (activeTrack && isCartPlaying) {
+
+			let newCartTimestamp = 0;
+
+			// Based on activeTrack type, get current cart timestamp
+			// Afterward, end current track
+			if (activeTrack.type === SPOTIFY_TRACK) {
+				newCartTimestamp = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false);
+				cartTimestamp.current = newCartTimestamp;
+
+				localAudioRef.current.pause();
+				localAudioRef.current.currentTime = 0;
 			}
 			else {
-				return prev + 1;
-			}
-		})
+				newCartTimestamp = getCartTimestampLocal(activeTrack, localAudioRef.current, localRemainingPlayLength.current);
+				console.log('nCT on local in program hook: ', newCartTimestamp);
+				cartTimestamp.current = newCartTimestamp;
 
-		console.log('prev aPN: ', activeProgramNumber);
+				spotifyPlayer.current.pause();
+			}
+
+			// Find new activeTrack
+			const newTrack = cartArray[newProgramNumber].find( (track) => {
+				return (
+					track.start_timestamp <= cartTimestamp.current &&
+					track.end_timestamp >= cartTimestamp.current
+				);
+			});
+
+			console.log('nCT: ', newCartTimestamp);
+			console.log('cT.c: ', cartTimestamp.current);
+			console.log('nAT: ', newTrack);
+
+			// Set new activeTrack
+			setActiveTrack(newTrack);
+
+		}
+
 	}
 
-	const checkPlaybackEndLocal = useCallback((activeTrack, activeProgramNumber, cartArray) => {
+	const checkPlaybackEndLocal = useCallback(() => {
 		const playbackObject = handleTrackEndLocal(
 			activeTrack,
 			localAudioRef.current,
@@ -605,7 +645,7 @@ export default function CartPlayer(props) {
 				{ activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}
 				<p className='playbackMessage'>{playbackMessage}</p>
 			</div>
-			<button type='button' className={`playbackButton ${activeCart ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
+			<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
 				{ isCartPlaying ? 'PAUSE' : 'PLAY'}
 			</button>
 			<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>

@@ -21,7 +21,7 @@ export function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd=f
 		console.log('position: ', position);
 		console.log('position: ', position);
 
-
+		console.log('Spotify timestamp return: ', activeTrack.start_timestamp + position);
 		return activeTrack.start_timestamp + position;
 	}
 }

@@ -6,9 +6,22 @@ function convertToSeconds(ms) {
 	return ms / 1000;
 }
 
-function getCartTimestampLocal(activeTrack, remainingPlayLength) {
-	return activeTrack.end_timestamp - remainingPlayLength;
-}
+export function getCartTimestampLocal(activeTrack, trackRef, remainingPlayLength) {
+	if (remainingPlayLength === 0) {
+		// This is done at the moment because, for its final playthrough,
+		// a track's start time is measured as some number of seconds from the end
+		// to avoid the more complicated task of playing part of an audio file
+		console.log('aT.et: ', activeTrack.end_timestamp);
+		console.log('rPL: ', remainingPlayLength);
+		console.log('tR.d: ', trackRef.duration);
+		console.log('tR.ct: ', trackRef.currentTime);
+		return activeTrack.end_timestamp - (convertToMS(trackRef.duration) - convertToMS(trackRef.currentTime));
+	}
+	else {
+		return activeTrack.end_timestamp - remainingPlayLength - convertToMS(trackRef.duration) + convertToMS(trackRef.currentTime);
+	}
+}	
+// + (duration - currentTime)
 
 export function handlePlayPauseLocal(trackRef, isCartPlaying) {
 	if (!isCartPlaying) {
@@ -68,7 +81,7 @@ export function handleTrackEndLocal(activeTrack, trackRef, fileLength, remaining
 		*/
 	}
 
-	const newCartTimestamp = getCartTimestampLocal(activeTrack, remainingPlayLength);
+	const newCartTimestamp = getCartTimestampLocal(activeTrack, trackRef, remainingPlayLength);
 
 	return ({
 		fileLength: fileLength,
@@ -81,6 +94,10 @@ export function handleTrackEndLocal(activeTrack, trackRef, fileLength, remaining
 
 export function startLocalPlayback(activeTrack, trackRef, cartTimestamp) {
 
+	const startTime = cartTimestamp - activeTrack.start_timestamp;
+	console.log('cT in local: ', cartTimestamp);
+	console.log('aT.st in local: ', activeTrack.start_timestamp);
+	console.log('startTime for local: ', startTime);
 	// console.log('aT in sLP: ', activeTrack);
 
 	/*
@@ -92,7 +109,7 @@ export function startLocalPlayback(activeTrack, trackRef, cartTimestamp) {
 	console.log('trackRef: ', trackRef);
 
 	let fileLength = convertToMS(trackRef.duration);
-	let playLength = activeTrack.length;
+	let playLength = activeTrack.length - startTime;
 	console.log('fileLength: ', fileLength);
 	console.log('playLength: ', playLength);
 
