@@ -74,6 +74,9 @@ async function createUser(req, res) {
 
 async function verifyUser(req, res) {
 
+	// Set max JWT age to 14 days
+	const MAX_TOKEN_AGE = 60 * 60 * 24 * 14;
+
 	// Define a user object prototype for emission,
 	// as well as default values for its key-value pairs
 	let userObjectToEmit = {};
@@ -98,7 +101,7 @@ async function verifyUser(req, res) {
 			const isPasswordMatching = await bcrypt.compare(submittedPassword, userQuery.dataValues.password_hash);
 
 			if (userQuery.dataValues.email === submittedEmail && isPasswordMatching) {
-				
+
 				const userObject = {
 					userId: userQuery.dataValues.user_id
 				}
@@ -107,7 +110,7 @@ async function verifyUser(req, res) {
 					userObject, 
 					process.env.JWT_SECRET,
 					{
-						expiresIn: 60 * 60 * 24 * 14
+						expiresIn: MAX_TOKEN_AGE
 					});
 
 
@@ -129,7 +132,8 @@ async function verifyUser(req, res) {
 				userObjectToEmit = {
 					connection_status: connectionStatus,
 					data_status: dataStatus,
-					user_token: userToken
+					user_token: userToken,
+					max_age: MAX_TOKEN_AGE
 				};
 
 				return res.status(httpCode).json(userObjectToEmit);

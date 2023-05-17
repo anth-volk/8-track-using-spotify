@@ -142,21 +142,24 @@ export default function Login() {
 		return () => clearTimeout(timerRef.current);
 	}, [])
 
-	// Store user object to local storage
+	// Store user object in cookie
 	useEffect(() => {
 
-		if(userToken) {
+		if(userToken && userToken.max_age) {
 
-			const maxAge = 60 * 60 * 24 * 30;
-
-			setCookie(
-				'userAuth',
-				userToken,
-				{
-					path: '/',
-					maxAge: maxAge
-				}
-			)
+			try {
+				setCookie(
+					'userAuth',
+					userToken,
+					{
+						path: '/',
+						maxAge: maxAge
+					}
+				)
+			}
+			catch (err) {
+				console.error('Error while setting JWT cookie: ', err);
+			}
 
 		}
 
