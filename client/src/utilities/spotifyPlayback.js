@@ -9,31 +9,8 @@ export async function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrac
 	if (isTrackEnd) {
 		return activeTrack.end_timestamp;
 	}
-	/*
-	else {
-		console.log('track inside gCT: ', activeTrack);
-		getSpotifyPlayerState(spotifyPlayer)
-			.then( (state) => {
-				console.log('track inside gSPS: ', activeTrack);
-				position = state.position;
-				console.log('position inside gSPS: ', position);
-				return activeTrack.start_timestamp + position;
-				// return track.start_timestamp + state.position;
-			})
-	*/
-		/*
-		console.log('position: ', position);
-		console.log('position: ', position);
-
-		console.log('Spotify timestamp return: ', activeTrack.start_timestamp + position);
-		return activeTrack.start_timestamp + position;
-		*/
-	/*
-	}
-	*/
 	else {
 		const state = await getSpotifyPlayerState(spotifyPlayer);
-		console.log('awaited state: ', state);
 		const position = state.position;
 		return activeTrack.start_timestamp + position;
 	}
@@ -48,7 +25,6 @@ async function getSpotifyPlayerState(spotifyPlayer) {
 			return;
 		}
 		else {
-			console.log('State from fetch function: ', state);
 			return state;
 		}
 	}
@@ -65,34 +41,6 @@ export function handlePlayPauseSpotify(spotifyPlayer, isCartPlaying) {
 		spotifyPlayer.pause();
 	}
 }
-
-/*
-// Track end handler with useCallback and async/await
-export function handleTrackEndSpotify(activeTrack, spotifyPlayer) {
-
-	// Calculate cartTimestamp
-	console.log('track param inside handleTrackEnd: ', activeTrack);
-	const newCartTimestamp = getCartTimestamp(activeTrack, spotifyPlayer, true);
-
-	console.log('nCT: ', newCartTimestamp);
-
-	/*
-	// Emit a track end 'event'
-	console.log('Emitting track change event from Spotify player');
-	setTrackChangeEventQueue( (prev) => {
-		return ([
-			...prev,
-			{
-				activeTrack: track,
-				cartTimestamp: newCartTimestamp,
-				type: TRACK_EVENT_TYPES.TRACK_END
-			}
-		])
-	});
-	*/
-/*
-}
-*/
 
 export async function startSpotifyPlayback(track, cartTimestamp, deviceId, spotifyUserAuthToken) {
 

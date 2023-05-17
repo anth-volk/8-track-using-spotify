@@ -92,37 +92,20 @@ export default function CartPlayer(props) {
 	function handleTrackChange() {
 		// If track is of type Spotify...
 		if (activeTrack.type === SPOTIFY_TRACK) {
-			// if (!isActiveSpotifyAudio) {
 		
 				startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyUserAuthToken)
 					.then( (playbackState) => {
 						setIsActiveSpotifyAudio(playbackState);
 					});
-			/*}
-			else {
-				handlePlayPauseSpotify(spotifyPlayer.current, isCartPlaying);
-			}
-			*/
 		}
 		// Else, if track is local effect...
 		else if (activeTrack.type === EFFECT) {
-			// if (!isActiveLocalAudio) {
-				console.log('!iALA routine');
 				localAudioRef.current = activeTrack.audio;
-		
-				console.log('lAR.c: ', localAudioRef.current);
 		
 				const playbackObject = startLocalPlayback(activeTrack, localAudioRef.current, cartTimestamp.current);
 				localFileLength.current = playbackObject.fileLength;
 				localRemainingPlayLength.current = playbackObject.playLength;
 				setIsActiveLocalAudio(playbackObject.playbackState);
-		
-			/*}
-			else {
-				console.log('hPPL routine');
-				handlePlayPauseLocal(localAudioRef.current, isCartPlaying);
-			}
-			*/
 		
 		}
 	}
@@ -140,7 +123,6 @@ export default function CartPlayer(props) {
 		} 
 		// Otherwise, handle play and pause
 		else {
-			// handleTrackChange();
 			if (activeTrack.type === SPOTIFY_TRACK) {
 				handlePlayPauseSpotify(spotifyPlayer.current, isCartPlaying);
 			}
@@ -151,56 +133,12 @@ export default function CartPlayer(props) {
 		}
 		setIsCartPlaying( (prev) => !prev);
 
-		/*
-		// If track is of type Spotify...
-		if (activeTrack.type === SPOTIFY_TRACK) {
-			if (!isActiveSpotifyAudio) {
-
-				startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyUserAuthToken)
-					.then( (playbackState) => {
-						setIsActiveSpotifyAudio(playbackState);
-					});
-			}
-			else {
-				handlePlayPauseSpotify(spotifyPlayer.current, isCartPlaying);
-			}
-		}
-		// Else, if track is local effect...
-		else if (activeTrack.type === EFFECT) {
-			if (!isActiveLocalAudio) {
-				localAudioRef.current = activeTrack.audio;
-
-				console.log('lAR.c: ', localAudioRef.current);
-
-				const playbackObject = startLocalPlayback(activeTrack, localAudioRef.current, cartTimestamp.current);
-				localFileLength.current = playbackObject.fileLength;
-				localRemainingPlayLength.current = playbackObject.playLength;
-				setIsActiveLocalAudio(playbackObject.playbackState);
-
-			}
-			else {
-				handlePlayPauseLocal(localAudioRef.current, isCartPlaying);
-			}
-
-		}
-		*/
-
-
 	}
 
 	async function handleProgramChange() {
 
-		/*
-		// Set new program number
-		const newProgramNumber = activeProgramNumber === NUMBER_OF_PROGRAMS - 1
-			? 0
-			: activeProgramNumber + 1
-		*/
-
 		// Set new program number
 		const newProgramNumber = calculateProgramNumber(activeProgramNumber);
-
-		console.log('nPN: ', newProgramNumber);
 
 		// Set new activeProgramNumber
 		setActiveProgramNumber(newProgramNumber);
@@ -219,34 +157,18 @@ export default function CartPlayer(props) {
 			// Afterward, end current track
 			if (activeTrack.type === SPOTIFY_TRACK) {
 				newCartTimestamp = await getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false);
-				console.log('nCT in Spotify program handler: ', newCartTimestamp);
 				cartTimestamp.current = newCartTimestamp;
 
 				spotifyPlayer.current.pause();
 				setIsActiveSpotifyAudio(false);
-				/*
-				getCartTimestampSpotify(activeTrack, spotifyPlayer.current, false)
-					.then( (timestamp) => {
-						newCartTimestamp = timestamp;
-						cartTimestamp.current = newCartTimestamp;
-
-						spotifyPlayer.current.pause();
-					});
-				*/
 
 			}
 			else {
 				newCartTimestamp = getCartTimestampLocal(activeTrack, localAudioRef.current, localRemainingPlayLength.current);
-				console.log('nCT on local in program hook: ', newCartTimestamp);
 				cartTimestamp.current = newCartTimestamp;
 
 				localAudioRef.current.pause();
 				localAudioRef.current.currentTime = 0;
-				/*
-				localAudioRef.current.removeEventListener('ended',(event) => {
-					checkPlaybackEndLocal();
-				}, {once: true}); 
-				*/
 				localCancelController.abort();
 				setIsActiveLocalAudio(false);
 			}
@@ -264,18 +186,8 @@ export default function CartPlayer(props) {
 				return element.start_timestamp === newTrack.start_timestamp;
 			});
 
-			/*
-			console.log('nCT: ', newCartTimestamp);
-			console.log('cT.c: ', cartTimestamp.current);
-			console.log('nAT: ', newTrack);
-			*/
-
-			console.log('nT.s_t: ', newTrack.start_timestamp);
-
 			// Set new index
 			trackIndex.current = newTrackIndex;
-			console.log('newTrackIndex: ', newTrackIndex);
-			console.log('tI.c: ', trackIndex.current);
 
 			// Set new activeTrack
 			setActiveTrack(newTrack);
@@ -294,7 +206,6 @@ export default function CartPlayer(props) {
 
 		if (playbackObject.playbackState === false) {
 			// This will require debugging at end of program
-			console.log('playbackState is false');
 
 			setIsActiveLocalAudio(false);
 			// If we've reached end of program...
@@ -306,7 +217,6 @@ export default function CartPlayer(props) {
 			}
 			else {
 				trackIndex.current = trackIndex.current + 1;
-				console.log('New track index:', trackIndex.current);
 				lastTrackEndAudio.current = activeTrack.audio;
 				setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
 			}
@@ -322,27 +232,18 @@ export default function CartPlayer(props) {
 
 	const checkPlaybackEndSpotify = useCallback(async (state) => {
 		const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
-		// console.log('aTURI: ', activeTrackURI);
 
 		if (
 			state
 			&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
 			&& state.paused
-			// && state.uri === activeTrackURI
 			&& state.track_window.current_track.id === activeTrack.audio
 		) {
-			console.log('state inside end listener: ', state);
-			console.log('Track ended');
-			// setIsSpotifyTrackEnded(true);
-			console.log('aT inside Spotify song end listener: ', activeTrack);
 			cartTimestamp.current = await getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
-			console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
 			// This check is necessary because the track end handler inexplicably fires at least twice,
 			// as documented elsewhere in Spotify developer forums
 			if (lastTrackEndAudio.current !== activeTrack.audio) {
-				console.log('tI.c before: ', trackIndex.current);
 				trackIndex.current += 1;
-				console.log('tI.c after: ', trackIndex.current);
 				lastTrackEndAudio.current = activeTrack.audio;
 				setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
 			}
@@ -352,7 +253,6 @@ export default function CartPlayer(props) {
 
 	const transferSpotifyPlayback = useCallback(async (deviceId) => {
 		try {
-			console.log('Making POST request to begin playback');
 			const fetchResponseRaw = await fetch('https://api.spotify.com/v1/me/player', {
 				method: 'PUT',
 				headers: {
@@ -367,10 +267,9 @@ export default function CartPlayer(props) {
 				})
 			});
 			if (!fetchResponseRaw.ok) {
-				console.log('Error while fetching');
+				console.error('Error while fetching Spotify playback');
 				const fetchResponseJSON = await fetchResponseRaw.json();
 				if (fetchResponseJSON && fetchResponseJSON.error && fetchResponseJSON.error.status) {
-					console.log(fetchResponseJSON);
 					switch(fetchResponseJSON.error.status) {
 						case 429:
 							return 'Exceeded Spotify API rate limits; please try again in 30+ seconds.';
@@ -381,7 +280,6 @@ export default function CartPlayer(props) {
 				}
 			}
 			else {
-				console.log('Fetched successfully');
 				setIsSpotifyReady(true);
 				return '';
 			}
@@ -392,11 +290,6 @@ export default function CartPlayer(props) {
 		}
 
 	}, [spotifyUserAuthToken])
-
-	// Testing
-	useEffect(() => {
-		console.log('new aT: ', activeTrack);
-	}, [activeTrack])
 
 	// Spotify SDK hook
 	useEffect(() => {
@@ -427,22 +320,6 @@ export default function CartPlayer(props) {
 				setPlaybackMessage('Spotify device offline; please try again later.');
 			});
 		
-			/*
-			spotifyPlayer.current.addListener('player_state_changed', ( state => {
-		
-				if (!state) {
-					return;
-				}
-		
-				spotifyPlayer.current.getCurrentState().then( state => { 
-					(!state)
-						? setSpotifyStatus(SPOTIFY_STATUSES.CREATING_DEVICE) 
-						: setSpotifyStatus(SPOTIFY_STATUSES.CONNECTED) 
-				});
-		
-			}));
-			*/
-	
 			spotifyPlayer.current.on('playback_error', ({message}) => {
 				console.error('Failed to perform playback', message);
 				setPlaybackMessage('Error while connecting with Spotify. Please try again later.');
@@ -561,10 +438,8 @@ export default function CartPlayer(props) {
 				{
 					audio: effects.PROGRAM_SELECTOR,
 					type: EFFECT,
-					// length: PROGRAM_SELECTOR_LENGTH_MS,
 					length: programSelectorLengthMS,
 					start_timestamp: startTimestamp,
-					// end_timestamp: startTimestamp + PROGRAM_SELECTOR_LENGTH_MS,
 					end_timestamp: startTimestamp + programSelectorLengthMS
 				}
 			];
@@ -576,40 +451,13 @@ export default function CartPlayer(props) {
 			];
 		};
 
-		console.log('Cart Array: ', cartArrayTemp);
-
 		// Set this array as state
 		setCartArray(cartArrayTemp);
-
-		// Set first item on current program as activeTrack
-		//setActiveTrack(cartArrayTemp[activeProgramNumber][0]);
 
 	}, [activeCart, effects.FADE_IN, effects.INTRA_TRACK_FADE, effects.FADE_OUT, effects.PROGRAM_SELECTOR]);
 
 	// Effect hook for changes to active track
 	useEffect(() => {
-
-		/*
-		if (!activeTrack || !isCartPlaying || (!isActiveLocalAudio && ! isActiveSpotifyAudio)) {
-			return;
-		}
-		else if (activeTrack.type === SPOTIFY_TRACK) {
-			startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyUserAuthToken)
-				.then( (playbackState) => {
-					setIsActiveSpotifyAudio(playbackState);
-				});
-		}
-		else if (activeTrack.type === EFFECT) {
-			localAudioRef.current = activeTrack.audio;
-
-			const playbackObject = startLocalPlayback(activeTrack, localAudioRef.current, cartTimestamp.current);
-			localFileLength.current = playbackObject.fileLength;
-			localRemainingPlayLength.current = playbackObject.playLength;
-			setIsActiveLocalAudio(playbackObject.playbackState);
-		}
-		*/
-
-		console.log('iCP? ', isCartPlaying);
 
 		if (!activeTrack || !isCartPlaying) {
 			return;
@@ -619,50 +467,15 @@ export default function CartPlayer(props) {
 
 	}, [activeTrack])
 
-	/*
-	// Effect hook for playing program change sound
-	useEffect(() => {
-
-		if (isCartPlaying) {
-			programClickRef.current.currentTime = 0;
-			programClickRef.current.play();
-		}
-
-	}, [activeProgramNumber, isCartPlaying])
-	*/
-
-	/*
-	useEffect(() => {
-		if (!activeTrack) {
-			return;
-		}
-		else if (activeTrack.type === SPOTIFY_TRACK) {
-			handlePlayPauseSpotify(spotifyPlayer.current, isCartPlaying);
-		}
-		else if (activeTrack.type === EFFECT) {
-			handlePlayPauseLocal(localAudioRef.current, isCartPlaying);
-		}
-	}, [isCartPlaying, activeTrack])
-	*/
-
 	// Effect hook to create event listener for local track end
 	useEffect(() => {
 		if (isActiveLocalAudio) {
 			// Create listener for local track end
-			console.log('Creating audioRef listener');
 
 			localAudioRef.current.addEventListener('ended', (event) => {
 				checkPlaybackEndLocal();
 			}, { signal: localCancelSignal, once: true });
 			
-			/*
-			return () => {
-				console.log('Removing local track end event listener');
-				localAudioRef.current.removeEventListener('ended', (event) => {
-					checkPlaybackEndLocal();
-				})
-			}
-			*/
 		}
 	}, [isActiveLocalAudio, checkPlaybackEndLocal])
 
@@ -678,33 +491,6 @@ export default function CartPlayer(props) {
 			// https://github.com/spotify/web-playback-sdk/issues/35
 			spotifyPlayer.current.addListener('player_state_changed', (state) => {
 
-				/*
-				const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
-				console.log('aTURI: ', activeTrackURI);
-
-				if (
-					state
-					&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
-					&& state.paused
-					// && state.uri === activeTrackURI
-					&& state.track_window.current_track.id === activeTrack.audio
-				) {
-					console.log('state inside end listener: ', state);
-					console.log('Track ended');
-					// setIsSpotifyTrackEnded(true);
-					console.log('aT inside Spotify song end listener: ', activeTrack);
-					cartTimestamp.current = getCartTimestampSpotify(activeTrack, spotifyPlayer.current, true);
-					console.log('cart Timestamp in Spotify end hook: ', cartTimestamp.current);
-					if (lastTrackEndAudio.current !== activeTrack.audio) {
-						console.log('tI.c before: ', trackIndex.current);
-						trackIndex.current += 1;
-						console.log('tI.c after: ', trackIndex.current);
-						lastTrackEndAudio.current = activeTrack.audio;
-						setActiveTrack(cartArray[activeProgramNumber][trackIndex.current]);
-					}
-
-				}
-				*/
 				checkPlaybackEndSpotify(state);
 
 			});
@@ -712,7 +498,6 @@ export default function CartPlayer(props) {
 		}
 
 		return () => {
-			console.log('Removing Spotify track end event listener');
 			spotifyPlayer.current.removeListener('player_state_changed', (state) => {
 				checkPlaybackEndSpotify(state);
 			});
