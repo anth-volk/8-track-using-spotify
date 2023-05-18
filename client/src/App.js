@@ -13,7 +13,13 @@ import NoConnection from './components/NoConnection.js';
 import CartCreation from './components/CartCreation.js';
 
 // Local function imports
-import { retrieveAuthToken } from './utilities/userAuth.js';
+import { 
+	retrieveAuthToken, 
+	retrieveRefreshToken, 
+	refreshToken,
+	storeAuthToken,
+	storeRefreshToken
+} from './utilities/userAuth.js';
 
 // Style imports
 import './styles/App.css';
@@ -38,9 +44,21 @@ function App() {
 
 		// Determine whether or not authToken is currently present
 		const retrievedAuthToken = retrieveAuthToken();
+		const retrievedRefreshToken = retrieveRefreshToken();
 
+		// If the token exists, set it as auth
 		if (retrievedAuthToken) {
-			setAuthToken(retrievedAuthToken);
+			setAuthToken(retrievedAuthToken.auth_token);
+		}
+		// If it doesn't, but refresh token exists, refresh the tokens, then set both
+		else if (retrievedRefreshToken) {
+
+			const resJSON = refreshToken(retrievedRefreshToken);
+
+			storeAuthToken(resJSON.auth_token, resJSON.auth_token_max_age);
+			storeRefreshToken(resJSON.refresh_token, resJSON.refresh_token_max_age);
+
+			setAuthToken(resJSON.auth_token);
 		}
 
 		// Determine if userSpotifyAuth token exists & isn't expired

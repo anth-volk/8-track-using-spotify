@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
-import { storeAuthToken } from '../utilities/userAuth';
+import { storeAuthToken, storeRefreshToken } from '../utilities/userAuth';
 
 export default function Login() {
 
@@ -24,6 +24,7 @@ export default function Login() {
 	const [formErrors, setFormErrors] = useState(formErrorsObject);
 	const [submissionMessage, setSubmissionMessage] = useState('');
 	const [authToken, setAuthToken] = useState(null);
+	const [refreshToken, setRefreshToken] = useState(null);
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -119,11 +120,21 @@ export default function Login() {
 			// If signup is successful per returned JSON object...
 			if (resJSON.connection_status === 'success' && resJSON.data_status === 'user_exists') {
 
-				// TESTING
+				/*
 				setAuthToken({
 					token: resJSON.auth_token,
-					max_age: resJSON.max_age
+					max_age: resJSON.auth_token_max_age
 				});
+
+				setRefreshToken({
+					token: resJSON.refresh_token,
+					max_age: resJSON.refresh_token_max_age
+				});
+				*/
+
+				storeAuthToken(resJSON.auth_token, resJSON.auth_token_max_age);
+
+				storeRefreshToken(resJSON.refresh_token, resJSON.refresh_token_max_age);
 
 				// Clear any existing timeout
 				clearTimeout(timerRef.current);
@@ -149,11 +160,12 @@ export default function Login() {
 		return () => clearTimeout(timerRef.current);
 	}, [])
 
+	/*
 	// Store user object in sessionStorage
 	useEffect(() => {
 
 		if(authToken) {
-
+	*/
 			/*
 			try {
 				setCookie(
@@ -169,11 +181,14 @@ export default function Login() {
 				console.error('Error while setting JWT cookie: ', err);
 			}
 			*/
+
+	/*
 			storeAuthToken(authToken);
 
 		}
 
 	}, [authToken, setCookie])
+	*/
 
 	return(
 		<div className='Login'>

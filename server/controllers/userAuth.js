@@ -19,6 +19,13 @@ const sequelize = new Sequelize(
 );
 const { User } = require('../models');
 
+// Other constants
+
+// Set max auth token age to 15 minutes
+const AUTH_TOKEN_MAX_AGE = 60 * 15;
+// Set max refresh token age to 7 days
+const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
+
 // bcrypt configuration
 const SALT_ROUNDS = 10;
 
@@ -39,6 +46,44 @@ async function hashPassword(password) {
 		throw new Error('Error while hashing password: ', err);
 	}
 	
+}
+
+/**
+ * Function for creating a standard user auth JWT
+ * @param {string} payload 
+ * @returns {string} Returns a signed JWT with set options for auth tokens
+ */
+function createAuthToken(payload) {
+
+	// Set signature key
+	const key = process.env.JWT_SECRET_AUTH;
+
+	// Add token expiry to the options object
+	const options = {
+		expiresIn: AUTH_TOKEN_MAX_AGE
+	};
+
+	// Generate token
+	return jwt.sign(payload, key, options);
+}
+
+/**
+ * Function for creating a user auth refresh JWT
+ * @param {string} payload 
+ * @returns {string} Returns a signed JWT with set options for refresh tokens
+ */
+function createRefreshToken(payload) {
+
+	// Set key
+	const key = process.env.JWT_SECRET_REFRESH;
+
+	// Add token expiry to the options object
+	const options = {
+		expiresIn: AUTH_TOKEN_MAX_AGE
+	};
+
+	// Generate token
+	return jwt.sign(payload, key, options);
 }
 
 async function createUser(req, res) {
@@ -74,9 +119,6 @@ async function createUser(req, res) {
 
 async function verifyUser(req, res) {
 
-	// Set max JWT age to 15 minutes
-	const MAX_TOKEN_AGE = 60 * 15;
-
 	// Define a user object prototype for emission,
 	// as well as default values for its key-value pairs
 	let userObjectToEmit = {};
@@ -106,13 +148,29 @@ async function verifyUser(req, res) {
 					userId: userQuery.dataValues.user_id
 				}
 
+				/*
 				authToken = jwt.sign(
 					userObject, 
-					process.env.JWT_SECRET,
+					process.env.JWT_SECRET_AUTH,
 					{
-						expiresIn: MAX_TOKEN_AGE
-					});
+						expiresIn: AUTH_TOKEN_MAX_AGE
+					}
+				);
+				*/
 
+				authToken = createAuthToken(userObject);
+
+				refreshToken = createRefreshToken(userObject);
+
+				/*
+				refreshToken = jwt.sign(
+					userObject,
+					process.env.JWT_SECRET_REFRESH,
+					{
+						expiresIn: REFRESH_TOKEN_MAX_AGE
+					}
+				);
+				*/
 
 				// Update connection status after successful querying
 				connectionStatus = 'success';
@@ -133,7 +191,9 @@ async function verifyUser(req, res) {
 					connection_status: connectionStatus,
 					data_status: dataStatus,
 					auth_token: authToken,
-					max_age: MAX_TOKEN_AGE
+					auth_token_max_age: AUTH_TOKEN_MAX_AGE,
+					refresh_token: refreshToken,
+					refresh_token_max_age: REFRESH_TOKEN_MAX_AGE
 				};
 
 				return res.status(httpCode).json(userObjectToEmit);
@@ -160,7 +220,44 @@ async function verifyUser(req, res) {
 
 }
 
+async function createRefreshToken(req, res) {
+
+	try {
+
+		// This is where the 'fingerprint' should be analyzed, instead of just decoding
+		const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
+
+		if(decodedData) {
+
+			// Generate new standard JWT and refresh token
+			const newAuthToken = createAuthToken(userObject);
+			const newRefreshToken = createRefreshToken(userObject);
+
+			// Resolve
+			res
+				.status(200)
+				.json({
+					connection_status: 'success',
+					auth_token: newAuthToken,
+					auth_token_max_age: AUTH_TOKEN_MAX_AGE,
+					refresh_token: newRefreshToken,
+					refresh_token_max_age: REFRESH_TOKEN_MAX_AGE
+				});
+		}
+	}
+	catch (err) {
+		console.error('Error while trying to refresh user auth token: ', err);
+		res
+			.status(401)
+			.json({
+				connection_status: 'failure',
+				error: err
+			});
+	}
+}
+
 module.exports = {
 	createUser,
 	verifyUser,
+	createRefreshToken
 }
