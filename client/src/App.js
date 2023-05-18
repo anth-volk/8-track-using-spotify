@@ -12,6 +12,8 @@ import CartLibrary from './components/CartLibrary.js';
 import NoConnection from './components/NoConnection.js';
 import CartCreation from './components/CartCreation.js';
 
+// Local function imports
+import { retrieveAuthToken } from './utilities/userAuth.js';
 
 // Style imports
 import './styles/App.css';
@@ -19,8 +21,8 @@ import './styles/App.css';
 function App() {
 
 	// State variable for user object
-	const [userAuthToken, setUserAuthToken] = useState(null);
-	const [userSpotifyToken, setUserSpotifyToken] = useState(null);
+	const [authToken, setAuthToken] = useState(null);
+	const [spotifyToken, setSpotifyToken] = useState(null);
 
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
@@ -28,8 +30,17 @@ function App() {
 	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
 
+		/*
 		if(cookies.userAuth) {
 			setUserAuthToken(cookies.userAuth);
+		}
+		*/
+
+		// Determine whether or not authToken is currently present
+		const retrievedAuthToken = retrieveAuthToken();
+
+		if (retrievedAuthToken) {
+			setAuthToken(retrievedAuthToken);
 		}
 
 		// Determine if userSpotifyAuth token exists & isn't expired
@@ -38,16 +49,15 @@ function App() {
 				// Call route for renewing Spotify auth
 			}
 			else {
-				setUserSpotifyToken(cookies.userSpotifyAuth);
+				setSpotifyToken(cookies.userSpotifyAuth);
 			}
 		}
-		
-	}, [cookies.userAuth, cookies.userSpotifyAuth])
+	}, [])
 
 
 	return (
 		<Fragment>
-			<Navbar userAuthToken={userAuthToken} />
+			<Navbar authToken={authToken} />
 
 			<Routes>
 				<Route path='/' element={<Home />} />
@@ -56,14 +66,14 @@ function App() {
 				<Route
 					path='/library'
 					element={
-						userSpotifyToken ? (
-							<CartLibrary userAuthToken={userAuthToken} userSpotifyToken={userSpotifyToken} />
+						spotifyToken ? (
+							<CartLibrary authToken={authToken} spotifyToken={spotifyToken} />
 						) : (
-							<NoConnection userAuthToken={userAuthToken} />
+							<NoConnection authToken={authToken} />
 						)
 					}
 				/>
-				<Route path='/create_cart' element={<CartCreation userAuthToken={userAuthToken} userSpotifyToken={userSpotifyToken} />} />
+				<Route path='/create_cart' element={<CartCreation authToken={authToken} spotifyToken={spotifyToken} />} />
 
 			</Routes>
 

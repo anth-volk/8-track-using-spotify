@@ -28,7 +28,7 @@ import programClick from '../audio_files/program_click.mp3';
 export default function CartPlayer(props) {
 
 	// Props
-	const spotifyUserAuthToken = props.authToken || null;
+	const spotifyToken = props.spotifyToken || null;
 	const activeCart = props.activeCart || null;
 
 	// Audio refs
@@ -83,8 +83,8 @@ export default function CartPlayer(props) {
 
 	function calculateProgramNumber(currentProgramNumber) {
 		const newProgramNumber = currentProgramNumber === NUMBER_OF_PROGRAMS - 1
-		? 0
-		: currentProgramNumber + 1
+			? 0
+			: currentProgramNumber + 1
 
 		return newProgramNumber
 	}
@@ -93,7 +93,7 @@ export default function CartPlayer(props) {
 		// If track is of type Spotify...
 		if (activeTrack.type === SPOTIFY_TRACK) {
 		
-				startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyUserAuthToken)
+				startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyToken)
 					.then( (playbackState) => {
 						setIsActiveSpotifyAudio(playbackState);
 					});
@@ -257,7 +257,7 @@ export default function CartPlayer(props) {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': 'Bearer ' + spotifyUserAuthToken
+					'Authorization': 'Bearer ' + spotifyToken
 				},
 				body: JSON.stringify({
 					device_ids: [
@@ -289,7 +289,7 @@ export default function CartPlayer(props) {
 			return 'Error while connecting Spotify player; please try again later.';
 		}
 
-	}, [spotifyUserAuthToken])
+	}, [spotifyToken])
 
 	// Spotify SDK hook
 	useEffect(() => {
@@ -304,7 +304,7 @@ export default function CartPlayer(props) {
 		
 			const playerConstructor = new window.Spotify.Player({
 				name: 'Web Playback SDK',
-				getOAuthToken: cb => { cb(spotifyUserAuthToken); },
+				getOAuthToken: cb => { cb(spotifyToken); },
 				volume: 1.0
 			});
 		
@@ -329,7 +329,7 @@ export default function CartPlayer(props) {
 		
 		};
 		
-	}, [spotifyUserAuthToken]);
+	}, [spotifyToken]);
 
 	// Effect hook for transferring Spotify playback
 	useEffect(() => {

@@ -15,6 +15,9 @@ export default function CartCreation(props) {
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
+	const authToken = props.authToken;
+	const spotifyToken = props.spotifyToken;
+
 	const timerRef = useRef(null);
 
 	function resetStateExceptCreationMessage() {
@@ -35,7 +38,7 @@ export default function CartCreation(props) {
 			headers: {
 				'Content-Type': 'application/json',
 				'CORS': 'Access-Control-Allow-Origin',
-				'Authorization': 'Bearer ' + cookies.userSpotifyAuth.access_token
+				'Authorization': 'Bearer ' + spotifyToken.access_token
 			}
 		});
 
@@ -52,7 +55,7 @@ export default function CartCreation(props) {
 			headers: {
 				'Content-Type': 'application/json',
 				'CORS': 'Access-Control-Allow-Origin',
-				'Authorization': 'Bearer ' + cookies.userSpotifyAuth.access_token
+				'Authorization': 'Bearer ' + spotifyToken.access_token
 			}
 		});
 
@@ -71,7 +74,7 @@ export default function CartCreation(props) {
 			headers: {
 				'Content-Type': 'application/json',
 				'CORS': 'Access-Control-Allow-Origin',
-				'Authorization': 'JWT ' + cookies.userAuth
+				'Authorization': 'JWT ' + authToken
 			},
 			body: JSON.stringify(programmedAlbum)
 		});

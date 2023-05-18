@@ -74,8 +74,8 @@ async function createUser(req, res) {
 
 async function verifyUser(req, res) {
 
-	// Set max JWT age to 14 days
-	const MAX_TOKEN_AGE = 60 * 60 * 24 * 14;
+	// Set max JWT age to 15 minutes
+	const MAX_TOKEN_AGE = 60 * 15;
 
 	// Define a user object prototype for emission,
 	// as well as default values for its key-value pairs
@@ -106,7 +106,7 @@ async function verifyUser(req, res) {
 					userId: userQuery.dataValues.user_id
 				}
 
-				userToken = jwt.sign(
+				authToken = jwt.sign(
 					userObject, 
 					process.env.JWT_SECRET,
 					{
@@ -118,7 +118,7 @@ async function verifyUser(req, res) {
 				connectionStatus = 'success';
 
 				// If login successful, set JSON object key-values
-				if (userToken) {
+				if (authToken) {
 					// Update data status
 					dataStatus = 'user_exists';
 					httpCode = 200;
@@ -132,7 +132,7 @@ async function verifyUser(req, res) {
 				userObjectToEmit = {
 					connection_status: connectionStatus,
 					data_status: dataStatus,
-					user_token: userToken,
+					auth_token: authToken,
 					max_age: MAX_TOKEN_AGE
 				};
 

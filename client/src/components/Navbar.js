@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import '../styles/Navbar.css';
 
 export default function Navbar(props) {
-	if (!props.userAuthToken) {
+	if (!props.authToken) {
 		return (
 			<Fragment>
 				<nav>
