@@ -6,7 +6,10 @@ import { useCookies } from 'react-cookie';
 // Internal imports
 import { storeAuthToken, storeRefreshToken } from '../utilities/userAuth';
 
-export default function Login() {
+export default function Login(props) {
+
+	// Props
+	const setDidLogIn = props.setDidLogIn;
 
 	// State variable object for controlled input
 	const formObject = {
@@ -45,10 +48,10 @@ export default function Login() {
 
 		// Map over form keys
 		Object.keys(form)
-			.forEach( (formElementKey) => {
+			.forEach((formElementKey) => {
 
 				// If the element exists...
-				if(form[formElementKey]) {
+				if (form[formElementKey]) {
 
 					switch (formElementKey) {
 						// Validate email addresses against regex from https://www.w3resource.com/javascript/form/email-validation.php
@@ -65,7 +68,7 @@ export default function Login() {
 							errors[formElementKey] = '';
 							break;
 					}
-				} 
+				}
 				// If the value is blank, add the below as an error message
 				else {
 					errors[formElementKey] = 'This field is required';
@@ -73,15 +76,15 @@ export default function Login() {
 				}
 
 			})
-		
+
 		// Set formErrors based on the errors accumulated
-		setFormErrors( (prev) => ({
+		setFormErrors((prev) => ({
 			...prev,
 			...errors
 		}));
-		
+
 		return isValid;
-		
+
 	}
 
 	// Form input handler
@@ -139,15 +142,16 @@ export default function Login() {
 				// Clear any existing timeout
 				clearTimeout(timerRef.current);
 
-				// Set a positive submission message
+				// Set a successful submission message
 				setSubmissionMessage('Successfully logged in. Redirecting to your library page...');
-				
-				// Wait 3 seconds, then navigate to '/' route
+
+				// Wait 3 seconds, then navigate to '/library' route and pass to app that user logged in
 				timerRef.current = setTimeout(() => {
+					setDidLogIn(true);
 					navigate('/library');
 				}, 3000);
-				
-			} 
+
+			}
 			// Otherwise, set negative submission message
 			else {
 				setSubmissionMessage('Unable to access account. Please try again.')
@@ -166,21 +170,21 @@ export default function Login() {
 
 		if(authToken) {
 	*/
-			/*
-			try {
-				setCookie(
-					'userAuth',
-					authToken,
-					{
-						path: '/',
-						maxAge: authToken.max_age
-					}
-				)
+	/*
+	try {
+		setCookie(
+			'userAuth',
+			authToken,
+			{
+				path: '/',
+				maxAge: authToken.max_age
 			}
-			catch (err) {
-				console.error('Error while setting JWT cookie: ', err);
-			}
-			*/
+		)
+	}
+	catch (err) {
+		console.error('Error while setting JWT cookie: ', err);
+	}
+	*/
 
 	/*
 			storeAuthToken(authToken);
@@ -190,7 +194,7 @@ export default function Login() {
 	}, [authToken, setCookie])
 	*/
 
-	return(
+	return (
 		<div className='Login'>
 			<div className='Login_container'>
 				<h1 className='Login_logoText'>TEXT PLACEHOLDER</h1>

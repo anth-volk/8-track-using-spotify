@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Internal imports
-const { createUser, verifyUser, createRefreshToken } = require('../controllers/userAuth.js');
+const { createUser, verifyUser, refreshTokens } = require('../controllers/userAuth.js');
 
 router.route('/login')
 	// POST requests will attempt to log user in;
@@ -22,6 +22,6 @@ router.route('/refresh_token')
 	// POST requests, when sent with a properly formed
 	// refresh JWT, will return a new refresh token and 
 	// new user auth JWT
-	.post(createRefreshToken);
+	.post(refreshTokens);
 
 module.exports = router;

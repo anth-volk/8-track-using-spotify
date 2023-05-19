@@ -29,6 +29,7 @@ function App() {
 	// State variable for user object
 	const [authToken, setAuthToken] = useState(null);
 	const [spotifyToken, setSpotifyToken] = useState(null);
+	const [didLogIn, setDidLogIn] = useState(false);
 
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
@@ -46,13 +47,18 @@ function App() {
 		const retrievedAuthToken = JSON.parse(retrieveAuthToken()) || null;
 		const retrievedRefreshToken = JSON.parse(retrieveRefreshToken()) || null;
 
+		console.log(retrievedAuthToken);
+		console.log(retrievedRefreshToken);
+
 		// If the token exists, set it as auth
 		if (retrievedAuthToken) {
+			console.log('Retrieving auth token');
 			setAuthToken(retrievedAuthToken.token);
 		}
 		// If it doesn't, but refresh token exists, refresh the tokens, then set both
 		else if (retrievedRefreshToken) {
 
+			console.log('Retrieving refresh token and refreshing');
 			const resJSON = refreshToken(retrievedRefreshToken);
 
 			storeAuthToken(resJSON.auth_token, resJSON.auth_token_max_age);
@@ -70,7 +76,7 @@ function App() {
 				setSpotifyToken(cookies.userSpotifyAuth);
 			}
 		}
-	}, [])
+	}, [didLogIn])
 
 	return (
 		<Fragment>
@@ -78,7 +84,7 @@ function App() {
 
 			<Routes>
 				<Route path='/' element={<Home />} />
-				<Route path='/login' element={<Login />} />
+				<Route path='/login' element={<Login setDidLogIn={setDidLogIn} />} />
 				<Route path='/signup' element={<Signup />} />
 				<Route
 					path='/library'

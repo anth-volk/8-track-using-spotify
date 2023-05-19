@@ -34,18 +34,18 @@ const SALT_ROUNDS = 10;
  * @param {string} password 
  * @returns {string} Returns a hashed password 
 */
-async function hashPassword(password) {
+async function hashValue(value) {
 
 	try {
 
 		const salt = await bcrypt.genSalt(SALT_ROUNDS);
-		const hash = await bcrypt.hash(password, salt);
+		const hash = await bcrypt.hash(value, salt);
 		return hash;
 
 	} catch (err) {
-		throw new Error('Error while hashing password: ', err);
+		throw new Error('Error while hashing value: ', err);
 	}
-	
+
 }
 
 /**
@@ -79,7 +79,7 @@ function createRefreshToken(payload) {
 
 	// Add token expiry to the options object
 	const options = {
-		expiresIn: AUTH_TOKEN_MAX_AGE
+		expiresIn: REFRESH_TOKEN_MAX_AGE
 	};
 
 	// Generate token
@@ -89,7 +89,7 @@ function createRefreshToken(payload) {
 async function createUser(req, res) {
 
 	try {
-		const passwordHash = await hashPassword(req.body.password);
+		const passwordHash = await hashValue(req.body.password);
 
 		const newUser = await User.create({
 			user_id: crypto.randomUUID(),
@@ -124,7 +124,6 @@ async function verifyUser(req, res) {
 	let userObjectToEmit = {};
 	let connectionStatus = 'failure';
 	let dataStatus = null;
-	let userToken = null;
 	let httpCode = null;
 
 	const submittedEmail = req.body.email;
@@ -158,9 +157,8 @@ async function verifyUser(req, res) {
 				);
 				*/
 
-				authToken = createAuthToken(userObject);
-
-				refreshToken = createRefreshToken(userObject);
+				const authToken = createAuthToken(userObject);
+				const refreshToken = createRefreshToken(userObject);
 
 				/*
 				refreshToken = jwt.sign(
@@ -172,6 +170,16 @@ async function verifyUser(req, res) {
 				);
 				*/
 
+				// Hash refreshToken
+				const refreshTokenHash = await hashValue(refreshToken);
+
+				// Store hashed version of refresh token
+				const refreshTokenQuery = await User.update({ refresh_token_hash: refreshTokenHash }, {
+					where: {
+						user_id: userObject.userId
+					}
+				});
+
 				// Update connection status after successful querying
 				connectionStatus = 'success';
 
@@ -180,7 +188,7 @@ async function verifyUser(req, res) {
 					// Update data status
 					dataStatus = 'user_exists';
 					httpCode = 200;
-				} 
+				}
 				else {
 					// Otherwise, add detail to emitted object indicating that user doesn't exist
 					dataStatus = 'user_not_found';
@@ -198,7 +206,7 @@ async function verifyUser(req, res) {
 
 				return res.status(httpCode).json(userObjectToEmit);
 			}
-		} 
+		}
 		return res
 			.status(404)
 			.json({
@@ -206,7 +214,7 @@ async function verifyUser(req, res) {
 				error_message: 'No user found containing provided credentials'
 			})
 
-		
+
 	} catch (err) {
 		console.error('Error while trying to verify user within database: ', err);
 		return res
@@ -216,18 +224,18 @@ async function verifyUser(req, res) {
 				error_message: err
 			});
 
-	} 
+	}
 
 }
 
-async function createRefreshToken(req, res) {
+async function refreshTokens(req, res) {
 
 	try {
 
 		// This is where the 'fingerprint' should be analyzed, instead of just decoding
 		const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
 
-		if(decodedData) {
+		if (decodedData) {
 
 			// Generate new standard JWT and refresh token
 			const newAuthToken = createAuthToken(userObject);
@@ -259,5 +267,5 @@ async function createRefreshToken(req, res) {
 module.exports = {
 	createUser,
 	verifyUser,
-	createRefreshToken
+	refreshTokens
 }
