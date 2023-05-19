@@ -15,7 +15,7 @@ export default function CartLibrary(props) {
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
-	const authToken = props.AuthToken;
+	const authToken = props.authToken;
 
 	// TODO: Replace with props
 	const spotifyToken = cookies.userSpotifyAuth.access_token;
@@ -51,9 +51,9 @@ export default function CartLibrary(props) {
 	useEffect(() => {
 
 		if (userLibrary) {
-			const userLibraryIterated = userLibrary.map( (album) => {
+			const userLibraryIterated = userLibrary.map((album) => {
 				return (
-					<div className="CartLibrary_album" key={album.cart_id} onClick={ (e) => {handleCartridgeSelection(album)}}>
+					<div className="CartLibrary_album" key={album.cart_id} onClick={(e) => { handleCartridgeSelection(album) }}>
 						<p className="CartLibrary_album_title">{album.cart_name}</p>
 						<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
 					</div>
@@ -64,12 +64,12 @@ export default function CartLibrary(props) {
 
 	}, [userLibrary])
 
-	return(
+	return (
 		<Fragment>
 			<h1>Cart Library Placeholder</h1>
 			<section className="CartLibrary_playerContainer">
 				{/*Drawing of 8-track player*/}
-				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken}/>
+				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
 				<svg>
 					<g className="CartLibrary_controls"></g>

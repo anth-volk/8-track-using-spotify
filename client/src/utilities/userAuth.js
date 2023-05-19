@@ -1,33 +1,33 @@
 export function retrieveAuthToken() {
-	return localStorage.getItem('authToken');
+	return sessionStorage.getItem('authToken');
 }
 
 /**
- * Store auth token in localStorage
+ * Store auth token in sessionStorage
  * @param {string} token A signed JWT
  * @param {number} maxAge The maximum age of the token, in seconds
  */
 export function storeAuthToken(token, maxAge) {
-	localStorage.setItem('authToken', {
+	sessionStorage.setItem('authToken', JSON.stringify({
 		token: token,
 		max_age: maxAge
-	});
+	}));
 }
 
 export function retrieveRefreshToken() {
-	return localStorage.getItem('refreshToken');
+	return sessionStorage.getItem('refreshToken');
 }
 
 /**
- * Store refresh token in localStorage
+ * Store refresh token in sessionStorage
  * @param {string} token A signed JWT
  * @param {number} maxAge The maximum age of the token, in seconds
  */
 export function storeRefreshToken(token, maxAge) {
-	localStorage.setItem('refreshToken', {
+	sessionStorage.setItem('refreshToken', JSON.stringify({
 		token: token,
 		max_age: maxAge
-	});
+	}));
 }
 
 // This function may need to be debugged and/or
@@ -43,9 +43,9 @@ export function refreshToken(token) {
 			'CORS': 'Access-Control-Allow-Origin',
 			'Authorization': 'JWT ' + token
 		},
-	}).then( (res) => {
+	}).then((res) => {
 		res.json();
-	}).then( (resJSON) => {
+	}).then((resJSON) => {
 
 		/*
 		// Remove existing token values

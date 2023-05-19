@@ -13,9 +13,9 @@ import NoConnection from './components/NoConnection.js';
 import CartCreation from './components/CartCreation.js';
 
 // Local function imports
-import { 
-	retrieveAuthToken, 
-	retrieveRefreshToken, 
+import {
+	retrieveAuthToken,
+	retrieveRefreshToken,
 	refreshToken,
 	storeAuthToken,
 	storeRefreshToken
@@ -43,12 +43,12 @@ function App() {
 		*/
 
 		// Determine whether or not authToken is currently present
-		const retrievedAuthToken = retrieveAuthToken();
-		const retrievedRefreshToken = retrieveRefreshToken();
+		const retrievedAuthToken = JSON.parse(retrieveAuthToken()) || null;
+		const retrievedRefreshToken = JSON.parse(retrieveRefreshToken()) || null;
 
 		// If the token exists, set it as auth
 		if (retrievedAuthToken) {
-			setAuthToken(retrievedAuthToken.auth_token);
+			setAuthToken(retrievedAuthToken.token);
 		}
 		// If it doesn't, but refresh token exists, refresh the tokens, then set both
 		else if (retrievedRefreshToken) {
@@ -71,7 +71,6 @@ function App() {
 			}
 		}
 	}, [])
-
 
 	return (
 		<Fragment>
