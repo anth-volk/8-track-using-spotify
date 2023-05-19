@@ -35,7 +35,6 @@ export function storeRefreshToken(token, maxAge) {
 export function refreshToken(token) {
 
 	// This is written with thens instead of async/await to enable calling inside useEffect
-
 	fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/refresh_token', {
 		method: 'POST',
 		headers: {

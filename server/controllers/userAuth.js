@@ -232,10 +232,34 @@ async function refreshTokens(req, res) {
 
 	try {
 
-		// This is where the 'fingerprint' should be analyzed, instead of just decoding
-		const decodedData = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
+		// If user didn't submit refresh token as auth header, resolve with 401
+		if (!req.headers || !req.headers.authorization || !(req.headers.authorization.split(' ')[0] === 'JWT')) {
+			res
+				.status(401)
+				.json({
+					connection_status: 'failure',
+					error: 'Malformed JWT refresh header, please try again'
+				})
+		}
 
-		if (decodedData) {
+		const submittedToken = req.headers.authorization.split(' ')[1];
+
+		// Verify that JWT is properly formed
+		const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
+
+		// Fetch hashed refresh token from db using userId provided by decoded JWT data
+		const storedTokenHash = User.findOne({
+			attributes: [
+				'refresh_token_hash'
+			],
+			where: {
+				user_id: decodedData.userId
+			}
+		});
+
+		const isRefreshTokenValid = await bcrypt.compare(submittedToken, storedTokenHash);
+
+		if (isRefreshTokenValid) {
 
 			// Generate new standard JWT and refresh token
 			const newAuthToken = createAuthToken(userObject);
@@ -251,6 +275,14 @@ async function refreshTokens(req, res) {
 					refresh_token: newRefreshToken,
 					refresh_token_max_age: REFRESH_TOKEN_MAX_AGE
 				});
+		}
+		else {
+			res
+				.status(403)
+				.json({
+					connection_status: 'success',
+					error: 'Invalid refresh token'
+				})
 		}
 	}
 	catch (err) {
