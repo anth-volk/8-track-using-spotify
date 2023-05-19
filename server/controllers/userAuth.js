@@ -29,9 +29,20 @@ const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 // bcrypt configuration
 const SALT_ROUNDS = 10;
 
+async function storeRefreshToken(tokenHash, userId) {
+
+	const refreshTokenQuery = await User.update({ refresh_token_hash: tokenHash }, {
+		where: {
+			user_id: userId
+		}
+	});
+
+	return refreshTokenQuery;
+}
+
 /**
- * Function for creating password hashes using bcrypt
- * @param {string} password 
+ * Function for hashing values using bcrypt
+ * @param {string} value 
  * @returns {string} Returns a hashed password 
 */
 async function hashValue(value) {
@@ -174,11 +185,7 @@ async function verifyUser(req, res) {
 				const refreshTokenHash = await hashValue(refreshToken);
 
 				// Store hashed version of refresh token
-				const refreshTokenQuery = await User.update({ refresh_token_hash: refreshTokenHash }, {
-					where: {
-						user_id: userObject.userId
-					}
-				});
+				const refreshTokenQuery = await storeRefreshToken(refreshTokenHash, userObject.userId);
 
 				// Update connection status after successful querying
 				connectionStatus = 'success';
@@ -246,6 +253,7 @@ async function refreshTokens(req, res) {
 
 		// Verify that JWT is properly formed
 		const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
+		const userId = decodedToken.userId;
 
 		// Fetch hashed refresh token from db using userId provided by decoded JWT data
 		const storedTokenHash = User.findOne({
@@ -253,7 +261,7 @@ async function refreshTokens(req, res) {
 				'refresh_token_hash'
 			],
 			where: {
-				user_id: decodedData.userId
+				user_id: userId
 			}
 		});
 
@@ -264,6 +272,14 @@ async function refreshTokens(req, res) {
 			// Generate new standard JWT and refresh token
 			const newAuthToken = createAuthToken(userObject);
 			const newRefreshToken = createRefreshToken(userObject);
+
+			// Hash new refresh token
+			const newRefreshTokenHash = await hashValue(newRefreshToken);
+
+			// Store new refresh token in db
+			const refreshTokenQuery = storeRefreshToken(newRefreshTokenHash, userId);
+
+			// Add error testing
 
 			// Resolve
 			res
