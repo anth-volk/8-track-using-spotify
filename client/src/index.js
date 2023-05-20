@@ -2,13 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { CookiesProvider } from 'react-cookie';
+
 import './styles/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 // Unbelievably, Spotify SDK is not compatible with standard React 18
 // DOM instantiation method, so app falls back on React 17 methods and packages
-
 ReactDOM.render(
 	<React.StrictMode>
 		<CookiesProvider>

@@ -1,9 +1,10 @@
 // External imports
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
 import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreation.js';
+import { AuthContext } from '../contexts/AuthContext.js';
 
 export default function CartCreation(props) {
 
@@ -15,7 +16,7 @@ export default function CartCreation(props) {
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
-	const authToken = props.authToken;
+	const { setDidLogIn, authToken } = useContext(AuthContext);
 	const spotifyToken = props.spotifyToken;
 
 	const timerRef = useRef(null);
@@ -105,7 +106,7 @@ export default function CartCreation(props) {
 			const albumTracksArray = parseAlbumAndPullTracks(clickedAlbum);
 			const albumTracksDistributed = finalizeTracks(albumTracksArray);
 
-			const albumArtists = clickedAlbum.artists.map( (artist) => {
+			const albumArtists = clickedAlbum.artists.map((artist) => {
 				return artist.name;
 			});
 
@@ -124,7 +125,7 @@ export default function CartCreation(props) {
 		return () => clearTimeout(timerRef.current);
 	}, [])
 
-	return(
+	return (
 		<Fragment>
 			<h1>Create New Cartridge</h1>
 			<grid>
@@ -136,7 +137,7 @@ export default function CartCreation(props) {
 					<div className='CartSearch_grid'>
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
 							return (
-								<div className='spotifyResultCard' key={index} onClick={(e) => {handleAlbumClick(index)}}>
+								<div className='spotifyResultCard' key={index} onClick={(e) => { handleAlbumClick(index) }}>
 									<img src={albumResultObject[index].images[0].url}></img>
 									<p>{albumResultObject[index].artists[0].name} </p>
 									<p>{albumResultObject[index].name}</p>
@@ -148,7 +149,7 @@ export default function CartCreation(props) {
 				<div className='CartCreation_right'>
 					<h2>Cartridge Preview</h2>
 					<div className='CartPreview_container'>
-						{clickedAlbum && 
+						{clickedAlbum &&
 							<Fragment>
 								<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
 								<p>{clickedAlbum.artists[0].name.toUpperCase()}</p>

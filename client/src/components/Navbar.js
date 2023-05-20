@@ -1,12 +1,18 @@
 // External imports
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+
+// Internal imports
+import { AuthContext } from '../contexts/AuthContext.js';
 
 // Style imports
 import '../styles/Navbar.css';
 
-export default function Navbar(props) {
-	if (!props.authToken) {
+export default function Navbar() {
+
+	const { setDidLogIn, authToken } = useContext(AuthContext);
+
+	if (!authToken) {
 		return (
 			<Fragment>
 				<nav>

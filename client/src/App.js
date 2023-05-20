@@ -11,6 +11,7 @@ import Signup from './components/Signup.js';
 import CartLibrary from './components/CartLibrary.js';
 import NoConnection from './components/NoConnection.js';
 import CartCreation from './components/CartCreation.js';
+import { AuthContext } from './contexts/AuthContext.js';
 
 // Local function imports
 import {
@@ -29,7 +30,7 @@ function App() {
 	// State variable for user object
 	const [authToken, setAuthToken] = useState(null);
 	const [spotifyToken, setSpotifyToken] = useState(null);
-	const [didLogIn, setDidLogIn] = useState(false);
+	const [didLogIn, setDidLogIn] = useState(null);
 
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
@@ -80,25 +81,27 @@ function App() {
 
 	return (
 		<Fragment>
-			<Navbar authToken={authToken} />
+			<AuthContext.Provider value={{ setDidLogIn, authToken }}>
+				<Navbar />
 
-			<Routes>
-				<Route path='/' element={<Home />} />
-				<Route path='/login' element={<Login setDidLogIn={setDidLogIn} />} />
-				<Route path='/signup' element={<Signup />} />
-				<Route
-					path='/library'
-					element={
-						spotifyToken ? (
-							<CartLibrary authToken={authToken} spotifyToken={spotifyToken} />
-						) : (
-							<NoConnection authToken={authToken} />
-						)
-					}
-				/>
-				<Route path='/create_cart' element={<CartCreation authToken={authToken} spotifyToken={spotifyToken} />} />
+				<Routes>
+					<Route path='/' element={<Home />} />
+					<Route path='/login' element={<Login />} />
+					<Route path='/signup' element={<Signup />} />
+					<Route
+						path='/library'
+						element={
+							spotifyToken ? (
+								<CartLibrary spotifyToken={spotifyToken} />
+							) : (
+								<NoConnection />
+							)
+						}
+					/>
+					<Route path='/create_cart' element={<CartCreation spotifyToken={spotifyToken} />} />
 
-			</Routes>
+				</Routes>
+			</AuthContext.Provider>
 
 		</Fragment>
 

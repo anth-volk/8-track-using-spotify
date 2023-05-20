@@ -1,10 +1,11 @@
 // External imports
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
 import CartPlayer from './CartPlayer.js';
+import { AuthContext } from '../contexts/AuthContext.js';
 
 export default function CartLibrary(props) {
 
@@ -15,7 +16,7 @@ export default function CartLibrary(props) {
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
-	const authToken = props.authToken;
+	const { setDidLogIn, authToken } = useContext(AuthContext);
 
 	// TODO: Replace with props
 	const spotifyToken = cookies.userSpotifyAuth.access_token;

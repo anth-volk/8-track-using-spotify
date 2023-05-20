@@ -1,15 +1,16 @@
 // External imports
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
 import { storeAuthToken, storeRefreshToken } from '../utilities/userAuth';
+import { AuthContext } from '../contexts/AuthContext.js';
 
-export default function Login(props) {
+export default function Login() {
 
-	// Props
-	const setDidLogIn = props.setDidLogIn;
+	// Context
+	const { setDidLogIn, authToken } = useContext(AuthContext);
 
 	// State variable object for controlled input
 	const formObject = {
@@ -26,7 +27,7 @@ export default function Login(props) {
 	const [form, setForm] = useState(formObject);
 	const [formErrors, setFormErrors] = useState(formErrorsObject);
 	const [submissionMessage, setSubmissionMessage] = useState('');
-	const [authToken, setAuthToken] = useState(null);
+	// const [authToken, setAuthToken] = useState(null);
 	const [refreshToken, setRefreshToken] = useState(null);
 
 	const [cookies, setCookie, removeCookie] = useCookies();

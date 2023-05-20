@@ -2,6 +2,7 @@
 import {
 	Fragment,
 	useCallback,
+	useContext,
 	useEffect,
 	useRef,
 	useState
@@ -21,6 +22,9 @@ import {
 	startLocalPlayback
 } from '../utilities/localPlayback.js';
 
+// Local context import
+import { AuthContext } from '../contexts/AuthContext.js';
+
 // Local audio imports
 import tapeHiss from '../audio_files/tape_hiss.mp3';
 import programClick from '../audio_files/program_click.mp3';
@@ -28,6 +32,7 @@ import programClick from '../audio_files/program_click.mp3';
 export default function CartPlayer(props) {
 
 	// Props
+	const { setDidLogIn, authToken } = useContext(AuthContext);
 	const spotifyToken = props.spotifyToken || null;
 	const activeCart = props.activeCart || null;
 
@@ -92,21 +97,21 @@ export default function CartPlayer(props) {
 	function handleTrackChange() {
 		// If track is of type Spotify...
 		if (activeTrack.type === SPOTIFY_TRACK) {
-		
-				startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyToken)
-					.then( (playbackState) => {
-						setIsActiveSpotifyAudio(playbackState);
-					});
+
+			startSpotifyPlayback(activeTrack, cartTimestamp.current, deviceId, spotifyToken)
+				.then((playbackState) => {
+					setIsActiveSpotifyAudio(playbackState);
+				});
 		}
 		// Else, if track is local effect...
 		else if (activeTrack.type === EFFECT) {
-				localAudioRef.current = activeTrack.audio;
-		
-				const playbackObject = startLocalPlayback(activeTrack, localAudioRef.current, cartTimestamp.current);
-				localFileLength.current = playbackObject.fileLength;
-				localRemainingPlayLength.current = playbackObject.playLength;
-				setIsActiveLocalAudio(playbackObject.playbackState);
-		
+			localAudioRef.current = activeTrack.audio;
+
+			const playbackObject = startLocalPlayback(activeTrack, localAudioRef.current, cartTimestamp.current);
+			localFileLength.current = playbackObject.fileLength;
+			localRemainingPlayLength.current = playbackObject.playLength;
+			setIsActiveLocalAudio(playbackObject.playbackState);
+
 		}
 	}
 
@@ -120,7 +125,7 @@ export default function CartPlayer(props) {
 		// If there is no active track, set it
 		if (!activeTrack) {
 			setActiveTrack(cartArray[activeProgramNumber][0]);
-		} 
+		}
 		// Otherwise, handle play and pause
 		else {
 			if (activeTrack.type === SPOTIFY_TRACK) {
@@ -131,7 +136,7 @@ export default function CartPlayer(props) {
 			}
 
 		}
-		setIsCartPlaying( (prev) => !prev);
+		setIsCartPlaying((prev) => !prev);
 
 	}
 
@@ -148,7 +153,7 @@ export default function CartPlayer(props) {
 			programClickRef.current.currentTime = 0;
 			programClickRef.current.play();
 		}
-		
+
 		if (activeTrack && isCartPlaying) {
 
 			let newCartTimestamp = 0;
@@ -174,7 +179,7 @@ export default function CartPlayer(props) {
 			}
 
 			// Find new activeTrack
-			const newTrack = cartArray[newProgramNumber].find( (track) => {
+			const newTrack = cartArray[newProgramNumber].find((track) => {
 				return (
 					track.start_timestamp <= cartTimestamp.current &&
 					track.end_timestamp >= cartTimestamp.current
@@ -182,7 +187,7 @@ export default function CartPlayer(props) {
 			});
 
 			// Find index of this track
-			const newTrackIndex = cartArray[newProgramNumber].findIndex( (element) => {
+			const newTrackIndex = cartArray[newProgramNumber].findIndex((element) => {
 				return element.start_timestamp === newTrack.start_timestamp;
 			});
 
@@ -270,7 +275,7 @@ export default function CartPlayer(props) {
 				console.error('Error while fetching Spotify playback');
 				const fetchResponseJSON = await fetchResponseRaw.json();
 				if (fetchResponseJSON && fetchResponseJSON.error && fetchResponseJSON.error.status) {
-					switch(fetchResponseJSON.error.status) {
+					switch (fetchResponseJSON.error.status) {
 						case 429:
 							return 'Exceeded Spotify API rate limits; please try again in 30+ seconds.';
 						case 502:
@@ -297,38 +302,38 @@ export default function CartPlayer(props) {
 		const script = document.createElement("script");
 		script.src = "https://sdk.scdn.co/spotify-player.js";
 		script.async = true;
-		
+
 		document.body.appendChild(script);
-		
+
 		window.onSpotifyWebPlaybackSDKReady = () => {
-		
+
 			const playerConstructor = new window.Spotify.Player({
 				name: 'Web Playback SDK',
 				getOAuthToken: cb => { cb(spotifyToken); },
 				volume: 1.0
 			});
-		
+
 			spotifyPlayer.current = playerConstructor;
-		
+
 			spotifyPlayer.current.addListener('ready', ({ device_id }) => {
 				console.log('Ready with Device ID', device_id);
 				setDeviceId(device_id);
 			});
-		
+
 			spotifyPlayer.current.addListener('not_ready', ({ device_id }) => {
 				console.log('Device ID has gone offline', device_id);
 				setPlaybackMessage('Spotify device offline; please try again later.');
 			});
-		
-			spotifyPlayer.current.on('playback_error', ({message}) => {
+
+			spotifyPlayer.current.on('playback_error', ({ message }) => {
 				console.error('Failed to perform playback', message);
 				setPlaybackMessage('Error while connecting with Spotify. Please try again later.');
 			})
-		
+
 			spotifyPlayer.current.connect();
-		
+
 		};
-		
+
 	}, [spotifyToken]);
 
 	// Effect hook for transferring Spotify playback
@@ -336,8 +341,8 @@ export default function CartPlayer(props) {
 		if (activeCart && deviceId) {
 			setPlaybackMessage('Connecting with Spotify, please wait...');
 			transferSpotifyPlayback(deviceId)
-				.then( (message) => {
-						setPlaybackMessage(message);
+				.then((message) => {
+					setPlaybackMessage(message);
 				});
 		}
 	}, [activeCart, deviceId])
@@ -475,14 +480,14 @@ export default function CartPlayer(props) {
 			localAudioRef.current.addEventListener('ended', (event) => {
 				checkPlaybackEndLocal();
 			}, { signal: localCancelSignal, once: true });
-			
+
 		}
 	}, [isActiveLocalAudio, checkPlaybackEndLocal])
 
 	// Effect hook to create listener for Spotify track end
 	useEffect(() => {
 
-		if (deviceId 
+		if (deviceId
 			&& activeTrack
 			&& activeTrack.type === SPOTIFY_TRACK
 		) {
@@ -507,22 +512,22 @@ export default function CartPlayer(props) {
 
 	return (
 		<Fragment>
-		<div className='container'>
-			<div className='main-wrapper'>
-				{/*Empty 8-track player visual*/}
-				{/*Inside of that: activeCart details, if present*/}
-				{ activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}
-				<p className='playbackMessage'>{playbackMessage}</p>
+			<div className='container'>
+				<div className='main-wrapper'>
+					{/*Empty 8-track player visual*/}
+					{/*Inside of that: activeCart details, if present*/}
+					{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}
+					<p className='playbackMessage'>{playbackMessage}</p>
+				</div>
+				<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
+					{isCartPlaying ? 'PAUSE' : 'PLAY'}
+				</button>
+				<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>
+				<div className='audioElements'>
+					<audio src={tapeHiss} ref={tapeHissRef} />
+					<audio src={programClick} ref={programClickRef} />
+				</div>
 			</div>
-			<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
-				{ isCartPlaying ? 'PAUSE' : 'PLAY'}
-			</button>
-			<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>
-			<div className='audioElements'>
-				<audio src={tapeHiss} ref={tapeHissRef} />
-				<audio src={programClick} ref={programClickRef} />
-			</div>
-		</div>
-	</Fragment>
+		</Fragment>
 	)
 }
