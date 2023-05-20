@@ -111,7 +111,7 @@ export async function jwtApiCall(route, method, authToken, query = '', body, sec
 		const newAuthToken = retrieveAuthToken();
 		console.log('nAT: ', newAuthToken);
 
-		jwtApiCall(route, method, newAuthToken, query = '', body, true);
+		return jwtApiCall(route, method, newAuthToken, query = '', body, true);
 
 	}
 
