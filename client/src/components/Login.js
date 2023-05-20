@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
-import { storeAuthToken, storeRefreshToken } from '../utilities/userAuth';
+import { storeAuthToken, storeAuthTokenMaxAge, storeRefreshToken, storeRefreshTokenMaxAge } from '../utilities/userAuth';
 import { AuthContext } from '../contexts/AuthContext.js';
 
 export default function Login() {
@@ -136,9 +136,11 @@ export default function Login() {
 				});
 				*/
 
-				storeAuthToken(resJSON.auth_token, resJSON.auth_token_max_age);
+				storeAuthToken(resJSON.auth_token);
+				storeAuthTokenMaxAge(resJSON.auth_token_max_age);
 
-				storeRefreshToken(resJSON.refresh_token, resJSON.refresh_token_max_age);
+				storeRefreshToken(resJSON.refresh_token);
+				storeRefreshTokenMaxAge(resJSON.refresh_token_max_age);
 
 				// Clear any existing timeout
 				clearTimeout(timerRef.current);

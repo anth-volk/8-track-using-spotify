@@ -19,7 +19,8 @@ import {
 	retrieveRefreshToken,
 	refreshToken,
 	storeAuthToken,
-	storeRefreshToken
+	storeRefreshToken,
+	retrieveAuthTokenMaxAge
 } from './utilities/userAuth.js';
 
 // Style imports
@@ -45,27 +46,24 @@ function App() {
 		*/
 
 		// Determine whether or not authToken is currently present
-		const retrievedAuthToken = JSON.parse(retrieveAuthToken()) || null;
-		const retrievedRefreshToken = JSON.parse(retrieveRefreshToken()) || null;
+		const retAuthToken = retrieveAuthToken();
+		const retRefreshToken = retrieveRefreshToken();
 
-		console.log(retrievedAuthToken);
-		console.log(retrievedRefreshToken);
+		console.log(retAuthToken);
+		console.log(retRefreshToken);
 
 		// If the token exists, set it as auth
-		if (retrievedAuthToken) {
-			console.log('Retrieving auth token');
-			setAuthToken(retrievedAuthToken.token);
+		if (retAuthToken) {
+			setAuthToken(retAuthToken);
 		}
 		// If it doesn't, but refresh token exists, refresh the tokens, then set both
-		else if (retrievedRefreshToken) {
+		else if (retRefreshToken) {
 
 			console.log('Retrieving refresh token and refreshing');
-			const resJSON = refreshToken(retrievedRefreshToken);
+			refreshToken(retRefreshToken);
 
-			storeAuthToken(resJSON.auth_token, resJSON.auth_token_max_age);
-			storeRefreshToken(resJSON.refresh_token, resJSON.refresh_token_max_age);
-
-			setAuthToken(resJSON.auth_token);
+			const retNewAuthToken = retrieveAuthToken();
+			setAuthToken(retNewAuthToken);
 		}
 
 		// Determine if userSpotifyAuth token exists & isn't expired

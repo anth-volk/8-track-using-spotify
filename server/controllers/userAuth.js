@@ -251,23 +251,35 @@ async function refreshTokens(req, res) {
 
 		const submittedToken = req.headers.authorization.split(' ')[1];
 
+		console.log(submittedToken);
+		console.log(typeof submittedToken);
+
 		// Verify that JWT is properly formed
 		const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
 		const userId = decodedToken.userId;
 
 		// Fetch hashed refresh token from db using userId provided by decoded JWT data
-		const storedTokenHash = User.findOne({
+		const { refresh_token_hash: storedTokenHash } = await User.findOne({
 			attributes: [
 				'refresh_token_hash'
 			],
 			where: {
 				user_id: userId
-			}
+			},
+			raw: true
 		});
+
+		console.log('Hash data:');
+		console.log(storedTokenHash);
+		console.log(typeof storedTokenHash);
 
 		const isRefreshTokenValid = await bcrypt.compare(submittedToken, storedTokenHash);
 
 		if (isRefreshTokenValid) {
+
+			const userObject = {
+				userId: userId
+			};
 
 			// Generate new standard JWT and refresh token
 			const newAuthToken = createAuthToken(userObject);

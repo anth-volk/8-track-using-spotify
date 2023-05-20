@@ -6,6 +6,7 @@ import { useCookies } from 'react-cookie';
 // Internal imports
 import CartPlayer from './CartPlayer.js';
 import { AuthContext } from '../contexts/AuthContext.js';
+import { jwtApiCall } from '../utilities/userAuth.js';
 
 export default function CartLibrary(props) {
 
@@ -32,6 +33,7 @@ export default function CartLibrary(props) {
 	useEffect(() => {
 
 		async function fetchUserLibrary() {
+			/*
 			const fetchedUserLibraryRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/get_library', {
 				method: 'GET',
 				headers: {
@@ -42,6 +44,9 @@ export default function CartLibrary(props) {
 			})
 
 			const fetchedUserLibraryJSON = await fetchedUserLibraryRaw.json();
+			*/
+			const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken, '');
+
 			setUserLibrary(fetchedUserLibraryJSON.library);
 
 		}

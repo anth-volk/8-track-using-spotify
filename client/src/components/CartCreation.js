@@ -5,6 +5,7 @@ import { useCookies } from 'react-cookie';
 // Internal imports
 import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreation.js';
 import { AuthContext } from '../contexts/AuthContext.js';
+import { jwtApiCall } from '../utilities/userAuth.js';
 
 export default function CartCreation(props) {
 
@@ -70,6 +71,7 @@ export default function CartCreation(props) {
 		const ERROR_MESSAGE = 'There was an error while trying to create your cartridge. Please try again.';
 		const SUCCESS_MESSAGE = 'Your cartridge was successfully added to your library!';
 
+		/*
 		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/create_cart', {
 			method: 'POST',
 			headers: {
@@ -81,6 +83,9 @@ export default function CartCreation(props) {
 		});
 
 		const responseObjectJSON = await responseObjectRaw.json();
+		*/
+
+		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', authToken, '', JSON.stringify(programmedAlbum));
 
 		if (responseObjectJSON.connection_status === 'success' && responseObjectJSON.created_cartridge) {
 			setCartridgeCreationMessage(SUCCESS_MESSAGE);
