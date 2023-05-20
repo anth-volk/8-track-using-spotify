@@ -8,7 +8,10 @@ import { AuthContext } from '../contexts/AuthContext.js';
 // Style imports
 import '../styles/Navbar.css';
 
-export default function Navbar() {
+export default function Navbar(props) {
+
+	// Props: logout handler from App component
+	const handleLogout = props.handleLogout;
 
 	const { setDidLogIn, authToken } = useContext(AuthContext);
 
@@ -44,7 +47,8 @@ export default function Navbar() {
 							<NavLink to='/library' className='active'>My Library</NavLink>
 						</li>
 						<li>
-							<NavLink to='/logout' className='active'>Log Out</NavLink>
+							{/*<NavLink to='/logout' className='active'>Log Out</NavLink>*/}
+							<button type='button' className='logout_handler' onClick={handleLogout}>Log Out</button>
 						</li>
 					</ul>
 				</nav>

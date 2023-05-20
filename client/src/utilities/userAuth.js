@@ -10,12 +10,12 @@ export function storeAuthToken(token) {
 	sessionStorage.setItem('authToken', token);
 }
 
-export function retrieveAuthTokenMaxAge() {
-	return sessionStorage.getItem('authTokenMaxAge');
+export function retrieveAuthTokenExpiry() {
+	return sessionStorage.getItem('authTokenExpiry');
 }
 
-export function storeAuthTokenMaxAge(age) {
-	sessionStorage.setItem('authTokenMaxAge', age);
+export function storeAuthTokenExpiry(expiry) {
+	sessionStorage.setItem('authTokenExpiry', expiry);
 }
 
 export function retrieveRefreshToken() {
@@ -31,12 +31,12 @@ export function storeRefreshToken(token) {
 	sessionStorage.setItem('refreshToken', token);
 }
 
-export function retrieveRefreshTokenMaxAge() {
-	return sessionStorage.getItem('refreshTokenMaxAge');
+export function retrieveRefreshTokenExpiry() {
+	return sessionStorage.getItem('refreshTokenExpiry');
 }
 
-export function storeRefreshTokenMaxAge(age) {
-	sessionStorage.setItem('refreshTokenMaxAge', age);
+export function storeRefreshTokenExpiry(expiry) {
+	sessionStorage.setItem('refreshTokenExpiry', expiry);
 }
 
 // This function may need to be debugged and/or
@@ -65,9 +65,9 @@ export function refreshToken(token) {
 
 		// Add new token values
 		storeAuthToken(resJSON.auth_token);
-		storeAuthTokenMaxAge(resJSON.auth_token_max_age);
+		storeAuthTokenExpiry(resJSON.auth_token_expiry);
 		storeRefreshToken(resJSON.refresh_token);
-		storeRefreshTokenMaxAge(resJSON.refresh_token_max_age);
+		storeRefreshTokenExpiry(resJSON.refresh_token_expiry);
 
 	});
 
@@ -103,7 +103,7 @@ export async function jwtApiCall(route, method, authToken, query = '', body, sec
 
 		return responseObjectJSON;
 	}
-	else if (responseObjectRaw.status === 401) {
+	else if (responseObjectRaw.status === 401 && secondCall === false) {
 		const retrievedRefreshToken = retrieveRefreshToken();
 
 		refreshToken(retrievedRefreshToken);
@@ -114,7 +114,5 @@ export async function jwtApiCall(route, method, authToken, query = '', body, sec
 		return jwtApiCall(route, method, newAuthToken, query = '', body, true);
 
 	}
-
-
 
 }

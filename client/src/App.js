@@ -20,7 +20,8 @@ import {
 	refreshToken,
 	storeAuthToken,
 	storeRefreshToken,
-	retrieveAuthTokenMaxAge
+	retrieveAuthTokenMaxAge,
+	retrieveRefreshTokenExpiry
 } from './utilities/userAuth.js';
 
 // Style imports
@@ -36,6 +37,14 @@ function App() {
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
 
+	function handleLogout() {
+		// Clear all sessionStorage items
+		sessionStorage.clear();
+
+		// Set didLogIn to false to trigger app-wide re-render
+		setDidLogIn(false);
+	}
+
 	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
 
@@ -44,6 +53,8 @@ function App() {
 			setUserAuthToken(cookies.userAuth);
 		}
 		*/
+
+		console.log('didLogIn changed');
 
 		// Determine whether or not authToken is currently present
 		const retAuthToken = retrieveAuthToken();
@@ -56,14 +67,28 @@ function App() {
 		if (retAuthToken) {
 			setAuthToken(retAuthToken);
 		}
-		// If it doesn't, but refresh token exists, refresh the tokens, then set both
+		// If it doesn't, but refresh token exists...
 		else if (retRefreshToken) {
 
+			// Determine if the token is still valid
+			const refreshTokenExpiry = retrieveRefreshTokenExpiry();
+
+			// If the refresh token is expired, log the user out
+			if (Date.now() > refreshTokenExpiry) {
+				// Log user out
+				handleLogout();
+			}
+
+			// Otherwise, refresh tokens
 			console.log('Retrieving refresh token and refreshing');
 			refreshToken(retRefreshToken);
 
 			const retNewAuthToken = retrieveAuthToken();
 			setAuthToken(retNewAuthToken);
+		}
+		// Otherwise, if neither token exists, set authToken to null, providing logged-out UI
+		else {
+			setAuthToken(null);
 		}
 
 		// Determine if userSpotifyAuth token exists & isn't expired
@@ -80,7 +105,7 @@ function App() {
 	return (
 		<Fragment>
 			<AuthContext.Provider value={{ setDidLogIn, authToken }}>
-				<Navbar />
+				<Navbar handleLogout={handleLogout} />
 
 				<Routes>
 					<Route path='/' element={<Home />} />

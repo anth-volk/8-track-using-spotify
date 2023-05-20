@@ -21,13 +21,22 @@ const { User } = require('../models');
 
 // Other constants
 
-// Set max auth token age to 15 minutes
+// Set max auth token age to 15 minutes in SECONDS
 const AUTH_TOKEN_MAX_AGE = 60 * 15;
-// Set max refresh token age to 7 days
+// Set max refresh token age to 7 days in SECONDS
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
 // bcrypt configuration
 const SALT_ROUNDS = 10;
+
+/**
+ * Function to calculate an expiration date, represented in MS since Unix epoch
+ * @param {number} maxAge Max age of item, in SECONDS
+ * @returns {number} Expiry date, as represented in MS since Unix epoch
+ */
+function calculateExpiry(maxAge) {
+	return (Date.now() + maxAge * 1000);
+}
 
 async function storeRefreshToken(tokenHash, userId) {
 
@@ -206,9 +215,9 @@ async function verifyUser(req, res) {
 					connection_status: connectionStatus,
 					data_status: dataStatus,
 					auth_token: authToken,
-					auth_token_max_age: AUTH_TOKEN_MAX_AGE,
+					auth_token_expiry: calculateExpiry(AUTH_TOKEN_MAX_AGE),
 					refresh_token: refreshToken,
-					refresh_token_max_age: REFRESH_TOKEN_MAX_AGE
+					refresh_token_expiry: calculateExpiry(REFRESH_TOKEN_MAX_AGE)
 				};
 
 				return res.status(httpCode).json(userObjectToEmit);
@@ -299,9 +308,9 @@ async function refreshTokens(req, res) {
 				.json({
 					connection_status: 'success',
 					auth_token: newAuthToken,
-					auth_token_max_age: AUTH_TOKEN_MAX_AGE,
+					auth_token_expiry: calculateExpiry(AUTH_TOKEN_MAX_AGE),
 					refresh_token: newRefreshToken,
-					refresh_token_max_age: REFRESH_TOKEN_MAX_AGE
+					refresh_token_expiry: calculateExpiry(REFRESH_TOKEN_MAX_AGE)
 				});
 		}
 		else {
