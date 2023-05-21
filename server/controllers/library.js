@@ -263,6 +263,8 @@ async function deleteCartridge(req, res) {
 
 		// If it exists, execute delete operation and resolve 204
 		if (resultCart) {
+
+			// This will need to be debugged due to Sequelize's cascade rules
 			await Cart.destroy({
 				where: {
 					cart_id: cartId,
