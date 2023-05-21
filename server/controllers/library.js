@@ -232,10 +232,71 @@ async function postCartridge(req, res) {
 				connection_status: 'failure',
 				error_message: err
 			});
+	}
+}
+
+async function deleteCartridge(req, res) {
+
+	try {
+
+		if (!req.query || !req.query.cartId) {
+			return res
+				.status(400)
+				.json({
+					connection_status: 'failure',
+					message: 'Missing required cartId query parameter'
+				});
 		}
+
+		// Pull cart ID from query params and user ID
+		// from data that is added by JWT verification middleware
+		const { cartId } = req.query;
+		const { userId } = req.user;
+
+		// Query db for a cart with the set cart ID attached to the user
+		const resultCart = await Cart.findOne({
+			where: {
+				cart_id: cartId,
+				user_id: userId
+			}
+		});
+
+		// If it exists, execute delete operation and resolve 204
+		if (resultCart) {
+			await Cart.destroy({
+				where: {
+					cart_id: cartId,
+					user_id: userId
+				}
+			});
+			return res
+				.status(204);
+		}
+		// Otherwise, resolve 404
+		else {
+			return res
+				.status(404)
+				.json({
+					connection_status: 'success',
+					message: 'No cart found with provided ID'
+				});
+		}
+
+	}
+	catch (err) {
+		console.error('Error while trying to delete cartridge: ', err);
+		return res
+			.status(500)
+			.json({
+				connection_status: 'failure',
+				error: err
+			});
+	}
+
 }
 
 module.exports = {
+	deleteCartridge,
 	getLibrary,
 	postCartridge
 };
