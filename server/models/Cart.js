@@ -14,22 +14,26 @@ module.exports = (sequelize) => {
 			this.hasOne(models.Program, {
 				as: 'program1',
 				sourceKey: 'program1_id',
-				foreignKey: 'program_id'
+				foreignKey: 'program_id',
+				onDelete: 'cascade'
 			});
 			this.hasOne(models.Program, {
 				as: 'program2',
 				sourceKey: 'program2_id',
-				foreignKey: 'program_id'
+				foreignKey: 'program_id',
+				onDelete: 'cascade'
 			});
 			this.hasOne(models.Program, {
 				as: 'program3',
 				sourceKey: 'program3_id',
-				foreignKey: 'program_id'
+				foreignKey: 'program_id',
+				onDelete: 'cascade'
 			});
 			this.hasOne(models.Program, {
 				as: 'program4',
 				sourceKey: 'program4_id',
-				foreignKey: 'program_id'
+				foreignKey: 'program_id',
+				onDelete: 'cascade'
 			});
 
 		}
