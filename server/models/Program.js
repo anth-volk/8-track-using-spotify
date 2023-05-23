@@ -18,19 +18,23 @@ module.exports = (sequelize) => {
 			});
 			this.belongsTo(models.Cart, {
 				foreignKey: 'program_id',
-				as: 'program1'
+				as: 'program1',
+				onDelete: 'cascade'
 			});
 			this.belongsTo(models.Cart, {
 				foreignKey: 'program_id',
-				as: 'program2'
+				as: 'program2',
+				onDelete: 'cascade'
 			});
 			this.belongsTo(models.Cart, {
 				foreignKey: 'program_id',
-				as: 'program3'
+				as: 'program3',
+				onDelete: 'cascade'
 			});
 			this.belongsTo(models.Cart, {
 				foreignKey: 'program_id',
-				as: 'program4'
+				as: 'program4',
+				onDelete: 'cascade'
 			});
 		}
 	}

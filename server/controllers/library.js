@@ -178,6 +178,8 @@ async function postCartridge(req, res) {
 
 		const result = await sequelize.transaction(async (t) => {
 
+			const cartId = crypto.randomUUID();
+
 			for (const [index, program] of cartridge.programs.entries()) {
 
 				const programId = crypto.randomUUID();
@@ -204,7 +206,7 @@ async function postCartridge(req, res) {
 			};
 
 			const resultCart = await Cart.create({
-				cart_id: crypto.randomUUID(),
+				cart_id: cartId,
 				user_id: userId,
 				cart_name: cartridge.name,
 				artists_array: cartridge.artists,
@@ -257,22 +259,51 @@ async function deleteCartridge(req, res) {
 		console.log(userId);
 
 		// Query db for a cart with the set cart ID attached to the user
-		const resultCart = await Cart.findOne({
-			where: {
-				cart_id: cart_id,
-				user_id: userId
-			}
+		const resultCart = await sequelize.transaction(async (t) => {
+
+			const cart = await Cart.findOne({
+				where: {
+					cart_id: cart_id,
+					user_id: userId
+				}
+			}, { transaction: t });
+
+			return cart;
+
 		});
 
 		// If it exists, execute delete operation and resolve 200
 		if (resultCart) {
 
-			// This will need to be debugged due to Sequelize's cascade rules
-			await Cart.destroy({
-				where: {
-					cart_id: cart_id,
-					user_id: userId
+			// Pull program numbers from result
+			const data = resultCart.dataValues;
+
+			const programIds = [
+				data.program1_id,
+				data.program2_id,
+				data.program3_id,
+				data.program4_id
+			]
+
+			const result = await sequelize.transaction(async (t) => {
+
+				// Delete cart
+				await Cart.destroy({
+					where: {
+						cart_id: cart_id,
+						user_id: userId
+					}
+				}, { transaction: t });
+
+				// Delete programs, which should cascade into tracks
+				for (const programId of programIds) {
+					await Program.destroy({
+						where: {
+							program_id: programId
+						}
+					}, { transaction: t });
 				}
+
 			});
 
 			return res
