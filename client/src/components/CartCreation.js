@@ -85,7 +85,7 @@ export default function CartCreation(props) {
 		const responseObjectJSON = await responseObjectRaw.json();
 		*/
 
-		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', authToken, '', JSON.stringify(programmedAlbum));
+		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', authToken, JSON.stringify(programmedAlbum));
 
 		if (responseObjectJSON.connection_status === 'success' && responseObjectJSON.created_cartridge) {
 			setCartridgeCreationMessage(SUCCESS_MESSAGE);

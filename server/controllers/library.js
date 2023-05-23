@@ -239,7 +239,7 @@ async function deleteCartridge(req, res) {
 
 	try {
 
-		if (!req.query || !req.query.cartId) {
+		if (!req.query || !req.query.cart_id) {
 			return res
 				.status(400)
 				.json({
@@ -250,29 +250,37 @@ async function deleteCartridge(req, res) {
 
 		// Pull cart ID from query params and user ID
 		// from data that is added by JWT verification middleware
-		const { cartId } = req.query;
+		const { cart_id } = req.query;
 		const { userId } = req.user;
+
+		console.log(cart_id);
+		console.log(userId);
 
 		// Query db for a cart with the set cart ID attached to the user
 		const resultCart = await Cart.findOne({
 			where: {
-				cart_id: cartId,
+				cart_id: cart_id,
 				user_id: userId
 			}
 		});
 
-		// If it exists, execute delete operation and resolve 204
+		// If it exists, execute delete operation and resolve 200
 		if (resultCart) {
 
 			// This will need to be debugged due to Sequelize's cascade rules
 			await Cart.destroy({
 				where: {
-					cart_id: cartId,
+					cart_id: cart_id,
 					user_id: userId
 				}
 			});
+
 			return res
-				.status(204);
+				.status(200)
+				.json({
+					connection_status: 'success',
+					message: 'Cart destroyed'
+				});
 		}
 		// Otherwise, resolve 404
 		else {

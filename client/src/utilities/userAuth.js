@@ -78,14 +78,13 @@ export function refreshToken(token) {
  * @param {string} route The route to make a request to
  * @param {string} method The request method, usually 'GET' or 'POST'
  * @param {import("jsonwebtoken").Jwt} authToken A JSON web token
- * @param {string} [query] An optional query parameter to include
  * @param {object} [body] An optional body to be transmitted on POST requests
  * @param {boolean} [secondCall] An optional boolean representing whether or not function is being invoked again
  * @returns JSON object
  */
-export async function jwtApiCall(route, method, authToken, query = '', body, secondCall = false) {
+export async function jwtApiCall(route, method, authToken, body, secondCall = false) {
 
-	const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected' + route + query, {
+	const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected' + route, {
 		method: method,
 		headers: {
 			'Content-Type': 'application/json',
@@ -109,9 +108,8 @@ export async function jwtApiCall(route, method, authToken, query = '', body, sec
 		refreshToken(retrievedRefreshToken);
 
 		const newAuthToken = retrieveAuthToken();
-		console.log('nAT: ', newAuthToken);
 
-		return jwtApiCall(route, method, newAuthToken, query = '', body, true);
+		return jwtApiCall(route, method, newAuthToken, body, true);
 
 	}
 

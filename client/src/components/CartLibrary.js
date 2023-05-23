@@ -14,6 +14,7 @@ export default function CartLibrary(props) {
 	const [userLibrary, setUserLibrary] = useState(null);
 	const [userLibraryView, setUserLibraryView] = useState(null);
 	const [activeCart, setActiveCart] = useState(null);
+	const [deleteMode, setDeleteMode] = useState(false);
 
 	const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -22,30 +23,28 @@ export default function CartLibrary(props) {
 	// TODO: Replace with props
 	const spotifyToken = cookies.userSpotifyAuth.access_token;
 
-	function handleCartridgeDeletion() {
-		return;
+	function handleCartridgeDeleteMode() {
+		setDeleteMode(true);
 	}
 
 	function handleCartridgeSelection(cart) {
 		setActiveCart(cart);
 	}
 
+	async function handleCartridgeDeletion(cart) {
+		// Send DELETE request to back end
+		const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE', authToken);
+
+		// Upon successful completion, fetch user library
+		const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken);
+		setUserLibrary(fetchedUserLibraryJSON.library);
+
+	}
+
 	useEffect(() => {
 
 		async function fetchUserLibrary() {
-			/*
-			const fetchedUserLibraryRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/get_library', {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'CORS': 'Access-Control-Allow-Origin',
-					'Authorization': 'JWT ' + authToken
-				}
-			})
-
-			const fetchedUserLibraryJSON = await fetchedUserLibraryRaw.json();
-			*/
-			const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken, '');
+			const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken);
 
 			setUserLibrary(fetchedUserLibraryJSON.library);
 
@@ -60,6 +59,7 @@ export default function CartLibrary(props) {
 			const userLibraryIterated = userLibrary.map((album) => {
 				return (
 					<div className="CartLibrary_album" key={album.cart_id} onClick={(e) => { handleCartridgeSelection(album) }}>
+						<button type="button" className={deleteMode ? '' : 'hidden'} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>
 						<p className="CartLibrary_album_title">{album.cart_name}</p>
 						<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
 					</div>
@@ -81,7 +81,7 @@ export default function CartLibrary(props) {
 					<g className="CartLibrary_controls"></g>
 				</svg>
 				<Link to='/create_cart'>Create new cartridge</Link>
-				<button type="button" onClick={handleCartridgeDeletion}>Remove cartridge from library</button>
+				<button type="button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
 				{/*Cartridge "storage" area*/}
 				{userLibraryView}
 			</section>
