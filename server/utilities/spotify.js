@@ -19,6 +19,23 @@ function constructForm(formObject) {
 	return formBody;
 }
 
+/**
+ * Function to generate a random string, based on function available at
+ * https://github.com/spotify/web-api-examples/blob/master/authentication/authorization_code/app.js
+ * @param {Number} length 
+ * @returns {string} Random string
+ */
+function generateRandomString(length) {
+	let text = '';
+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+	for (let i = 0; i < length; i++) {
+		text = text.concat(possible.charAt(Math.floor(Math.random() * possible.length)));
+	}
+	return text;
+}
+
 module.exports = {
-	constructForm
+	constructForm,
+	generateRandomString
 };

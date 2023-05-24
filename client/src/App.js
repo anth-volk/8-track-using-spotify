@@ -48,11 +48,14 @@ function App() {
 	// Determine if user profile and Spotify cookies are present
 	useEffect(() => {
 
-		/*
-		if(cookies.userAuth) {
-			setUserAuthToken(cookies.userAuth);
+		async function refreshSpotifyToken(refreshToken) {
+			await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify_auth/refresh_token?refresh_token=' + refreshToken, {
+				method: 'GET',
+				headers: {
+					'CORS': 'Access-Control-Allow-Origin'
+				}
+			});
 		}
-		*/
 
 		console.log('didLogIn changed');
 
@@ -94,7 +97,8 @@ function App() {
 		// Determine if userSpotifyAuth token exists & isn't expired
 		if (cookies.userSpotifyAuth) {
 			if (cookies.userSpotifyAuth.expires_in + cookies.userSpotifyAuth.timestamp < Date.now()) {
-				// Call route for renewing Spotify auth
+				const refreshToken = cookies.userSpotifyAuth.refresh_token;
+				refreshSpotifyToken(refreshToken);
 			}
 			else {
 				setSpotifyToken(cookies.userSpotifyAuth);

@@ -2,7 +2,7 @@
 require('dotenv').config();
 const querystring = require('querystring');
 const fetch = require('node-fetch');
-const { constructForm } = require('../utilities/spotify');
+const { constructForm, generateRandomString } = require('../utilities/spotify');
 
 // Spotify auth setup
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -19,7 +19,7 @@ function spotifyAuth(req, res) {
 
 	// Set Spotify auth variables
 	// TODO: Write function to randomly generate this code
-	const state = 'jaw98ejff8j39f3lasdjf';
+	const state = generateRandomString(16);
 	const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming user-read-email user-read-private';
 
 	// Write state var to cookie to verify during callback redirect
