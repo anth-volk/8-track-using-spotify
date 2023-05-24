@@ -84,33 +84,40 @@ export function refreshToken(token) {
  */
 export async function jwtApiCall(route, method, authToken, body, secondCall = false) {
 
-	const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected' + route, {
-		method: method,
-		headers: {
-			'Content-Type': 'application/json',
-			'CORS': 'Access-Control-Allow-Origin',
-			'Authorization': 'JWT ' + authToken
-		},
-		body: body ? body : null
-	});
+	try {
 
-	console.log(responseObjectRaw);
+		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected' + route, {
+			method: method,
+			headers: {
+				'Content-Type': 'application/json',
+				'CORS': 'Access-Control-Allow-Origin',
+				'Authorization': 'JWT ' + authToken
+			},
+			body: body ? body : null
+		});
 
-	if (responseObjectRaw.ok) {
+		console.log(responseObjectRaw);
 
-		const responseObjectJSON = await responseObjectRaw.json();
+		if (responseObjectRaw.ok) {
 
-		return responseObjectJSON;
+			const responseObjectJSON = await responseObjectRaw.json();
+
+			return responseObjectJSON;
+		}
+		else if (responseObjectRaw.status === 401 && secondCall === false) {
+			const retrievedRefreshToken = retrieveRefreshToken();
+
+			refreshToken(retrievedRefreshToken);
+
+			const newAuthToken = retrieveAuthToken();
+
+			return await jwtApiCall(route, method, newAuthToken, body, true);
+
+		}
 	}
-	else if (responseObjectRaw.status === 401 && secondCall === false) {
-		const retrievedRefreshToken = retrieveRefreshToken();
-
-		refreshToken(retrievedRefreshToken);
-
-		const newAuthToken = retrieveAuthToken();
-
-		return jwtApiCall(route, method, newAuthToken, body, true);
-
+	catch (err) {
+		console.error('Error while executing JWT-protected API call: ', err);
 	}
+
 
 }
