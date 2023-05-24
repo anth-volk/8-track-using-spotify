@@ -1,6 +1,6 @@
 // External imports
 import { Fragment, useEffect, useState } from 'react';
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 // Component imports
@@ -37,12 +37,18 @@ function App() {
 	// Cookies object
 	const [cookies, setCookie, removeCookie] = useCookies();
 
+	// React-Router navigate
+	const navigate = useNavigate();
+
 	function handleLogout() {
 		// Clear all sessionStorage items
 		sessionStorage.clear();
 
-		// Set didLogIn to false to trigger app-wide re-render
+		// Set didLogIn to false
 		setDidLogIn(false);
+
+		// Redirect to home
+		navigate('/');
 	}
 
 	// Determine if user profile and Spotify cookies are present
