@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Internal imports
-const { spotifyAuth, spotifyAuthCallback } = require('../controllers/spotifyAuth.js');
+const { spotifyAuth, spotifyAuthCallback, spotifyRefresh } = require('../controllers/spotifyAuth.js');
 
 router.route('/')
 	// GET requests send users to first step in Spotify authorization
@@ -19,6 +19,8 @@ router.route('/callback')
 	.get(spotifyAuthCallback);
 
 router.route('/refresh_token')
-	.post();
+	// GET requests refresh expired Spotify tokens; based on docs at
+	// https://developer.spotify.com/documentation/web-api/tutorials/code-flow/  
+	.get(spotifyRefresh);
 
 module.exports = router;
