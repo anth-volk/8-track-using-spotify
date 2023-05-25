@@ -1,0 +1,11 @@
+nav {
+	width: 100vw;
+	height: var(--navbar-height);
+	border: 1px solid black;
+}
+
+.navbar_logo {
+	font-family: var(--display-font);
+	font-size: 2rem;
+	color: var(--primary-color);
+}

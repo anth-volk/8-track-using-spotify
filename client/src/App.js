@@ -2,7 +2,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Component imports
 import Navbar from './components/Navbar.js';
@@ -28,16 +27,7 @@ import {
 // Style imports
 import './styles/App.css';
 
-// Define custom Material-UI theme
-const theme = createTheme({
-	palette: {
-		primary: {
-			main: '#bcd123'
-		}
-	}
-});
-
-function App() {
+export default function App() {
 
 	// State variable for user object
 	const [authToken, setAuthToken] = useState(null);
@@ -124,33 +114,29 @@ function App() {
 
 	return (
 		<Fragment>
-			<ThemeProvider theme={theme}>
-				<AuthContext.Provider value={{ setDidLogIn, authToken }}>
-					<Navbar handleLogout={handleLogout} />
+			<AuthContext.Provider value={{ setDidLogIn, authToken }}>
+				<Navbar handleLogout={handleLogout} />
 
-					<Routes>
-						<Route path='/' element={<Home />} />
-						<Route path='/login' element={<Login />} />
-						<Route path='/signup' element={<Signup />} />
-						<Route
-							path='/library'
-							element={
-								spotifyToken ? (
-									<CartLibrary spotifyToken={spotifyToken} />
-								) : (
-									<NoConnection />
-								)
-							}
-						/>
-						<Route path='/create_cart' element={<CartCreation spotifyToken={spotifyToken} />} />
+				<Routes>
+					<Route path='/' element={<Home />} />
+					<Route path='/login' element={<Login />} />
+					<Route path='/signup' element={<Signup />} />
+					<Route
+						path='/library'
+						element={
+							spotifyToken ? (
+								<CartLibrary spotifyToken={spotifyToken} />
+							) : (
+								<NoConnection />
+							)
+						}
+					/>
+					<Route path='/create_cart' element={<CartCreation spotifyToken={spotifyToken} />} />
 
-					</Routes>
-				</AuthContext.Provider>
-			</ThemeProvider>
+				</Routes>
+			</AuthContext.Provider>
 
 		</Fragment>
 
 	);
 }
-
-export default App;

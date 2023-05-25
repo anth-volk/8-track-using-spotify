@@ -17,22 +17,20 @@ export default function Navbar(props) {
 
 	if (!authToken) {
 		return (
-			<Fragment>
-				<nav>
-					<h2 className='navbar_logo'>TEXT PLACEHOLDER</h2>
-					<ul>
-						<li>
-							<NavLink to='/' className='active'>Home</NavLink>
-						</li>
-						<li>
-							<NavLink to='/signup' className='active'>Sign Up</NavLink>
-						</li>
-						<li>
-							<NavLink to='/login' className='active'>Log In</NavLink>
-						</li>
-					</ul>
-				</nav>
-			</Fragment>
+			<nav>
+				<h2 className='navbar_logo'>STEREO 8s</h2>
+				<ul>
+					<li>
+						<NavLink to='/' className='active'>Home</NavLink>
+					</li>
+					<li>
+						<NavLink to='/signup' className='active'>Sign Up</NavLink>
+					</li>
+					<li>
+						<NavLink to='/login' className='active'>Log In</NavLink>
+					</li>
+				</ul>
+			</nav>
 		);
 	} else {
 		return (

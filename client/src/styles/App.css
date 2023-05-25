@@ -1,38 +1,181 @@
-.App {
-  text-align: center;
+/* ---------- ROOT VARIABLES ---------- */
+:root {
+	--primary-color: '#e8ad36';
+	--secondary-color: '#84b0a1';
+	--accent-color: '#e8602b';
+	--background-color: 'f6f2e8';
+	--serif-font: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
+	--sans-header-font: 'Didact Gothic', 'Futura', 'Arial', sans-serif;
+	--sans-text-font: 'Helvetica', sans-serif;
+	--display-font: 'Monoton', 'Prisma', 'Open Sans', sans-serif;
+	--gutter: 12.5vw;
+	--navbar-height: 75px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* ---------- APP-WIDE CSS RESET ---------- */
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+* {
+	border: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+	margin: 0;
+	padding: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+	display: block;
 }
 
-.App-link {
-  color: #61dafb;
+body {
+	line-height: 1;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+ol,
+ul {
+	list-style: none;
+}
+
+blockquote,
+q {
+	quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+	content: '';
+	content: none;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* ---------- APP-WIDE DEFAULT STYLES ---------- */
+
+p {
+	font-size: 16px;
+}
+
+h1 {
+	font-family: var(--sans-header-font);
+	font-weight: medium;
+	font-size: 2rem;
+	text-align: center;
+}
+
+h2 {
+	font-family: var(--sans-text-font);
+	font-weight: medium;
+	font-size: 1.25rem;
+	text-align: center;
+}
+
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--sans-text-font);
 }
