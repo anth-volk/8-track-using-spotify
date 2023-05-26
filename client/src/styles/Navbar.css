@@ -27,6 +27,7 @@ nav:hover {
 	list-style: none;
 	padding: 0 0.5rem;
 	font-size: 1.1rem;
+	font-weight: 500;
 }
 
 .navbar_link>a {
@@ -36,6 +37,7 @@ nav:hover {
 
 .navbar_link>a:hover {
 	text-decoration: underline;
+	text-decoration-thickness: 7.5%;
 }
 
 .navbar_logo {

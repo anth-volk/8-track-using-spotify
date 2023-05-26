@@ -8,11 +8,13 @@
 	--sans-header-font: 'Didact Gothic', 'Futura', 'Arial', sans-serif;
 	--sans-text-font: 'Montserrat', 'Helvetica', sans-serif;
 	--display-font: 'Monoton', 'Prisma', 'Open Sans', sans-serif;
-	--gutter: 10vw;
+	--gutter: 6vw;
+	--width-no-gutter: calc(100% - 2 * var(--gutter));
 	--navbar-height: 75px;
 	--text-size: 16px;
 	--text-color: #131212;
 	--inverted-text-color: #f3f2f2;
+	--inverted-a-color: #c58af9;
 	--bg-color-trans: background-color 0.3s;
 }
 
@@ -33,7 +35,7 @@ dd {
 	margin: 0;
 }
 
-/* SITE-WIDE STYLING: ELEMENT BEHAVIOR */
+/* ---------- APP-WIDE ELEMENT BEHAVIOR ---------- */
 
 /* Add global border-box */
 *,
@@ -112,6 +114,58 @@ a:focus,
 a:active,
 a:visited {
 	display: inline-block;
+}
+
+button {
+	padding: 1rem 1.5rem;
+	text-decoration: none;
+	border: none;
+	border-radius: 5px;
+}
+
+small {
+	font-size: 0.8rem;
+}
+
+/* ---------- APP-WIDE UTILITY CLASSES ---------- */
+.Util_btnPrimary {
+	background-color: var(--primary-color);
+	text-decoration: none;
+}
+
+.Util_btnSecondary {
+	background-color: var(--secondary-color);
+	color: var(--inverted-text-color);
+	text-decoration: none;
+}
+
+.Util_btnAccent {
+	background-color: var(--accent-color);
+	color: var(--inverted-text-color);
+	text-decoration: none;
+}
+
+.Util_btnPrimary:hover,
+.Util_btnSecondary:hover,
+.Util_btnAccent:hover {
+	box-shadow: rgba(0, 0, 0, 0.4) invert;
+}
+
+.Util_invertedA {
+	color: var(--inverted-a-color);
+	text-decoration: underline;
+}
+
+/* Styling for buttons meant to mimic anchors */
+.Util_btnLink {
+	color: none;
+	border: none;
+	background-color: rgba(0, 0, 0, 0);
+	font-size: var(--text-size);
+}
+
+.Util_logoInText {
+	font-family: var(--display-font);
 }
 
 /* ---------- ACCESSIBILITY ---------- */
