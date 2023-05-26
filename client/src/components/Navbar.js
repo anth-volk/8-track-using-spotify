@@ -19,14 +19,14 @@ export default function Navbar(props) {
 		return (
 			<nav>
 				<h2 className='navbar_logo'>STEREO 8s</h2>
-				<ul>
-					<li>
+				<ul className='navbar_links'>
+					<li className='navbar_link'>
 						<NavLink to='/' className='active'>Home</NavLink>
 					</li>
-					<li>
+					<li className='navbar_link'>
 						<NavLink to='/signup' className='active'>Sign Up</NavLink>
 					</li>
-					<li>
+					<li className='navbar_link'>
 						<NavLink to='/login' className='active'>Log In</NavLink>
 					</li>
 				</ul>
@@ -37,14 +37,14 @@ export default function Navbar(props) {
 			<Fragment>
 				<nav>
 					<h2 className='navbar_logo'>TEXT PLACEHOLDER</h2>
-					<ul>
-						<li>
+					<ul className='navbar_links'>
+						<li className='navbar_link'>
 							<NavLink to='/' className='active'>Home</NavLink>
 						</li>
-						<li>
+						<li className='navbar_link'>
 							<NavLink to='/library' className='active'>My Library</NavLink>
 						</li>
-						<li>
+						<li className='navbar_link'>
 							{/*<NavLink to='/logout' className='active'>Log Out</NavLink>*/}
 							<button type='button' className='logout_handler' onClick={handleLogout}>Log Out</button>
 						</li>

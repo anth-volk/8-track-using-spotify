@@ -1,175 +1,91 @@
 /* ---------- ROOT VARIABLES ---------- */
 :root {
-	--primary-color: '#e8ad36';
-	--secondary-color: '#84b0a1';
-	--accent-color: '#e8602b';
-	--background-color: 'f6f2e8';
+	--primary-color: #e8ad36;
+	--secondary-color: #84b0a1;
+	--accent-color: #e8602b;
+	--background-color: #f6f2e8;
 	--serif-font: 'EB Garamond', 'Garamond', 'Times New Roman', serif;
 	--sans-header-font: 'Didact Gothic', 'Futura', 'Arial', sans-serif;
-	--sans-text-font: 'Helvetica', sans-serif;
+	--sans-text-font: 'Montserrat', 'Helvetica', sans-serif;
 	--display-font: 'Monoton', 'Prisma', 'Open Sans', sans-serif;
-	--gutter: 12.5vw;
+	--gutter: 10vw;
 	--navbar-height: 75px;
+	--text-size: 16px;
+	--text-color: #131212;
+	--inverted-text-color: #f3f2f2;
+	--bg-color-trans: background-color 0.3s;
 }
 
 /* ---------- APP-WIDE CSS RESET ---------- */
+/* (inspired by https://piccalil.li/blog/a-modern-css-reset/) */
 
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-
-* {
-	border: none;
-}
-
-html,
+/* Remove default margin */
 body,
-div,
-span,
-applet,
-object,
-iframe,
 h1,
 h2,
 h3,
 h4,
-h5,
-h6,
 p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
 figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
+blockquote,
+dl,
+dd {
 	margin: 0;
-	padding: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
 }
 
-/* HTML5 display-role reset for older browsers */
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-menu,
-nav,
-section {
+/* SITE-WIDE STYLING: ELEMENT BEHAVIOR */
+
+/* Add global border-box */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+
+/* Set site-wide smooth scrolling */
+html:focus-within {
+	scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+	min-height: 100vh;
+	text-rendering: optimizeSpeed;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	line-height: 1.25;
+}
+
+/* Images fill container */
+img,
+picture {
+	max-width: 100%;
 	display: block;
 }
 
-body {
-	line-height: 1;
+/* ---------- APP-WIDE PAGE STYLING ---------- */
+
+html {
+	background-color: var(--site-background-color);
 }
 
-ol,
-ul {
-	list-style: none;
-}
-
-blockquote,
-q {
-	quotes: none;
-}
-
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-	content: '';
-	content: none;
-}
-
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
-/* ---------- APP-WIDE DEFAULT STYLES ---------- */
-
-p {
-	font-size: 16px;
-}
+/* ---------- APP-WIDE TEXT STYLING ---------- */
 
 h1 {
 	font-family: var(--sans-header-font);
 	font-weight: medium;
 	font-size: 2rem;
 	text-align: center;
+	padding: 2rem 0;
+
 }
 
 h2 {
 	font-family: var(--sans-text-font);
+	padding: 0.5rem 0 0.25rem 0;
+	font-size: 1.5rem;
 	font-weight: medium;
-	font-size: 1.25rem;
 	text-align: center;
 }
 
@@ -178,4 +94,65 @@ h4,
 h5,
 h6 {
 	font-family: var(--sans-text-font);
+}
+
+p,
+li {
+	font-family: var(--sans-text-font);
+	font-size: var(--text-size);
+}
+
+i {
+	padding-right: 0.125em;
+}
+
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+	display: inline-block;
+}
+
+/* ---------- ACCESSIBILITY ---------- */
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+	html:focus-within {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+@media screen and (max-width: 767px) {
+	:root {
+		--nav-text-size: 1rem;
+		--gutter: 5vw;
+	}
+}
+
+@media screen and (max-width: 575px) {
+
+	p>a::after,
+	.App_underline::after {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 0;
+		right: 0;
+		bottom: -0.05em;
+		background: var(--accent-color);
+		height: 0.125em;
+		transition: none;
+	}
+
+
 }
