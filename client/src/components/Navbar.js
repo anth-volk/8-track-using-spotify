@@ -1,6 +1,6 @@
 // External imports
 import React, { Fragment, useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 // Internal imports
 import { AuthContext } from '../contexts/AuthContext.js';
@@ -18,7 +18,9 @@ export default function Navbar(props) {
 	if (!authToken) {
 		return (
 			<nav>
-				<h2 className='navbar_logo'>STEREO 8s</h2>
+				<h2 className='navbar_logo'>
+					<Link to='/' style={{ textDecoration: 'inherit', color: 'inherit' }}>STEREO 8s</Link>
+				</h2>
 				<ul className='navbar_links'>
 					<li className='navbar_link'>
 						<NavLink to='/' className='active'>Home</NavLink>
