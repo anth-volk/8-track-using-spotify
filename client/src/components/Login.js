@@ -7,6 +7,9 @@ import { useCookies } from 'react-cookie';
 import { storeAuthToken, storeAuthTokenExpiry, storeRefreshToken, storeRefreshTokenExpiry } from '../utilities/userAuth';
 import { AuthContext } from '../contexts/AuthContext.js';
 
+// Style imports
+import '../styles/Login.css';
+
 export default function Login() {
 
 	// Context
@@ -124,18 +127,6 @@ export default function Login() {
 			// If signup is successful per returned JSON object...
 			if (resJSON.connection_status === 'success' && resJSON.data_status === 'user_exists') {
 
-				/*
-				setAuthToken({
-					token: resJSON.auth_token,
-					max_age: resJSON.auth_token_max_age
-				});
-
-				setRefreshToken({
-					token: resJSON.refresh_token,
-					max_age: resJSON.refresh_token_max_age
-				});
-				*/
-
 				storeAuthToken(resJSON.auth_token);
 				storeAuthTokenExpiry(resJSON.auth_token_expiry);
 
@@ -167,51 +158,20 @@ export default function Login() {
 		return () => clearTimeout(timerRef.current);
 	}, [])
 
-	/*
-	// Store user object in sessionStorage
-	useEffect(() => {
-
-		if(authToken) {
-	*/
-	/*
-	try {
-		setCookie(
-			'userAuth',
-			authToken,
-			{
-				path: '/',
-				maxAge: authToken.max_age
-			}
-		)
-	}
-	catch (err) {
-		console.error('Error while setting JWT cookie: ', err);
-	}
-	*/
-
-	/*
-			storeAuthToken(authToken);
-
-		}
-
-	}, [authToken, setCookie])
-	*/
-
 	return (
 		<div className='Login'>
 			<div className='Login_container'>
-				<h1 className='Login_logoText'>TEXT PLACEHOLDER</h1>
-				<h2 className='Login_title'>Log In</h2>
+				<h1 className='Login_title'>Log In</h1>
 				<form className='Login_form' onSubmit={handleFormSubmit}>
-					<label htmlFor='email'>Email Address</label>
+					<label className='Login_label' htmlFor='email'>Email Address</label>
 					<input className='Login_textInput' type='email' name='email' value={form.email} onChange={handleFormChange} placeholder='Email Address'></input>
 					<p className='Login_validationText'>{formErrors.email}</p>
-					<label htmlFor='password'>Password</label>
-					<input className='Login_textInput' type='password' name='password' value={form.password} onChange={handleFormChange}></input>
+					<label className='Login_label' htmlFor='password'>Password</label>
+					<input className='Login_textInput' type='password' name='password' value={form.password} onChange={handleFormChange} placeholder='Password'></input>
 					<p className='Login_validationText'>{formErrors.password}</p>
-					<button type='submit' className='Util_button'>Log In</button>
+					<button type='submit' className='Util_btnSecondary Login_submitButton'>Log In</button>
 				</form>
-				<Link to='/signup'>I don't have an account yet</Link>
+				<Link to='/signup' style={{ marginBottom: '8px' }}>I don't have an account yet</Link>
 				<p className='Login_submissionMessage'>{submissionMessage}</p>
 			</div>
 		</div>

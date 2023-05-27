@@ -127,6 +127,14 @@ small {
 	font-size: 0.8rem;
 }
 
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+	padding: calc(0.75 * var(--text-size)) calc(0.75 * var(--text-size)) calc(0.75 * var(--text-size)) calc(0.375 * var(--text-size));
+}
+
+
+
 /* ---------- APP-WIDE UTILITY CLASSES ---------- */
 .Util_bold {
 	font-weight: bold;
@@ -143,7 +151,9 @@ small {
 
 .Util_btnSecondary {
 	background-color: var(--secondary-color);
-	color: var(--inverted-text-color);
+	/* Assigning white because it's hard to see
+	inverted color against secondary color */
+	color: white;
 	text-decoration: none;
 }
 

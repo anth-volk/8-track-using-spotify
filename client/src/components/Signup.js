@@ -2,6 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// Style imports
+import '../styles/Signup.css';
+
 export default function Signup() {
 
 	// State variable object for controlled input
@@ -43,10 +46,10 @@ export default function Signup() {
 
 		// Map over form keys
 		Object.keys(form)
-			.forEach( (formElementKey) => {
+			.forEach((formElementKey) => {
 
 				// If the element exists...
-				if(form[formElementKey]) {
+				if (form[formElementKey]) {
 
 					switch (formElementKey) {
 						// Validate email addresses against regex from https://www.w3resource.com/javascript/form/email-validation.php
@@ -74,10 +77,10 @@ export default function Signup() {
 						default:
 							errors[formElementKey] = '';
 							break;
-						
+
 					}
 
-				} 
+				}
 				// If the value is blank, add the below as an error message
 				else {
 					errors[formElementKey] = 'This field is required';
@@ -85,15 +88,15 @@ export default function Signup() {
 				}
 
 			})
-		
+
 		// Set formErrors based on the errors accumulated
-		setFormErrors( (prev) => ({
+		setFormErrors((prev) => ({
 			...prev,
 			...errors
 		}));
-		
+
 		return isValid;
-		
+
 	}
 
 	// Form input handler
@@ -151,7 +154,7 @@ export default function Signup() {
 						navigate('/');
 					}, 3000);
 
-				} 
+				}
 				// Otherwise, set negative submission message
 				else {
 					setSubmissionMessage('Unable to create account. Please try again.')
@@ -165,30 +168,39 @@ export default function Signup() {
 		return () => clearTimeout(timerRef.current);
 	}, [])
 
-	return(
+	return (
 		<div className='Signup'>
 			<div className='Signup_container'>
-				<h1 className='Signup_logoText'>TEXT PLACEHOLDER</h1>
-				<h2 className='Signup_title'>Sign Up</h2>
+				<h1 className='Signup_title'>Sign Up</h1>
 				<form className='Signup_form' onSubmit={handleFormSubmit}>
-					<label htmlFor='fname'>First Name</label>
-					<input className='Signup_textInput' type='text' name='fname' value={form.fname} onChange={handleFormChange} placeholder='First Name'></input>
-					<p className='Signup_validationText'>{formErrors.fname}</p>
-					<label htmlFor='lname'>Last Name</label>
-					<input className='Signup_textInput' type='text' name='lname' value={form.lname} onChange={handleFormChange} placeholder='Last Name'></input>
-					<p className='Signup_validationText'>{formErrors.lname}</p>
-					<label htmlFor='email'>Email Address</label>
-					<input className='Signup_textInput' type='email' name='email' value={form.email} onChange={handleFormChange} placeholder='Email Address'></input>
-					<p className='Signup_validationText'>{formErrors.email}</p>
-					<label htmlFor='password'>Password</label>
-					<input className='Signup_textInput' type='password' name='password' value={form.password} onChange={handleFormChange}></input>
-					<p className='Signup_validationText'>{formErrors.password}</p>
-					<label htmlFor='confirmPassword'>Confirm Password</label>
-					<input className='Signup_textInput' type='password' name='confirmPassword' value={form.confirmPassword} onChange={handleFormChange}></input>
-					<p className='Signup_validationText'>{formErrors.confirmPassword}</p>
-					<button type='submit' className='Util_button'>Sign Up</button>
+					<div className='Signup_form_unit'>
+						<label className='Signup_label' htmlFor='fname'>First Name</label>
+						<input className='Signup_textInput' type='text' name='fname' value={form.fname} onChange={handleFormChange} placeholder='First Name'></input>
+						<p className='Signup_validationText'>{formErrors.fname}</p>
+					</div>
+					<div className='Signup_form_unit'>
+						<label className='Signup_label' htmlFor='lname'>Last Name</label>
+						<input className='Signup_textInput' type='text' name='lname' value={form.lname} onChange={handleFormChange} placeholder='Last Name'></input>
+						<p className='Signup_validationText'>{formErrors.lname}</p>
+					</div>
+					<div className='Signup_form_unit--long'>
+						<label className='Signup_label' htmlFor='email'>Email Address</label>
+						<input className='Signup_textInput' type='email' name='email' value={form.email} onChange={handleFormChange} placeholder='Email Address'></input>
+						<p className='Signup_validationText'>{formErrors.email}</p>
+					</div>
+					<div className='Signup_form_unit'>
+						<label className='Signup_label' htmlFor='password'>Password</label>
+						<input className='Signup_textInput' type='password' name='password' value={form.password} onChange={handleFormChange}></input>
+						<p className='Signup_validationText'>{formErrors.password}</p>
+					</div>
+					<div className='Signup_form_unit'>
+						<label className='Signup_label' htmlFor='confirmPassword'>Confirm Password</label>
+						<input className='Signup_textInput' type='password' name='confirmPassword' value={form.confirmPassword} onChange={handleFormChange}></input>
+						<p className='Signup_validationText'>{formErrors.confirmPassword}</p>
+					</div>
+					<button type='submit' className='Util_btnSecondary Signup_submitButton'>Sign Up</button>
 				</form>
-				<Link to='/login'>I already have an account</Link>
+				<Link to='/login' style={{ marginBottom: '8px' }}>I already have an account</Link>
 				<p className='Signup_submissionMessage'>{submissionMessage}</p>
 			</div>
 		</div>
