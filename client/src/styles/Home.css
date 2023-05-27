@@ -84,3 +84,27 @@
 	height: calc(1.5 * var(--text-size));
 	object-fit: contain;
 }
+
+.Home_about {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	width: var(--width-no-gutter);
+	column-gap: calc(0.5 * var(--gutter));
+}
+
+.Home_about_halfSection {
+	grid-column: span 1;
+	padding: var(--text-size) 0;
+	text-align: justify;
+}
+
+.Home_about_halfSection>p {
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+.Home_about_fullSection {
+	grid-column: span 2;
+	padding: var(--text-size) 0;
+	text-align: center;
+}

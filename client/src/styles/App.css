@@ -128,6 +128,14 @@ small {
 }
 
 /* ---------- APP-WIDE UTILITY CLASSES ---------- */
+.Util_bold {
+	font-weight: bold;
+}
+
+.Util_italic {
+	font-style: italic;
+}
+
 .Util_btnPrimary {
 	background-color: var(--primary-color);
 	text-decoration: none;
