@@ -60,3 +60,7 @@
 	width: 40%;
 	align-self: center;
 }
+
+.Login_submissionMessage {
+	padding-bottom: calc(0.5 * var(--text-size));
+}
