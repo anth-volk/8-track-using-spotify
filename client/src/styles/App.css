@@ -123,6 +123,10 @@ button {
 	border-radius: 5px;
 }
 
+button:hover {
+	cursor: pointer;
+}
+
 small {
 	font-size: 0.8rem;
 }
