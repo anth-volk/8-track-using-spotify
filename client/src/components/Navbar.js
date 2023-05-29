@@ -38,7 +38,7 @@ export default function Navbar(props) {
 		return (
 			<Fragment>
 				<nav>
-					<h2 className='navbar_logo'>TEXT PLACEHOLDER</h2>
+					<h2 className='navbar_logo'>STEREO 8s</h2>
 					<ul className='navbar_links'>
 						<li className='navbar_link'>
 							<NavLink to='/' className='active'>Home</NavLink>
