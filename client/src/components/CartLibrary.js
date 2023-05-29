@@ -8,6 +8,9 @@ import CartPlayer from './CartPlayer.js';
 import { AuthContext } from '../contexts/AuthContext.js';
 import { jwtApiCall } from '../utilities/userAuth.js';
 
+// Style import
+import '../styles/CartLibrary.css';
+
 export default function CartLibrary(props) {
 
 	// Note: userAuth and userSpotifyAuth stored in props
@@ -71,9 +74,9 @@ export default function CartLibrary(props) {
 	}, [userLibrary])
 
 	return (
-		<Fragment>
+		<section className="CartLibrary">
 			<h1>Cart Library Placeholder</h1>
-			<section className="CartLibrary_playerContainer">
+			<div className="CartLibrary_playerContainer">
 				{/*Drawing of 8-track player*/}
 				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
@@ -84,7 +87,7 @@ export default function CartLibrary(props) {
 				<button type="button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
 				{/*Cartridge "storage" area*/}
 				{userLibraryView}
-			</section>
-		</Fragment>
+			</div>
+		</section>
 	);
 }

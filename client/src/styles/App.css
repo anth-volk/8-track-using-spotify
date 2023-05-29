@@ -186,6 +186,15 @@ input[type="password"] {
 	font-size: var(--text-size);
 }
 
+/* Styling for achors meant to mimic buttons */
+.Util_linkBtnAccent {
+	background-color: var(--accent-color);
+	padding: 1rem 1.5rem;
+	border-radius: 5px;
+	color: var(--inverted-text-color);
+	text-decoration: none;
+}
+
 .Util_logoInText {
 	font-family: var(--display-font);
 }
