@@ -51,7 +51,24 @@ nav:hover .navbar_logo {
 	transition: var(--bg-color-trans);
 }
 
-nav:hover .navbar_link>a {
+nav:hover .navbar_link>a,
+nav:hover .logout_handler {
 	color: var(--inverted-text-color);
 	transition: var(--bg-color-trans);
+}
+
+.logout_handler {
+	font-family: var(--sans-text-font);
+	font-size: 1.1rem;
+	font-weight: 500;
+	background: none;
+	padding: 0;
+	color: var(--text-color);
+	margin: 0;
+}
+
+.logout_handler:hover {
+	text-decoration: underline;
+	text-decoration-thickness: 7.5%;
+	cursor: pointer;
 }
