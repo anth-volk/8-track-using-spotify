@@ -29,6 +29,9 @@ import { AuthContext } from '../contexts/AuthContext.js';
 import tapeHiss from '../audio_files/tape_hiss.mp3';
 import programClick from '../audio_files/program_click.mp3';
 
+// Style imports
+import '../styles/CartPlayer.css';
+
 export default function CartPlayer(props) {
 
 	// Props
@@ -512,22 +515,39 @@ export default function CartPlayer(props) {
 
 	return (
 		<Fragment>
-			<div className='container'>
-				<div className='main-wrapper'>
-					{/*Empty 8-track player visual*/}
-					{/*Inside of that: activeCart details, if present*/}
-					{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}
-					<p className='playbackMessage'>{playbackMessage}</p>
+			<section className="CartPlayer">
+				<div className="CartPlayer_middle">
+					<div className="CartPlayer_inner">
+						<div className="CartPlayer_progLightContainer">
+							<div className={`CartPlayer_progLight ${activeProgramNumber === 0 ? 'progLight_active' : ''}`}>1</div>
+							<div className={`CartPlayer_progLight ${activeProgramNumber === 1 ? 'progLight_active' : ''}`}>2</div>
+							<div className={`CartPlayer_progLight ${activeProgramNumber === 2 ? 'progLight_active' : ''}`}>3</div>
+							<div className={`CartPlayer_progLight ${activeProgramNumber === 3 ? 'progLight_active' : ''}`}>4</div>
+						</div>
+						<div className="CartPlayer_playbackContainer">
+							<div className='CartPlayer_tapeSlot'>
+								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8 TRACK</p>}
+								{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}
+							</div>
+							<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
+							</button>
+							<button type='button' className='programButton' onClick={handleProgramChange}></button>
+							<div className='audioElements'>
+								<audio src={tapeHiss} ref={tapeHissRef} />
+								<audio src={programClick} ref={programClickRef} />
+							</div>
+						</div>
+						<div className="CartPlayer_bottomContainer">
+							<p className="CartPlayer_bottomText bottomText_copyright">JavaSonic</p>
+							<p className="CartPlayer_bottomText">
+								{isCartPlaying ? 'PAUSE' : 'PLAY'}
+							</p>
+							<p className="CartPlayer_bottomText">PROGRAM</p>
+						</div>
+					</div>
 				</div>
-				<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
-					{isCartPlaying ? 'PAUSE' : 'PLAY'}
-				</button>
-				<button type='button' className='playbackButton' onClick={handleProgramChange}>PROGRAM</button>
-				<div className='audioElements'>
-					<audio src={tapeHiss} ref={tapeHissRef} />
-					<audio src={programClick} ref={programClickRef} />
-				</div>
-			</div>
+			</section>
+			<p className='playbackMessage'>{playbackMessage}</p>
 		</Fragment>
 	)
 }

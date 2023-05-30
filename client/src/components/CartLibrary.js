@@ -75,14 +75,11 @@ export default function CartLibrary(props) {
 
 	return (
 		<section className="CartLibrary">
-			<h1>Cart Library Placeholder</h1>
 			<div className="CartLibrary_playerContainer">
-				{/*Drawing of 8-track player*/}
 				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
 				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
-				<svg>
-					<g className="CartLibrary_controls"></g>
-				</svg>
+			</div>
+			<div className="CartLibrary_collectionContainer">
 				<Link to='/create_cart'>Create new cartridge</Link>
 				<button type="button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
 				{/*Cartridge "storage" area*/}
