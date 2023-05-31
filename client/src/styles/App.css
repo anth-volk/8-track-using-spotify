@@ -121,6 +121,7 @@ button {
 	text-decoration: none;
 	border: none;
 	border-radius: 5px;
+	font-size: var(--text-size);
 }
 
 button:hover {
@@ -195,8 +196,25 @@ input[type="password"] {
 	text-decoration: none;
 }
 
+.Util_linkBtnSecondary {
+	background-color: var(--secondary-color);
+	padding: 1rem 1.5rem;
+	border-radius: 5px;
+	color: var(--inverted-text-color);
+	text-decoration: none;
+}
+
 .Util_logoInText {
 	font-family: var(--display-font);
+}
+
+.Util_btnThin {
+	padding: 0.5rem;
+	font-size: calc(0.8 * var(--text-size));
+}
+
+.hidden {
+	display: none;
 }
 
 /* ---------- ACCESSIBILITY ---------- */

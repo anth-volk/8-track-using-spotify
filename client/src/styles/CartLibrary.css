@@ -1,3 +1,7 @@
+:root {
+	--tape-aspect-ratio: 8;
+}
+
 .CartLibrary {
 	background-color: var(--background-color);
 	min-height: calc(100vh - var(--navbar-height));
@@ -11,4 +15,82 @@
 
 .CartLibrary_playerContainer {
 	width: 100%;
+	padding-bottom: 1px;
+}
+
+.CartLibrary_collectionContainer {
+	width: calc(100% - 15vw);
+	background-color: #954520;
+	max-height: 50vh;
+	overflow: scroll;
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	justify-content: center;
+}
+
+.CartLibrary_collectionButtons {
+	width: 100%;
+	padding: 1vw;
+	display: grid;
+	align-items: center;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.CartLibrary_button {
+	margin: 0 auto;
+}
+
+.CartLibrary_collectionInner {
+	width: calc(100% - 2vw);
+	height: 100%;
+	background-color: #954520;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	margin: 0 auto;
+	gap: 1vw;
+}
+
+.CartLibrary_shadow {
+	display: block;
+	width: 100%;
+	aspect-ratio: var(--tape-aspect-ratio);
+	background-color: black;
+	cursor: pointer;
+}
+
+.CartLibrary_albumPlastic {
+	display: flex;
+	background-color: #d61e0a;
+	border: 0.75vw solid black;
+	border-radius: 2vw;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	flex-direction: row;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+.CartLibrary_album {
+	background-color: #faf8fa;
+	width: 94%;
+	margin: 0 auto;
+	height: 80%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.CartLibrary_album_artists,
+.CartLibrary_album_title {
+	font-size: 1.25vw;
+	text-align: center;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.CartLibrary_album_deleteBtn {
+	z-index: 3;
 }

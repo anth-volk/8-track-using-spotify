@@ -27,7 +27,7 @@ export default function CartLibrary(props) {
 	const spotifyToken = cookies.userSpotifyAuth.access_token;
 
 	function handleCartridgeDeleteMode() {
-		setDeleteMode(true);
+		setDeleteMode(prev => !prev);
 	}
 
 	function handleCartridgeSelection(cart) {
@@ -59,15 +59,25 @@ export default function CartLibrary(props) {
 	useEffect(() => {
 
 		if (userLibrary) {
-			const userLibraryIterated = userLibrary.map((album) => {
+			let userLibraryIterated = userLibrary.map((album) => {
 				return (
-					<div className="CartLibrary_album" key={album.cart_id} onClick={(e) => { handleCartridgeSelection(album) }}>
-						<button type="button" className={deleteMode ? '' : 'hidden'} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>
-						<p className="CartLibrary_album_title">{album.cart_name}</p>
-						<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
+					<div className="CartLibrary_shadow" key={album.cart_id}>
+						<div className="CartLibrary_albumPlastic">
+							<div className="CartLibrary_album" onClick={(e) => { handleCartridgeSelection(album) }}>
+								{/*<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>*/}
+								<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
+								<p className="CartLibrary_album_title">{album.cart_name}</p>
+							</div>
+						</div>
 					</div>
 				);
 			})
+			if (userLibrary.length % 2 !== 0) {
+				userLibraryIterated = userLibraryIterated.concat(
+					<div className="CartLibrary_shadow">
+					</div>
+				)
+			}
 			setUserLibraryView(userLibraryIterated);
 		}
 
@@ -77,13 +87,16 @@ export default function CartLibrary(props) {
 		<section className="CartLibrary">
 			<div className="CartLibrary_playerContainer">
 				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
-				{/*Drawing of uppermost part of "cabinet" with two buttons in it*/}
 			</div>
 			<div className="CartLibrary_collectionContainer">
-				<Link to='/create_cart'>Create new cartridge</Link>
-				<button type="button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
+				<div className="CartLibrary_collectionButtons">
+					<Link to='/create_cart' className="Util_linkBtnSecondary Util_btnThin CartLibrary_button">Create new cartridge</Link>
+					<button type="button" className="Util_btnSecondary Util_btnThin CartLibrary_button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
+				</div>
 				{/*Cartridge "storage" area*/}
-				{userLibraryView}
+				<div className="CartLibrary_collectionInner">
+					{userLibraryView}
+				</div>
 			</div>
 		</section>
 	);
