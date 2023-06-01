@@ -3,15 +3,16 @@
 }
 
 .CartLibrary {
-	background: linear-gradient(315deg, var(--primary-color) var(--navbar-height), var(--accent-color));
+	background: linear-gradient(-45deg, var(--primary-color), var(--accent-color));
+	background-size: 400% 400%;
 	min-height: 100vh;
 	min-height: 100dvh;
 	min-width: 100vw;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* May edit justify-content property */
 	justify-content: flex-end;
+	animation: gradient 12s ease infinite;
 }
 
 .CartLibrary_playerContainer {
@@ -94,4 +95,18 @@
 
 .CartLibrary_album_deleteBtn {
 	z-index: 3;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+
+	50% {
+		background-position: 100% 50%;
+	}
+
+	100% {
+		background-position: 0% 50%;
+	}
 }

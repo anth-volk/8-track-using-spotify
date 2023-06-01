@@ -8,7 +8,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	background-image: linear-gradient(-135deg, var(--primary-color), var(--accent-color) 100%);
+	background-image: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
 }
 
 .Login_container {

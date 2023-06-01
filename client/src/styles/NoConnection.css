@@ -1,13 +1,19 @@
 .CartLibraryNoConnection {
-	min-height: calc(100vh - var(--navbar-height));
+	min-height: 100vh;
+	min-height: 100dvh;
 	min-width: 100vw;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-image: linear-gradient(-135deg, var(--primary-color) var(--navbar-height), var(--accent-color) 100%);
+	background-image: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
+}
+
+.CLNC_header {
+	color: var(--inverted-text-color);
 }
 
 .CLNC_text {
 	margin-bottom: 2rem;
+	color: var(--inverted-text-color);
 }

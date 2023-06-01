@@ -84,7 +84,7 @@ export default function CartLibrary(props) {
 	}, [userLibrary])
 
 	return (
-		<section className="CartLibrary">
+		<section className={`CartLibrary ${activeCart ? '' : 'Util_animPaused'}`}>
 			<div className="CartLibrary_playerContainer">
 				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
 			</div>
