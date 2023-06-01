@@ -1,21 +1,54 @@
 .CartCreation {
 	min-height: 100vh;
 	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
 	background-image: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
 	padding-top: var(--navbar-height);
 }
 
 .CartCreation_grid {
-	height: 100%;
+	flex: 1;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	grid-template-rows: 1;
 	align-items: center;
 	justify-items: center;
 }
 
-.CartCreation_left,
-.CartCreation_right {
+.CartCreation_side {
+	margin: 0 auto;
 	width: 100%;
 	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.CartCreation_left {}
+
+.CartCreation_right {}
+
+.CartCreation_searchContainer {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	padding: 0 3vw 1rem 3vw;
+	justify-content: space-between;
+	align-items: center;
+	gap: 3vw;
+}
+
+.CartCreation_searchInput {
+	width: 100%;
+	background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg");
+	background-size: 1.5rem;
+	background-repeat: no-repeat;
+	background-position: 0.5rem center;
+	padding-left: calc(1.5 * var(--text-size));
+}
+
+.CartCreation_sideHeader {
+	color: var(--inverted-text-color);
+	padding-bottom: 1rem;
 }

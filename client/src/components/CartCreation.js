@@ -120,14 +120,16 @@ export default function CartCreation(props) {
 	}, [])
 
 	return (
-		<div className="CartCreation">
+		<section className="CartCreation">
 			<h1 className="Util_invertedText">Create New Cartridge</h1>
 			<div className="CartCreation_grid">
-				<div className='CartCreation_left'>
-					<h2>Search for an album below:</h2>
-					{/*Display little search icon*/}
-					<input type='text' value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
-					<button type='button' onClick={handleSearchSubmission}>Search</button>
+				<div className='CartCreation_side CartCreation_left'>
+					<h2 className="CartCreation_sideHeader">Search for an album below:</h2>
+					<div className="CartCreation_searchContainer">
+						{/*Display little search icon*/}
+						<input type='text' className="CartCreation_searchInput" value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
+						<button type='button' className="Util_btnSecondary Util_btnThin" onClick={handleSearchSubmission} aria->Search</button>
+					</div>
 					<div className='CartSearch_grid'>
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
 							return (
@@ -140,8 +142,8 @@ export default function CartCreation(props) {
 						})}
 					</div>
 				</div>
-				<div className='CartCreation_right'>
-					<h2>Cartridge Preview</h2>
+				<div className='CartCreation_side CartCreation_right'>
+					<h2 className="CartCreation_sideHeader">Cartridge Preview</h2>
 					<div className='CartPreview_container'>
 						{clickedAlbum &&
 							<Fragment>
@@ -160,6 +162,6 @@ export default function CartCreation(props) {
 					<p>{cartridgeCreationMessage}</p>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

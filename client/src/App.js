@@ -3,6 +3,9 @@ import { Fragment, useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
+// Style imports
+import './styles/App.css';
+
 // Component imports
 import Navbar from './components/Navbar.js';
 import Home from './components/Home.js';
@@ -23,9 +26,6 @@ import {
 	retrieveAuthTokenMaxAge,
 	retrieveRefreshTokenExpiry
 } from './utilities/userAuth.js';
-
-// Style imports
-import './styles/App.css';
 
 export default function App() {
 
