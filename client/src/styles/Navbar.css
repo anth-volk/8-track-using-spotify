@@ -65,7 +65,7 @@ nav:hover .logout_handler {
 	font-weight: 500;
 	background: none;
 	padding: 0;
-	color: var(--text-color);
+	color: var(--inverted-text-color);
 	margin: 0;
 }
 
