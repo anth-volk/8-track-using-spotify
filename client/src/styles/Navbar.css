@@ -1,16 +1,18 @@
 nav {
 	width: 100vw;
 	height: var(--navbar-height);
-	background-color: var(--background-color);
+	background: none;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 var(--gutter);
+	position: absolute;
+	z-index: 3;
 }
 
 nav:hover {
-	background-color: var(--primary-color);
+	background-color: var(--background-color);
 	transition: var(--bg-color-trans);
 }
 
@@ -32,7 +34,7 @@ nav:hover {
 
 .navbar_link>a {
 	text-decoration: none;
-	color: var(--text-color);
+	color: var(--inverted-text-color);
 }
 
 .navbar_link>a:hover {
@@ -43,18 +45,18 @@ nav:hover {
 .navbar_logo {
 	font-family: var(--display-font);
 	font-size: 2rem;
-	color: var(--primary-color);
+	color: var(--inverted-text-color);
 }
 
 nav:hover .navbar_logo {
-	color: var(--inverted-text-color);
+	color: var(--accent-color);
 	transition: var(--bg-color-trans);
 }
 
 nav:hover .navbar_link>a,
 nav:hover .logout_handler {
-	color: var(--inverted-text-color);
 	transition: var(--bg-color-trans);
+	color: var(--text-color);
 }
 
 .logout_handler {

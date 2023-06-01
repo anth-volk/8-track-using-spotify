@@ -168,11 +168,32 @@ input[type="password"] {
 	text-decoration: none;
 }
 
+
+.Util_btnPrimary,
+.Util_btnSecondary,
+.Util_btnAccent,
+.Util_btnLink,
+.Util_linkBtnAccent,
+.Util_linkBtnSecondary {
+	box-shadow: 0px 0px 4px black;
+}
+
+.Util_btnPrimary:active,
+.Util_btnSecondary:active,
+.Util_btnAccent:active,
+.Util_btnLink:active,
+.Util_linkBtnAccent:active,
+.Util_linkBtnSecondary:active {
+	box-shadow: 0px 0px 5px black inset;
+}
+
+/*
 .Util_btnPrimary:hover,
 .Util_btnSecondary:hover,
 .Util_btnAccent:hover {
 	box-shadow: rgba(0, 0, 0, 0.4) invert;
 }
+*/
 
 .Util_invertedA {
 	color: var(--inverted-a-color);

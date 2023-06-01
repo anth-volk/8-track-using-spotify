@@ -526,7 +526,7 @@ export default function CartPlayer(props) {
 						</div>
 						<div className="CartPlayer_playbackContainer">
 							<div className='CartPlayer_tapeSlot'>
-								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8 TRACK</p>}
+								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8-TRACK</p>}
 								{/*{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}*/}
 								{activeCart && (
 									<div className="CartPlayer_shadow">

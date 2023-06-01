@@ -3,8 +3,9 @@
 }
 
 .CartLibrary {
-	background-color: var(--background-color);
-	min-height: calc(100vh - var(--navbar-height));
+	background: linear-gradient(315deg, var(--primary-color) var(--navbar-height), var(--accent-color));
+	min-height: 100vh;
+	min-height: 100dvh;
 	min-width: 100vw;
 	display: flex;
 	flex-direction: column;
