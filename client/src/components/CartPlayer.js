@@ -534,8 +534,8 @@ export default function CartPlayer(props) {
 								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8-TRACK</p>}
 								{/*{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}*/}
 								{activeCart && (
-									<div className="CartPlayer_shadow" onClick={handleCartridgeEjection}>
-										<div className="CartPlayer_albumPlastic">
+									<div className="CartPlayer_shadow">
+										<div className="CartPlayer_albumPlastic" onClick={handleCartridgeEjection}>
 											<div className="CartPlayer_album">
 												{/*<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>*/}
 												<p className="CartPlayer_album_artists">{activeCart.artists_array[0]}</p>

@@ -58,7 +58,6 @@
 	width: 100%;
 	aspect-ratio: var(--tape-aspect-ratio);
 	background-color: black;
-	cursor: pointer;
 }
 
 .CartLibrary_albumPlastic {
@@ -72,6 +71,7 @@
 	flex-direction: row;
 	align-items: flex-end;
 	justify-content: center;
+	cursor: pointer;
 }
 
 .CartLibrary_album {
@@ -83,6 +83,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	position: relative;
 }
 
 .CartLibrary_album_artists,
@@ -94,7 +95,17 @@
 }
 
 .CartLibrary_album_deleteBtn {
+	position: absolute;
+	left: 0%;
 	z-index: 3;
+	height: 3vw;
+	aspect-ratio: 1;
+	font-size: 1.75vw;
+	padding: 0;
+	background: none;
+	border: none;
+	border-radius: 2px;
+	border: 1px solid black;
 }
 
 @keyframes gradient {

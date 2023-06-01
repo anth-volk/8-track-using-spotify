@@ -159,6 +159,7 @@
 	flex-direction: row;
 	align-items: flex-end;
 	justify-content: center;
+	cursor: pointer;
 }
 
 .CartPlayer_album {

@@ -68,9 +68,9 @@ export default function CartLibrary(props) {
 			let userLibraryIterated = userLibrary.map((album) => {
 				return (
 					<div className="CartLibrary_shadow" key={album.cart_id}>
-						<div className="CartLibrary_albumPlastic">
-							<div className="CartLibrary_album" onClick={(e) => { handleCartridgeSelection(album) }}>
-								{/*<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>*/}
+						<div className="CartLibrary_albumPlastic" onClick={(e) => { handleCartridgeSelection(album) }}>
+							<div className="CartLibrary_album">
+								<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>
 								<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
 								<p className="CartLibrary_album_title">{album.cart_name}</p>
 							</div>
@@ -80,14 +80,14 @@ export default function CartLibrary(props) {
 			})
 			if (userLibrary.length % 2 !== 0) {
 				userLibraryIterated = userLibraryIterated.concat(
-					<div className="CartLibrary_shadow">
+					<div className="CartLibrary_shadow" key="0">
 					</div>
 				)
 			}
 			setUserLibraryView(userLibraryIterated);
 		}
 
-	}, [userLibrary])
+	}, [userLibrary, deleteMode])
 
 	return (
 		<section className={`CartLibrary ${activeCart ? '' : 'Util_animPaused'}`}>
@@ -97,7 +97,7 @@ export default function CartLibrary(props) {
 			<div className="CartLibrary_collectionContainer">
 				<div className="CartLibrary_collectionButtons">
 					<Link to='/create_cart' className="Util_linkBtnSecondary Util_btnThin CartLibrary_button">Create new cartridge</Link>
-					<button type="button" className="Util_btnSecondary Util_btnThin CartLibrary_button" onClick={handleCartridgeDeleteMode}>Remove cartridge from library</button>
+					<button type="button" className={`Util_btnSecondary Util_btnThin CartLibrary_button ${deleteMode ? 'Util_btnDepressed' : ''}`} onClick={handleCartridgeDeleteMode}>Remove cartridges...</button>
 				</div>
 				{/*Cartridge "storage" area*/}
 				<div className="CartLibrary_collectionInner">
