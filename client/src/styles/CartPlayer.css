@@ -180,3 +180,8 @@
 	font-weight: 700;
 	text-transform: uppercase;
 }
+
+.playbackMessage {
+	color: var(--inverted-text-color);
+	margin-left: calc((100% - var(--player-width)) / 2);
+}

@@ -520,6 +520,7 @@ export default function CartPlayer(props) {
 
 	return (
 		<Fragment>
+			<p className='playbackMessage'>{playbackMessage}</p>
 			<section className="CartPlayer">
 				<div className="CartPlayer_middle">
 					<div className="CartPlayer_inner">
@@ -563,7 +564,6 @@ export default function CartPlayer(props) {
 					</div>
 				</div>
 			</section>
-			<p className='playbackMessage'>{playbackMessage}</p>
 		</Fragment>
 	)
 }
