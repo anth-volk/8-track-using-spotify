@@ -533,12 +533,10 @@ export default function CartPlayer(props) {
 						<div className="CartPlayer_playbackContainer">
 							<div className='CartPlayer_tapeSlot'>
 								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8-TRACK</p>}
-								{/*{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}*/}
 								{activeCart && (
 									<div className="CartPlayer_shadow">
 										<div className="CartPlayer_albumPlastic" onClick={handleCartridgeEjection}>
 											<div className="CartPlayer_album">
-												{/*<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>*/}
 												<p className="CartPlayer_album_artists">{activeCart.artists_array[0]}</p>
 												<p className="CartPlayer_album_title">{activeCart.cart_name}</p>
 											</div>
@@ -546,9 +544,11 @@ export default function CartPlayer(props) {
 									</div>
 								)}
 							</div>
-							<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
-							</button>
-							<button type='button' className='programButton' onClick={handleProgramChange}></button>
+							<div className="CartPlayer_buttonContainer">
+								<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
+								</button>
+								<button type='button' className='programButton' onClick={handleProgramChange}></button>
+							</div>
 							<div className='audioElements'>
 								<audio src={tapeHiss} ref={tapeHissRef} />
 								<audio src={programClick} ref={programClickRef} />
