@@ -44,6 +44,12 @@ export default function CartLibrary(props) {
 
 	}
 
+	function handleCartridgeEjection(cart) {
+		if (activeCart) {
+			setActiveCart(null);
+		}
+	}
+
 	useEffect(() => {
 
 		async function fetchUserLibrary() {
@@ -86,7 +92,7 @@ export default function CartLibrary(props) {
 	return (
 		<section className={`CartLibrary ${activeCart ? '' : 'Util_animPaused'}`}>
 			<div className="CartLibrary_playerContainer">
-				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} />
+				<CartPlayer activeCart={activeCart} authToken={authToken} spotifyToken={spotifyToken} setActiveCart={setActiveCart} />
 			</div>
 			<div className="CartLibrary_collectionContainer">
 				<div className="CartLibrary_collectionButtons">

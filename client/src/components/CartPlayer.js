@@ -36,6 +36,7 @@ export default function CartPlayer(props) {
 
 	// Props
 	const { setDidLogIn, authToken } = useContext(AuthContext);
+	const setActiveCart = props.setActiveCart;
 	const spotifyToken = props.spotifyToken || null;
 	const activeCart = props.activeCart || null;
 
@@ -95,6 +96,10 @@ export default function CartPlayer(props) {
 			: currentProgramNumber + 1
 
 		return newProgramNumber
+	}
+
+	function handleCartridgeEjection() {
+		setActiveCart(null);
 	}
 
 	function handleTrackChange() {
@@ -529,7 +534,7 @@ export default function CartPlayer(props) {
 								{!activeCart && <p className="CartPlayer_tapeSlotText">STEREO 8-TRACK</p>}
 								{/*{activeCart && <p className='activeCart_details'>{activeCart.cart_name}</p>}*/}
 								{activeCart && (
-									<div className="CartPlayer_shadow">
+									<div className="CartPlayer_shadow" onClick={handleCartridgeEjection}>
 										<div className="CartPlayer_albumPlastic">
 											<div className="CartPlayer_album">
 												{/*<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>*/}

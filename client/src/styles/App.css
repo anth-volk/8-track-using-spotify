@@ -223,7 +223,7 @@ input[type="password"] {
 
 .Util_btnThin {
 	padding: 0.5rem;
-	font-size: calc(0.8 * var(--text-size));
+	font-size: calc(0.9 * var(--text-size));
 }
 
 .Util_animPaused {
