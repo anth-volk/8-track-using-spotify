@@ -193,6 +193,10 @@ input[type="password"] {
 	text-decoration: underline;
 }
 
+.Util_invertedText {
+	color: var(--inverted-text-color);
+}
+
 /* Styling for buttons meant to mimic anchors */
 .Util_btnLink {
 	color: none;

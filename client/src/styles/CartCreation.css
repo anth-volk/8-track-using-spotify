@@ -1,0 +1,21 @@
+.CartCreation {
+	min-height: 100vh;
+	min-height: 100dvh;
+	background-image: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
+	padding-top: var(--navbar-height);
+}
+
+.CartCreation_grid {
+	height: 100%;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows: 1;
+	align-items: center;
+	justify-items: center;
+}
+
+.CartCreation_left,
+.CartCreation_right {
+	width: 100%;
+	height: 100%;
+}

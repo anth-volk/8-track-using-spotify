@@ -7,6 +7,9 @@ import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreati
 import { AuthContext } from '../contexts/AuthContext.js';
 import { jwtApiCall } from '../utilities/userAuth.js';
 
+// Style imports
+import '../styles/CartCreation.css';
+
 export default function CartCreation(props) {
 
 	const [albumSearchParam, setAlbumSearchParam] = useState('');
@@ -71,20 +74,6 @@ export default function CartCreation(props) {
 		const ERROR_MESSAGE = 'There was an error while trying to create your cartridge. Please try again.';
 		const SUCCESS_MESSAGE = 'Your cartridge was successfully added to your library!';
 
-		/*
-		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected/library/create_cart', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'CORS': 'Access-Control-Allow-Origin',
-				'Authorization': 'JWT ' + authToken
-			},
-			body: JSON.stringify(programmedAlbum)
-		});
-
-		const responseObjectJSON = await responseObjectRaw.json();
-		*/
-
 		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', authToken, JSON.stringify(programmedAlbum));
 
 		if (responseObjectJSON.connection_status === 'success' && responseObjectJSON.created_cartridge) {
@@ -131,9 +120,9 @@ export default function CartCreation(props) {
 	}, [])
 
 	return (
-		<Fragment>
-			<h1>Create New Cartridge</h1>
-			<grid>
+		<div className="CartCreation">
+			<h1 className="Util_invertedText">Create New Cartridge</h1>
+			<div className="CartCreation_grid">
 				<div className='CartCreation_left'>
 					<h2>Search for an album below:</h2>
 					{/*Display little search icon*/}
@@ -170,7 +159,7 @@ export default function CartCreation(props) {
 					}
 					<p>{cartridgeCreationMessage}</p>
 				</div>
-			</grid>
-		</Fragment>
+			</div>
+		</div>
 	)
 }
