@@ -7,9 +7,6 @@ import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreati
 import { AuthContext } from '../contexts/AuthContext.js';
 import { jwtApiCall } from '../utilities/userAuth.js';
 
-// Style imports
-import '../styles/CartCreation.css';
-
 export default function CartCreation(props) {
 
 	const [albumSearchParam, setAlbumSearchParam] = useState('');

@@ -8,9 +8,6 @@ import CartPlayer from './CartPlayer.js';
 import { AuthContext } from '../contexts/AuthContext.js';
 import { jwtApiCall } from '../utilities/userAuth.js';
 
-// Style import
-import '../styles/CartLibrary.css';
-
 export default function CartLibrary(props) {
 
 	// Note: userAuth and userSpotifyAuth stored in props

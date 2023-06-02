@@ -5,9 +5,6 @@ import { Link, NavLink } from 'react-router-dom';
 // Internal imports
 import { AuthContext } from '../contexts/AuthContext.js';
 
-// Style imports
-import '../styles/Navbar.css';
-
 export default function Navbar(props) {
 
 	// Props: logout handler from App component

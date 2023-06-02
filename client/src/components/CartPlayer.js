@@ -29,9 +29,6 @@ import { AuthContext } from '../contexts/AuthContext.js';
 import tapeHiss from '../audio_files/tape_hiss.mp3';
 import programClick from '../audio_files/program_click.mp3';
 
-// Style imports
-import '../styles/CartPlayer.css';
-
 export default function CartPlayer(props) {
 
 	// Props

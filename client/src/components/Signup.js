@@ -2,9 +2,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// Style imports
-import '../styles/Signup.css';
-
 export default function Signup() {
 
 	// State variable object for controlled input

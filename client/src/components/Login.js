@@ -7,9 +7,6 @@ import { useCookies } from 'react-cookie';
 import { storeAuthToken, storeAuthTokenExpiry, storeRefreshToken, storeRefreshTokenExpiry } from '../utilities/userAuth';
 import { AuthContext } from '../contexts/AuthContext.js';
 
-// Style imports
-import '../styles/Login.css';
-
 export default function Login() {
 
 	// Context

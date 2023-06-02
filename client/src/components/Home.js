@@ -6,9 +6,6 @@ import { Link } from 'react-router-dom';
 import heroTapes from '../images/hero_tapes.jpg';
 import spotifyLogo from '../images/spotify_logo_white.png';
 
-// Style imports
-import '../styles/Home.css';
-
 export default function Home() {
 
 	const linkStyle = {

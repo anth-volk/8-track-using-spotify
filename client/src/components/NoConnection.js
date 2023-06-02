@@ -1,6 +1,3 @@
-// Style import
-import '../styles/NoConnection.css';
-
 export default function NoConnection() {
 
 	const BACKEND_URL = process.env.REACT_APP_BACKEND_TLD;
