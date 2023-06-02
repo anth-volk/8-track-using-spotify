@@ -16,6 +16,9 @@
 	--inverted-text-color: #f3f2f2;
 	--inverted-a-color: #c58af9;
 	--bg-color-trans: background-color 0.3s;
+	--box-shadow-standard: 0px 0px 2px rgba(0, 0, 0, 0.6);
+	--box-shadow-hover: 0px 0px 4px black;
+	--box-shadow-inset: 0px 0px 5px black inset;
 }
 
 /* ---------- APP-WIDE CSS RESET ---------- */
@@ -154,6 +157,7 @@ input[type="password"] {
 .Util_btnPrimary {
 	background-color: var(--primary-color);
 	text-decoration: none;
+	box-shadow: var(--box-shadow-standard);
 }
 
 .Util_btnSecondary {
@@ -162,22 +166,25 @@ input[type="password"] {
 	inverted color against secondary color */
 	color: white;
 	text-decoration: none;
+	box-shadow: var(--box-shadow-standard);
 }
 
 .Util_btnAccent {
 	background-color: var(--accent-color);
 	color: var(--inverted-text-color);
 	text-decoration: none;
+	box-shadow: var(--box-shadow-standard);
 }
 
 
-.Util_btnPrimary,
-.Util_btnSecondary,
-.Util_btnAccent,
-.Util_btnLink,
-.Util_linkBtnAccent,
-.Util_linkBtnSecondary {
-	box-shadow: 0px 0px 4px black;
+.Util_btnPrimary:hover,
+.Util_btnSecondary:hover,
+.Util_btnAccent:hover,
+.Util_btnLink:hover,
+.Util_linkBtnAccent:hover,
+.Util_linkBtnSecondary:hover {
+	box-shadow: var(--box-shadow-hover);
+	transition: box-shadow 0.25s ease;
 }
 
 .Util_btnPrimary:active,
@@ -187,7 +194,7 @@ input[type="password"] {
 .Util_linkBtnAccent:active,
 .Util_linkBtnSecondary:active,
 .Util_btnDepressed {
-	box-shadow: 0px 0px 5px black inset;
+	box-shadow: var(--box-shadow-inset);
 }
 
 .Util_invertedA {
@@ -214,6 +221,7 @@ input[type="password"] {
 	border-radius: 5px;
 	color: var(--inverted-text-color);
 	text-decoration: none;
+	box-shadow: var(--box-shadow-standard);
 }
 
 .Util_linkBtnSecondary {
@@ -222,6 +230,7 @@ input[type="password"] {
 	border-radius: 5px;
 	color: var(--inverted-text-color);
 	text-decoration: none;
+	box-shadow: var(--box-shadow-standard);
 }
 
 .Util_logoInText {

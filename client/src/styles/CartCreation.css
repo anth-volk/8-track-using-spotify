@@ -1,9 +1,16 @@
+:root {
+	/* This value represents the number of albums
+	to be displayed after searching; it should track
+	with a similar constant in CartCreation.js */
+	--num-albums-to-display: 6;
+}
+
 .CartCreation {
 	min-height: 100vh;
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	background-image: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
+	background-image: linear-gradient(360deg, var(--primary-color), var(--accent-color) 100%);
 	padding-top: var(--navbar-height);
 }
 
@@ -13,21 +20,18 @@
 	grid-template-columns: repeat(2, 1fr);
 	align-items: center;
 	justify-items: center;
+	gap: 5vw;
 }
 
 .CartCreation_side {
 	margin: 0 auto;
 	width: 100%;
-	height: 100%;
+	min-height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
 }
-
-.CartCreation_left {}
-
-.CartCreation_right {}
 
 .CartCreation_searchContainer {
 	display: flex;
@@ -41,14 +45,141 @@
 
 .CartCreation_searchInput {
 	width: 100%;
-	background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg");
-	background-size: 1.5rem;
-	background-repeat: no-repeat;
-	background-position: 0.5rem center;
-	padding-left: calc(1.5 * var(--text-size));
 }
 
 .CartCreation_sideHeader {
 	color: var(--inverted-text-color);
 	padding-bottom: 1rem;
+}
+
+.CartSearch_grid {
+	min-height: 100%;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(round(up, calc(var(--num-albums-to-display) / 3), 1), 1fr);
+}
+
+.CartSearch_spotifyResultCard {
+	margin: 1vw;
+	background-color: var(--background-color);
+	border-radius: 6px;
+	padding: 1vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	cursor: pointer;
+	gap: 0.5rem;
+	box-shadow: 0px 0px 2px rgba(0, 0, 0, 1);
+}
+
+.CartSearch_spotifyResultCard:hover {
+	box-shadow: var(--box-shadow-hover);
+	transition: box-shadow 0.25s ease;
+}
+
+.CartSearch_spotifyResultCard:active {
+	box-shadow: var(--box-shadow-inset);
+}
+
+.spotifyResultCard_image {
+	border-radius: 4px;
+	aspect-ratio: 1;
+}
+
+.spotifyResultCard_artist,
+.spotifyResultCard_name {
+	text-align: center;
+}
+
+.spotifyResultCard_artist {
+	font-weight: 500;
+}
+
+.CartPreview_container {
+	margin: 1vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	position: relative;
+}
+
+.CartPreview_plastic {
+	width: 100%;
+	max-height: 80vh;
+	aspect-ratio: 4 / 5.25;
+	-webkit-mask-image: url('../images/tape_plastic.svg');
+	mask-image: url('../images/tape_plastic.svg');
+	background-color: firebrick;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.CartPreview_label {
+	padding-top: 1rem;
+	height: 90%;
+	width: 90%;
+	background-color: white;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.CartPreview_label_imageContainer {
+	width: 70%;
+	margin-bottom: 0.25rem;
+}
+
+.CartPreview_label_title,
+.CartPreview_label_name {
+	font-weight: 700;
+}
+
+.CartPreview_label_programs {
+	padding: 1vw 3% 0 3%;
+	display: grid;
+	grid-template: repeat(2, 1fr) / repeat(2, 1fr);
+	gap: 1vw;
+}
+
+.programContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 1vw;
+	border: 1px solid black;
+}
+
+.programContainer_number {
+	font-weight: 500;
+	font-size: min(4vw, 2.5rem);
+	padding-left: 0.5vw;
+}
+
+.programContainer_track {
+	font-size: min(0.95vw, 0.5rem);
+}
+
+/* This is done because the 2nd program on tapes
+was always in column 1, and the 3rd at the top of column 2,
+which doesn't follow CSS grid conventions */
+.programContainer:nth-child(2) {
+	grid-column: 1;
+	grid-row: 2;
+}
+
+@media screen and (max-width: 768px) {
+	.CartSearch_grid {
+		grid-template-columns: repeat(2, 1fr);
+		grid-template-rows: repeat(round(up, calc(var(--num-albums-to-display) / 2), 1), 1fr);
+	}
 }

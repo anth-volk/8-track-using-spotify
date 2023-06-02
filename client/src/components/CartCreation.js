@@ -13,6 +13,7 @@ export default function CartCreation(props) {
 	const [albumResultObject, setAlbumResultObject] = useState(null);
 	const [clickedAlbum, setClickedAlbum] = useState(null);
 	const [programmedAlbum, setProgrammedAlbum] = useState(null);
+	const [programView, setProgramView] = useState(null);
 	const [cartridgeCreationMessage, setCartridgeCreationMessage] = useState('');
 
 	const [cookies, setCookie, removeCookie] = useCookies();
@@ -106,6 +107,25 @@ export default function CartCreation(props) {
 				artists: albumArtists,
 				programs: albumTracksDistributed
 			};
+
+			let programElems = finalizedAlbum.programs.map((program) => {
+				return (
+					<div className='programContainer'>
+						<p className='programContainer_number'>{program.program_number}</p>
+						<div className='programContainer_trackContainer'>
+							{program.tracks.map((track) => {
+								return (
+									<p className='programContainer_track'>{track.name}</p>
+								)
+							})}
+						</div>
+					</div>
+				)
+			});
+
+			console.log(finalizedAlbum);
+
+			setProgramView(programElems);
 			setProgrammedAlbum(finalizedAlbum);
 		}
 
@@ -123,17 +143,16 @@ export default function CartCreation(props) {
 				<div className='CartCreation_side CartCreation_left'>
 					<h2 className="CartCreation_sideHeader">Search for an album below:</h2>
 					<div className="CartCreation_searchContainer">
-						{/*Display little search icon*/}
 						<input type='text' className="CartCreation_searchInput" value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
 						<button type='button' className="Util_btnSecondary Util_btnThin" onClick={handleSearchSubmission} aria->Search</button>
 					</div>
 					<div className='CartSearch_grid'>
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
 							return (
-								<div className='spotifyResultCard' key={index} onClick={(e) => { handleAlbumClick(index) }}>
-									<img src={albumResultObject[index].images[0].url}></img>
-									<p>{albumResultObject[index].artists[0].name} </p>
-									<p>{albumResultObject[index].name}</p>
+								<div className='CartSearch_spotifyResultCard' key={index} onClick={(e) => { handleAlbumClick(index) }}>
+									<img className='spotifyResultCard_image' src={albumResultObject[index].images[0].url}></img>
+									<p className='spotifyResultCard_artist'>{albumResultObject[index].artists[0].name} </p>
+									<p className='spotifyResultCard_name'>{albumResultObject[index].name}</p>
 								</div>
 							)
 						})}
@@ -143,20 +162,27 @@ export default function CartCreation(props) {
 					<h2 className="CartCreation_sideHeader">Cartridge Preview</h2>
 					<div className='CartPreview_container'>
 						{clickedAlbum &&
-							<Fragment>
-								<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
-								<p>{clickedAlbum.artists[0].name.toUpperCase()}</p>
-								<p>{clickedAlbum.name}</p>
-							</Fragment>
+							<div className='CartPreview_plastic'>
+								<div className='CartPreview_label'>
+									<div className='CartPreview_label_imageContainer'>
+										<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
+									</div>
+									<p className='CartPreview_label_title'>{clickedAlbum.artists[0].name.toUpperCase()}</p>
+									<p className='CartPreview_label_name'>{clickedAlbum.name}</p>
+									<div className='CartPreview_label_programs'>
+										{programView}
+									</div>
+								</div>
+							</div>
 						}
 					</div>
 					{clickedAlbum && !programmedAlbum &&
 						<p>Loading...</p>
 					}
 					{programmedAlbum &&
-						<button type='button' onClick={handleCartCreation}>Create New Cartridge</button>
+						<button type='button' className='Util_btnAccent Util_btnThin' onClick={handleCartCreation}>Create New Cartridge</button>
 					}
-					<p>{cartridgeCreationMessage}</p>
+					<p className='Util_invertedText'>{cartridgeCreationMessage}</p>
 				</div>
 			</div>
 		</section>
