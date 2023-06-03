@@ -20,13 +20,13 @@ export default function Navbar(props) {
 				</h2>
 				<ul className='navbar_links'>
 					<li className='navbar_link'>
-						<NavLink to='/' className='active'>Home</NavLink>
+						<NavLink to='/'>Home</NavLink>
 					</li>
 					<li className='navbar_link'>
-						<NavLink to='/signup' className='active'>Sign Up</NavLink>
+						<NavLink to='/signup'>Sign Up</NavLink>
 					</li>
 					<li className='navbar_link'>
-						<NavLink to='/login' className='active'>Log In</NavLink>
+						<NavLink to='/login'>Log In</NavLink>
 					</li>
 				</ul>
 			</nav>
@@ -40,10 +40,10 @@ export default function Navbar(props) {
 					</h2>
 					<ul className='navbar_links'>
 						<li className='navbar_link'>
-							<NavLink to='/' className='active'>Home</NavLink>
+							<NavLink to='/'>Home</NavLink>
 						</li>
 						<li className='navbar_link'>
-							<NavLink to='/library' className='active'>My Library</NavLink>
+							<NavLink to='/library'>My Library</NavLink>
 						</li>
 						<li className='navbar_link'>
 							{/*<NavLink to='/logout' className='active'>Log Out</NavLink>*/}

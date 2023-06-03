@@ -206,6 +206,10 @@ input[type="password"] {
 	color: var(--inverted-text-color);
 }
 
+a.active {
+	font-weight: 500;
+}
+
 /* Styling for buttons meant to mimic anchors */
 .Util_btnLink {
 	color: none;
