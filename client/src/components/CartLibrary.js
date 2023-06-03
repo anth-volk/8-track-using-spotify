@@ -31,7 +31,10 @@ export default function CartLibrary(props) {
 		setActiveCart(cart);
 	}
 
-	async function handleCartridgeDeletion(cart) {
+	async function handleCartridgeDeletion(e, cart) {
+		// Stop event
+		e.stopPropagation();
+
 		// Send DELETE request to back end
 		const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE', authToken);
 
@@ -67,7 +70,7 @@ export default function CartLibrary(props) {
 					<div className="CartLibrary_shadow" key={album.cart_id}>
 						<div className="CartLibrary_albumPlastic" onClick={(e) => { handleCartridgeSelection(album) }}>
 							<div className="CartLibrary_album">
-								<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(album) }}>X</button>
+								<button type="button" className={`CartLibrary_album_deleteBtn ${deleteMode ? '' : 'hidden'}`} onClick={(e) => { handleCartridgeDeletion(e, album) }}>X</button>
 								<p className="CartLibrary_album_artists">{album.artists_array[0]}</p>
 								<p className="CartLibrary_album_title">{album.cart_name}</p>
 							</div>
