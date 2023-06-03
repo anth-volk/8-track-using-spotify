@@ -22,6 +22,9 @@ export default function CartCreation(props) {
 	const spotifyToken = props.spotifyToken;
 
 	const timerRef = useRef(null);
+	const searchSubmissionRef = useRef(null);
+	const cartCreationRef = useRef(null);
+	const searchBoxRef = useRef(null);
 
 	function resetStateExceptCreationMessage() {
 		setAlbumSearchParam('');
@@ -89,9 +92,39 @@ export default function CartCreation(props) {
 		// Wait 3 seconds, then reset cartridge creation message
 		timerRef.current = setTimeout(() => {
 			setCartridgeCreationMessage('');
-		}, 2000);
+		}, 3000);
 
 	}
+
+	// Enter key event listener
+	useEffect(() => {
+		function handleEnterKeydown() {
+			if (!albumSearchParam) {
+				return;
+			}
+			else if (albumSearchParam && !albumResultObject) {
+				handleSearchSubmission();
+			}
+			else if (albumResultObject) {
+				handleCartCreation();
+			}
+		}
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter') {
+				console.log(event);
+				handleEnterKeydown();
+			}
+		})
+
+		return () => {
+			document.removeEventListener('keydown', (event) => {
+				if (event.key === 'Enter') {
+					handleEnterKeydown();
+				}
+			})
+		}
+	}, [])
 
 	useEffect(() => {
 		if (clickedAlbum) {
@@ -143,8 +176,8 @@ export default function CartCreation(props) {
 				<div className='CartCreation_side CartCreation_left'>
 					<h2 className="CartCreation_sideHeader">Search for an album below:</h2>
 					<div className="CartCreation_searchContainer">
-						<input type='text' className="CartCreation_searchInput" value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
-						<button type='button' className="Util_btnSecondary Util_btnThin" onClick={handleSearchSubmission} aria->Search</button>
+						<input type='text' className="CartCreation_searchInput" ref={searchBoxRef} value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
+						<button type='button' className="Util_btnSecondary Util_btnThin" ref={searchSubmissionRef} onClick={handleSearchSubmission} aria->Search</button>
 					</div>
 					<div className='CartSearch_grid'>
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
@@ -180,7 +213,7 @@ export default function CartCreation(props) {
 						<p>Loading...</p>
 					}
 					{programmedAlbum &&
-						<button type='button' className='Util_btnAccent Util_btnThin' onClick={handleCartCreation}>Create New Cartridge</button>
+						<button type='button' className='Util_btnAccent Util_btnThin' ref={cartCreationRef} onClick={handleCartCreation}>Create New Cartridge</button>
 					}
 					<p className='Util_invertedText'>{cartridgeCreationMessage}</p>
 				</div>
