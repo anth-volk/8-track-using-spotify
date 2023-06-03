@@ -167,16 +167,6 @@ async function verifyUser(req, res) {
 					userId: userQuery.dataValues.user_id
 				}
 
-				/*
-				authToken = jwt.sign(
-					userObject, 
-					process.env.JWT_SECRET_AUTH,
-					{
-						expiresIn: AUTH_TOKEN_MAX_AGE
-					}
-				);
-				*/
-
 				const authToken = createAuthToken(userObject);
 				const refreshToken = createRefreshToken(userObject);
 

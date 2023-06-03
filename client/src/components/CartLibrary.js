@@ -36,10 +36,10 @@ export default function CartLibrary(props) {
 		e.stopPropagation();
 
 		// Send DELETE request to back end
-		const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE', authToken);
+		const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE');
 
 		// Upon successful completion, fetch user library
-		const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken);
+		const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET');
 		setUserLibrary(fetchedUserLibraryJSON.library);
 
 	}
@@ -53,7 +53,7 @@ export default function CartLibrary(props) {
 	useEffect(() => {
 
 		async function fetchUserLibrary() {
-			const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET', authToken);
+			const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET');
 
 			setUserLibrary(fetchedUserLibraryJSON.library);
 

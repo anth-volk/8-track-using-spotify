@@ -75,7 +75,7 @@ export default function CartCreation(props) {
 		const ERROR_MESSAGE = 'There was an error while trying to create your cartridge. Please try again.';
 		const SUCCESS_MESSAGE = 'Your cartridge was successfully added to your library!';
 
-		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', authToken, JSON.stringify(programmedAlbum));
+		const responseObjectJSON = await jwtApiCall('/library/create_cart', 'POST', JSON.stringify(programmedAlbum));
 
 		if (responseObjectJSON.connection_status === 'success' && responseObjectJSON.created_cartridge) {
 			setCartridgeCreationMessage(SUCCESS_MESSAGE);

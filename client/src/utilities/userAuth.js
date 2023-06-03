@@ -39,52 +39,70 @@ export function storeRefreshTokenExpiry(expiry) {
 	sessionStorage.setItem('refreshTokenExpiry', expiry);
 }
 
-// This function may need to be debugged and/or
-// written with async/await to improve clarity
-export function refreshToken(token) {
+/**
+ * Function to refresh auth token based on stored refresh token
+ * @param {import("jsonwebtoken").Jwt} token The refresh token (not auth token) stored locally
+ * @returns void
+ */
+export async function refreshToken(token) {
 
-	console.log('Refreshing tokens...');
-
-	// This is written with thens instead of async/await to enable calling inside useEffect
-	fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/refresh_token', {
+	const resRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/user_auth/refresh_token', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 			'CORS': 'Access-Control-Allow-Origin',
 			'Authorization': 'JWT ' + token
-		},
-	}).then((res) => {
-		console.log('res: ', res);
-		return res.json();
-	}).then((resJSON) => {
+		}
+	})
 
-		console.log(resJSON);
+	const resJSON = await resRaw.json();
 
-		// Remove existing token values
-		sessionStorage.clear();
+	sessionStorage.clear();
 
-		// Add new token values
-		storeAuthToken(resJSON.auth_token);
-		storeAuthTokenExpiry(resJSON.auth_token_expiry);
-		storeRefreshToken(resJSON.refresh_token);
-		storeRefreshTokenExpiry(resJSON.refresh_token_expiry);
+	// Add new token values
+	storeAuthToken(resJSON.auth_token);
+	storeAuthTokenExpiry(resJSON.auth_token_expiry);
+	storeRefreshToken(resJSON.refresh_token);
+	storeRefreshTokenExpiry(resJSON.refresh_token_expiry);
 
-	});
+	return;
 
+}
+
+/**
+ * Function to verify whether or not auth token is expired, and if it is, to renew it
+ * @returns void
+ */
+export async function verifyTokenValidity() {
+	try {
+		const authTokenExpiry = retrieveAuthTokenExpiry();
+
+		if (authTokenExpiry < Date.now()) {
+			const retrievedRefreshToken = retrieveRefreshToken();
+
+			await refreshToken(retrievedRefreshToken);
+		}
+		return;
+	}
+	catch (err) {
+		console.error('Error while verifying JWT auth token validity: ', err);
+	}
 }
 
 /**
  * Make request to JWT-protected routes located on the back end
  * @param {string} route The route to make a request to
  * @param {string} method The request method, usually 'GET' or 'POST'
- * @param {import("jsonwebtoken").Jwt} authToken A JSON web token
  * @param {object} [body] An optional body to be transmitted on POST requests
- * @param {boolean} [secondCall] An optional boolean representing whether or not function is being invoked again
  * @returns JSON object
  */
-export async function jwtApiCall(route, method, authToken, body, secondCall = false) {
+export async function jwtApiCall(route, method, body) {
 
 	try {
+
+		await verifyTokenValidity();
+
+		const authToken = retrieveAuthToken();
 
 		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/protected' + route, {
 			method: method,
@@ -104,20 +122,16 @@ export async function jwtApiCall(route, method, authToken, body, secondCall = fa
 
 			return responseObjectJSON;
 		}
-		else if (responseObjectRaw.status === 401 && secondCall === false) {
-			const retrievedRefreshToken = retrieveRefreshToken();
+		else {
 
-			refreshToken(retrievedRefreshToken);
-
-			const newAuthToken = retrieveAuthToken();
-
-			return await jwtApiCall(route, method, newAuthToken, body, true);
+			const responseObjectJSON = await responseObjectRaw.json();
+			console.error('Error while executing JWT-protected API call:');
+			console.error(responseObjectJSON);
 
 		}
 	}
 	catch (err) {
 		console.error('Error while executing JWT-protected API call: ', err);
 	}
-
 
 }
