@@ -112,7 +112,6 @@ export default function CartCreation(props) {
 
 		document.addEventListener('keydown', (event) => {
 			if (event.key === 'Enter') {
-				console.log(event);
 				handleEnterKeydown();
 			}
 		})
