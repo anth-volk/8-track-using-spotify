@@ -1,5 +1,5 @@
 // Function for calculating overall cart timestamp using track position
-export async function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd=false) {
+export async function getCartTimestampSpotify(activeTrack, spotifyPlayer, isTrackEnd = false) {
 
 	let position = 0;
 
@@ -48,6 +48,8 @@ export async function startSpotifyPlayback(track, cartTimestamp, deviceId, spoti
 	const startTime = cartTimestamp - track.start_timestamp + 1;
 
 	try {
+		console.log('Trying Spotify fetch');
+
 		const responseRaw = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceId, {
 			method: 'PUT',
 			headers: {
@@ -61,8 +63,11 @@ export async function startSpotifyPlayback(track, cartTimestamp, deviceId, spoti
 				position_ms: startTime
 			})
 		});
+		console.log(responseRaw);
+
 		if (!responseRaw.ok) {
 			const responseJSON = await responseRaw.json();
+			console.log(responseJSON);
 			console.error('Network-related error while initiating Spotify playback: ', responseJSON);
 
 			if (responseJSON.error.status === 502) {

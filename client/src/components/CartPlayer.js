@@ -2,7 +2,6 @@
 import {
 	Fragment,
 	useCallback,
-	useContext,
 	useEffect,
 	useRef,
 	useState
@@ -22,9 +21,6 @@ import {
 	startLocalPlayback
 } from '../utilities/localPlayback.js';
 
-// Local context import
-import { AuthContext } from '../contexts/AuthContext.js';
-
 // Local audio imports
 import tapeHiss from '../audio_files/tape_hiss.mp3';
 import programClick from '../audio_files/program_click.mp3';
@@ -32,7 +28,6 @@ import programClick from '../audio_files/program_click.mp3';
 export default function CartPlayer(props) {
 
 	// Props
-	const { setDidLogIn, authToken } = useContext(AuthContext);
 	const setActiveCart = props.setActiveCart;
 	const spotifyToken = props.spotifyToken || null;
 	const activeCart = props.activeCart || null;
@@ -81,9 +76,6 @@ export default function CartPlayer(props) {
 	const localRemainingPlayLength = useRef(null);
 
 	// Signals for cancelling event listeners
-	const spotifyCancelController = new AbortController();
-	const { signal: spotifyCancelSignal } = spotifyCancelController;
-
 	const localCancelController = new AbortController();
 	const { signal: localCancelSignal } = localCancelController;
 
@@ -215,7 +207,6 @@ export default function CartPlayer(props) {
 		);
 
 		if (playbackObject.playbackState === false) {
-			// This will require debugging at end of program
 
 			setIsActiveLocalAudio(false);
 			// If we've reached end of program...
@@ -224,6 +215,13 @@ export default function CartPlayer(props) {
 				const newProgramNumber = calculateProgramNumber(activeProgramNumber);
 				setActiveTrack(cartArray[newProgramNumber][0]);
 				setActiveProgramNumber(newProgramNumber);
+
+				// Play program switch audio
+				if (programClickRef.current) {
+					programClickRef.current.currentTime = 0;
+					programClickRef.current.play();
+				}
+
 			}
 			else {
 				trackIndex.current = trackIndex.current + 1;
@@ -241,8 +239,6 @@ export default function CartPlayer(props) {
 	}, [activeProgramNumber, activeTrack, cartArray]);
 
 	const checkPlaybackEndSpotify = useCallback(async (state) => {
-		const activeTrackURI = 'spotify:track:'.concat(activeTrack.audio);
-
 		if (
 			state
 			&& state.track_window.previous_tracks.find(x => x.id === state.track_window.current_track.id)
@@ -443,6 +439,7 @@ export default function CartPlayer(props) {
 			// Calculate program selector length here to ensure audio ref is fully loaded
 			const programSelectorLengthMS = programClickRef.current.duration * 1000;
 
+			/*
 			programArray = [
 				...programArray,
 				{
@@ -453,6 +450,7 @@ export default function CartPlayer(props) {
 					end_timestamp: startTimestamp + programSelectorLengthMS
 				}
 			];
+			*/
 
 			// Finally, concat finished programArray to cartArray
 			cartArrayTemp = [
