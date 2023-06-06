@@ -1,5 +1,5 @@
 // External imports
-import { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 // Internal imports
@@ -37,7 +37,7 @@ export default function CartCreation(props) {
 		setAlbumSearchParam(event.target.value);
 	}
 
-	async function handleSearchSubmission() {
+	const handleSearchSubmission = useCallback(async () => {
 
 		const responseObjectRaw = await fetch(process.env.REACT_APP_BACKEND_TLD + '/api/v1/spotify_api/search_album?album=' + albumSearchParam, {
 			method: 'GET',
@@ -52,7 +52,7 @@ export default function CartCreation(props) {
 
 		setAlbumResultObject(responseObjectJSON.result_object.albums.items);
 
-	}
+	}, [albumSearchParam, spotifyToken])
 
 	async function handleAlbumClick(index) {
 
@@ -98,32 +98,19 @@ export default function CartCreation(props) {
 
 	// Enter key event listener
 	useEffect(() => {
-		function handleEnterKeydown() {
-			if (!albumSearchParam) {
-				return;
-			}
-			else if (albumSearchParam && !albumResultObject) {
-				handleSearchSubmission();
-			}
-			else if (albumResultObject) {
-				handleCartCreation();
+
+		async function handleEnterKey(event) {
+			if (event.key === 'Enter') {
+				await handleSearchSubmission();
 			}
 		}
 
-		document.addEventListener('keydown', (event) => {
-			if (event.key === 'Enter') {
-				handleEnterKeydown();
-			}
-		})
+		document.addEventListener('keydown', handleEnterKey);
 
 		return () => {
-			document.removeEventListener('keydown', (event) => {
-				if (event.key === 'Enter') {
-					handleEnterKeydown();
-				}
-			})
+			document.removeEventListener('keydown', handleEnterKey);
 		}
-	}, [])
+	}, [albumSearchParam, handleSearchSubmission])
 
 	useEffect(() => {
 		if (clickedAlbum) {
@@ -140,8 +127,6 @@ export default function CartCreation(props) {
 				programs: albumTracksDistributed
 			};
 
-			console.log(finalizedAlbum);
-
 			let programElems = finalizedAlbum.programs.map((program) => {
 				return (
 					<div className='programContainer' key={program.program_number}>
@@ -156,8 +141,6 @@ export default function CartCreation(props) {
 					</div>
 				)
 			});
-
-			console.log(finalizedAlbum);
 
 			setProgramView(programElems);
 			setProgrammedAlbum(finalizedAlbum);
@@ -178,7 +161,7 @@ export default function CartCreation(props) {
 					<h2 className="CartCreation_sideHeader">Search for an album below:</h2>
 					<div className="CartCreation_searchContainer">
 						<input type='text' className="CartCreation_searchInput" ref={searchBoxRef} value={albumSearchParam} name='albumSearchParam' placeholder='Find an album' onChange={handleSearchValueUpdate}></input>
-						<button type='button' className="Util_btnSecondary Util_btnThin" ref={searchSubmissionRef} onClick={handleSearchSubmission} aria->Search</button>
+						<button type='button' className="Util_btnSecondary Util_btnThin" ref={searchSubmissionRef} onClick={handleSearchSubmission}>Search</button>
 					</div>
 					<div className='CartSearch_grid'>
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
