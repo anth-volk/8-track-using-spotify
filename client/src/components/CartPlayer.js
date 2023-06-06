@@ -317,12 +317,10 @@ export default function CartPlayer(props) {
 			spotifyPlayer.current = playerConstructor;
 
 			spotifyPlayer.current.addListener('ready', ({ device_id }) => {
-				console.log('Ready with Device ID', device_id);
 				setDeviceId(device_id);
 			});
 
 			spotifyPlayer.current.addListener('not_ready', ({ device_id }) => {
-				console.log('Device ID has gone offline', device_id);
 				setPlaybackMessage('Spotify device offline; please try again later.');
 			});
 
@@ -433,24 +431,6 @@ export default function CartPlayer(props) {
 			];
 
 			startTimestamp = startTimestamp + FADE_OUT_LENGTH_MS + 1;
-
-			// Finally, add program selector arm
-
-			// Calculate program selector length here to ensure audio ref is fully loaded
-			const programSelectorLengthMS = programClickRef.current.duration * 1000;
-
-			/*
-			programArray = [
-				...programArray,
-				{
-					audio: effects.PROGRAM_SELECTOR,
-					type: EFFECT,
-					length: programSelectorLengthMS,
-					start_timestamp: startTimestamp,
-					end_timestamp: startTimestamp + programSelectorLengthMS
-				}
-			];
-			*/
 
 			// Finally, concat finished programArray to cartArray
 			cartArrayTemp = [

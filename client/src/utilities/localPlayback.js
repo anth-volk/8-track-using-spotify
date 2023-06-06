@@ -16,7 +16,7 @@ export function getCartTimestampLocal(activeTrack, trackRef, remainingPlayLength
 	else {
 		return activeTrack.end_timestamp - remainingPlayLength - convertToMS(trackRef.duration) + convertToMS(trackRef.currentTime);
 	}
-}	
+}
 
 export function handlePlayPauseLocal(trackRef, isCartPlaying) {
 	if (!isCartPlaying) {

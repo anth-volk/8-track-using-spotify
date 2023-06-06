@@ -27,17 +27,17 @@ export function finalizeTracks(trackArray) {
 	return programArrayFadeTimes;
 }
 
-function addFadeTimes(programArraySorted)  {
+function addFadeTimes(programArraySorted) {
 
 	// Iterate over programs and determine which is longest
-	const programLengthArray = programArraySorted.reduce( (accuArr, program) => {
+	const programLengthArray = programArraySorted.reduce((accuArr, program) => {
 		return accuArr.concat(program.program_length);
 	}, []);
 
 	const longestProgram = Math.max(...programLengthArray);
 
 	// For each program...
-	return programArraySorted.map( (program) => {
+	return programArraySorted.map((program) => {
 
 		// Calculate difference between program length and longestProgram
 		const programLengthDeficit = longestProgram - program.program_length;
@@ -61,42 +61,12 @@ function addFadeTimes(programArraySorted)  {
 			program_length_ms: longestProgram
 		});
 
-		/*
-		// Accumulated time starts with fade-in length
-		let accumulatedTime = FADE_IN_MS;
-
-		// For each track...
-		const tracksWithTimes = program.tracks.map( (track) => {
-
-			// Calculate a start_time_ms and end_time_ms val
-			// Start time is equal to any accumulated time on program, plus 1
-			const startTimeMs = accumulatedTime + 1;
-
-			// End time will be the start time, plus the track's duration
-			const endTimeMs = startTimeMs + track.duration_ms;
-
-			// Then, accumulated time will be updated to inclue this, 
-			// plus the inter-track fade length
-			accumulatedTime = endTimeMs + fadeLength;
-
-			return ({
-				...track,
-				start_time_ms: startTimeMs,
-				end_time_ms: endTimeMs
-			});
-		})
-
-		return({
-			...program,
-			tracks: tracksWithTimes
-		});
-		*/
 	})
 }
 
 export function sortRoughResultArray(roughResultArray) {
 
-	return roughResultArray.map( (program) => {
+	return roughResultArray.map((program) => {
 		const newTracks = sortTracksByNumber(program.tracks);
 		return {
 			...program,
@@ -147,7 +117,7 @@ export function distributeTracksToPrograms(sortedTrackArray, idealTime) {
 		idealTime
 	];
 
-	sortedTrackArray.forEach( (track, index) => {
+	sortedTrackArray.forEach((track, index) => {
 		if (index < 4) {
 			resultArray[index].tracks = resultArray[index].tracks.concat(track);
 			varianceArray[index] = Math.abs(varianceArray[index] - track.duration_ms);
@@ -162,7 +132,7 @@ export function distributeTracksToPrograms(sortedTrackArray, idealTime) {
 	})
 
 	return resultArray;
-	
+
 }
 
 /**
@@ -177,7 +147,7 @@ export function calculateIdealTime(trackArray) {
 	const NUMBER_OF_PROGRAMS = 4;
 
 	return trackArray
-		.reduce( (total, track) => total + track.duration_ms, 0)
+		.reduce((total, track) => total + track.duration_ms, 0)
 		/ NUMBER_OF_PROGRAMS;
 
 }
@@ -191,7 +161,7 @@ export function calculateIdealTime(trackArray) {
 export function sortTracksByDuration(trackArray) {
 
 	return trackArray
-		.sort( (a, b) => {
+		.sort((a, b) => {
 			return b.duration_ms - a.duration_ms
 		});
 
@@ -200,7 +170,7 @@ export function sortTracksByDuration(trackArray) {
 export function sortTracksByNumber(trackArray) {
 
 	return trackArray
-		.sort( (a, b) => {
+		.sort((a, b) => {
 			return a.track_number - b.track_number
 		});
 
@@ -217,7 +187,7 @@ export function parseAlbumAndPullTracks(spotifyAlbumObject) {
 
 	let resultArray = [];
 
-	spotifyAlbumObject.tracks.items.map( (track) => {
+	spotifyAlbumObject.tracks.items.map((track) => {
 		return resultArray = [
 			...resultArray,
 			{

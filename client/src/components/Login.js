@@ -1,7 +1,6 @@
 // External imports
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
 
 // Internal imports
 import { storeAuthToken, storeAuthTokenExpiry, storeRefreshToken, storeRefreshTokenExpiry } from '../utilities/userAuth';
@@ -27,10 +26,6 @@ export default function Login() {
 	const [form, setForm] = useState(formObject);
 	const [formErrors, setFormErrors] = useState(formErrorsObject);
 	const [submissionMessage, setSubmissionMessage] = useState('');
-	// const [authToken, setAuthToken] = useState(null);
-	const [refreshToken, setRefreshToken] = useState(null);
-
-	const [cookies, setCookie, removeCookie] = useCookies();
 
 	// Declare navigate from react-router-dom in order to use inside submit handler
 	const navigate = useNavigate();

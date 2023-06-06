@@ -255,9 +255,6 @@ async function deleteCartridge(req, res) {
 		const { cart_id } = req.query;
 		const { userId } = req.user;
 
-		console.log(cart_id);
-		console.log(userId);
-
 		// Query db for a cart with the set cart ID attached to the user
 		const resultCart = await sequelize.transaction(async (t) => {
 

@@ -1,5 +1,4 @@
 // External imports
-import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
 // File imports

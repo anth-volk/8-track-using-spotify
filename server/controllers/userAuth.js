@@ -170,16 +170,6 @@ async function verifyUser(req, res) {
 				const authToken = createAuthToken(userObject);
 				const refreshToken = createRefreshToken(userObject);
 
-				/*
-				refreshToken = jwt.sign(
-					userObject,
-					process.env.JWT_SECRET_REFRESH,
-					{
-						expiresIn: REFRESH_TOKEN_MAX_AGE
-					}
-				);
-				*/
-
 				// Hash refreshToken
 				const refreshTokenHash = await hashValue(refreshToken);
 
@@ -250,9 +240,6 @@ async function refreshTokens(req, res) {
 
 		const submittedToken = req.headers.authorization.split(' ')[1];
 
-		console.log(submittedToken);
-		console.log(typeof submittedToken);
-
 		// Verify that JWT is properly formed
 		const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET_REFRESH);
 		const userId = decodedToken.userId;
@@ -267,10 +254,6 @@ async function refreshTokens(req, res) {
 			},
 			raw: true
 		});
-
-		console.log('Hash data:');
-		console.log(storedTokenHash);
-		console.log(typeof storedTokenHash);
 
 		const isRefreshTokenValid = await bcrypt.compare(submittedToken, storedTokenHash);
 
@@ -289,8 +272,6 @@ async function refreshTokens(req, res) {
 
 			// Store new refresh token in db
 			const refreshTokenQuery = storeRefreshToken(newRefreshTokenHash, userId);
-
-			// Add error testing
 
 			// Resolve
 			res

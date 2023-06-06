@@ -1,5 +1,5 @@
 // External imports
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
@@ -36,18 +36,21 @@ export default function CartLibrary(props) {
 		e.stopPropagation();
 
 		// Send DELETE request to back end
-		const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE');
+		try {
+			const response = await jwtApiCall('/library/delete_cart?cart_id='.concat(cart.cart_id), 'DELETE');
+			if (!response.ok) {
+				const responseJSON = await response.json();
+				console.error('Error while deleting cartridge: ', responseJSON);
+			}
+		}
+		catch (err) {
+			console.error('Error while deleting cartridge: ', err);
+		}
 
 		// Upon successful completion, fetch user library
 		const fetchedUserLibraryJSON = await jwtApiCall('/library/get_library', 'GET');
 		setUserLibrary(fetchedUserLibraryJSON.library);
 
-	}
-
-	function handleCartridgeEjection(cart) {
-		if (activeCart) {
-			setActiveCart(null);
-		}
 	}
 
 	useEffect(() => {
@@ -99,7 +102,6 @@ export default function CartLibrary(props) {
 					<Link to='/create_cart' className="Util_linkBtnSecondary Util_btnThin CartLibrary_button">Create new cartridge</Link>
 					<button type="button" className={`Util_btnSecondary Util_btnThin CartLibrary_button ${deleteMode ? 'Util_btnDepressed' : ''}`} onClick={handleCartridgeDeleteMode}>Remove cartridges...</button>
 				</div>
-				{/*Cartridge "storage" area*/}
 				<div className="CartLibrary_collectionInner">
 					{userLibraryView}
 				</div>

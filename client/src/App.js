@@ -18,9 +18,6 @@ import {
 	retrieveAuthToken,
 	retrieveRefreshToken,
 	refreshToken,
-	storeAuthToken,
-	storeRefreshToken,
-	retrieveAuthTokenMaxAge,
 	retrieveRefreshTokenExpiry
 } from './utilities/userAuth.js';
 
@@ -60,14 +57,10 @@ export default function App() {
 			});
 		}
 
-		console.log('didLogIn changed');
-
 		// Determine whether or not authToken is currently present
 		const retAuthToken = retrieveAuthToken();
 		const retRefreshToken = retrieveRefreshToken();
 
-		console.log(retAuthToken);
-		console.log(retRefreshToken);
 
 		// If the token exists, set it as auth
 		if (retAuthToken) {
@@ -86,7 +79,6 @@ export default function App() {
 			}
 
 			// Otherwise, refresh tokens
-			console.log('Retrieving refresh token and refreshing');
 			refreshToken(retRefreshToken);
 
 			const retNewAuthToken = retrieveAuthToken();

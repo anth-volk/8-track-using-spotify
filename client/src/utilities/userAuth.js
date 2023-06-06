@@ -4,7 +4,7 @@ export function retrieveAuthToken() {
 
 /**
  * Store auth token in sessionStorage
- * @param {string} token A signed JWT
+ * @param {string} token A signed JWT 
  */
 export function storeAuthToken(token) {
 	sessionStorage.setItem('authToken', token);
@@ -113,8 +113,6 @@ export async function jwtApiCall(route, method, body) {
 			},
 			body: body ? body : null
 		});
-
-		console.log(responseObjectRaw);
 
 		if (responseObjectRaw.ok) {
 

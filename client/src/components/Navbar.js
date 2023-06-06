@@ -46,7 +46,6 @@ export default function Navbar(props) {
 							<NavLink to='/library'>My Library</NavLink>
 						</li>
 						<li className='navbar_link'>
-							{/*<NavLink to='/logout' className='active'>Log Out</NavLink>*/}
 							<button type='button' className='logout_handler' onClick={handleLogout}>Log Out</button>
 						</li>
 					</ul>

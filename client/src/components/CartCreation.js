@@ -1,10 +1,8 @@
 // External imports
-import { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Internal imports
 import { finalizeTracks, parseAlbumAndPullTracks } from '../utilities/cartCreation.js';
-import { AuthContext } from '../contexts/AuthContext.js';
 import { jwtApiCall } from '../utilities/userAuth.js';
 
 export default function CartCreation(props) {
@@ -16,9 +14,6 @@ export default function CartCreation(props) {
 	const [programView, setProgramView] = useState(null);
 	const [cartridgeCreationMessage, setCartridgeCreationMessage] = useState('');
 
-	const [cookies, setCookie, removeCookie] = useCookies();
-
-	const { setDidLogIn, authToken } = useContext(AuthContext);
 	const spotifyToken = props.spotifyToken;
 
 	const timerRef = useRef(null);
@@ -167,7 +162,7 @@ export default function CartCreation(props) {
 						{albumResultObject && Object.keys(albumResultObject).map((key, index) => {
 							return (
 								<div className='CartSearch_spotifyResultCard' key={index} onClick={(e) => { handleAlbumClick(index) }}>
-									<img className='spotifyResultCard_image' src={albumResultObject[index].images[0].url}></img>
+									<img className='spotifyResultCard_image' src={albumResultObject[index].images[0].url} alt={`Album cover of ${albumResultObject[index].name}`}></img>
 									<p className='spotifyResultCard_artist'>{albumResultObject[index].artists[0].name} </p>
 									<p className='spotifyResultCard_name'>{albumResultObject[index].name}</p>
 								</div>
@@ -182,7 +177,7 @@ export default function CartCreation(props) {
 							<div className='CartPreview_plastic'>
 								<div className='CartPreview_label'>
 									<div className='CartPreview_label_imageContainer'>
-										<img className='CartPreview_image' src={clickedAlbum.images[0].url}></img>
+										<img className='CartPreview_image' src={clickedAlbum.images[0].url} alt={`Album cover of ${clickedAlbum.name}`}></img>
 									</div>
 									<p className='CartPreview_label_title'>{clickedAlbum.artists[0].name.toUpperCase()}</p>
 									<p className='CartPreview_label_name'>{clickedAlbum.name}</p>

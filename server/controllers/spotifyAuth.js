@@ -10,15 +10,12 @@ const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:8000/api/v1/spotify_auth/callback';
 const FRONTEND_URL = 'http://localhost:3000'
 
-// Cookie constants
-
 // Make Spotify auth cookies valid for 30 days
 const MAX_AGE = 60 * 60 * 24 * 30
 
 function spotifyAuth(req, res) {
 
 	// Set Spotify auth variables
-	// TODO: Write function to randomly generate this code
 	const state = generateRandomString(16);
 	const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing streaming user-read-email user-read-private';
 
@@ -44,7 +41,6 @@ async function spotifyAuthCallback(req, res) {
 	const state = req.query.state || null;
 
 	// If state is null
-	// TODO: Create better handler for this case
 	if (state === null || req.cookies.spotify_state !== state || req.query.error) {
 		res.redirect('/error');
 	}
