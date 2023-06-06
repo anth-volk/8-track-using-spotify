@@ -313,7 +313,7 @@ export default function CartPlayer(props) {
 		window.onSpotifyWebPlaybackSDKReady = () => {
 
 			const playerConstructor = new window.Spotify.Player({
-				name: 'Web Playback SDK',
+				name: 'STEREO 8s',
 				getOAuthToken: cb => { cb(spotifyToken); },
 				volume: 1.0
 			});
