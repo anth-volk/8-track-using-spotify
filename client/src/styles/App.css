@@ -143,6 +143,17 @@ input[type="password"] {
 	border-radius: 8px;
 }
 
+footer {
+	min-height: 10vh;
+	width: 100%;
+	background: var(--background-color);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	padding: 1rem var(--gutter);
+}
+
 
 
 /* ---------- APP-WIDE UTILITY CLASSES ---------- */
@@ -152,6 +163,12 @@ input[type="password"] {
 
 .Util_italic {
 	font-style: italic;
+}
+
+.Util_pageBreak {
+	height: 3vh;
+	width: 100vw;
+	background: linear-gradient(315deg, var(--primary-color), var(--accent-color) 100%);
 }
 
 .Util_btnPrimary {

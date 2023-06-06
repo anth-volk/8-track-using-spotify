@@ -94,13 +94,30 @@
 
 .Home_about_halfSection {
 	grid-column: span 1;
-	padding: var(--text-size) 0;
+	padding: 8vh 8vw;
 	text-align: justify;
+	align-content: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.Home_about_halfSection>h1 {
+	padding-top: 0;
 }
 
 .Home_about_halfSection>p {
 	max-width: 400px;
 	margin: 0 auto;
+}
+
+.Home_about_halfSection>img {
+	width: 100%;
+	max-height: 400px;
+	object-fit: cover;
+	border-radius: 64px;
+	aspect-ratio: 1;
 }
 
 .Home_about_fullSection {
