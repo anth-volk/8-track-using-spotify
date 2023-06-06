@@ -52,7 +52,7 @@ export default function Home() {
 				</div>
 				<div className="Home_about_halfSection">
 					<h1>What technology does <span className="Util_logoInText">STEREO 8s</span> use?</h1>
-					<p><span className="Util_logoInText">STEREO 8s</span> is a full-stack web applcation. The back end, which creates, stores, and deletes users' cartridges, is a RESTful API built using NodeJS and ExpressJS, connected to a PostgreSQL database via Sequelize ORM. The front end, including most requests to Spotify's API, is a ReactJS 17 application. For more information, check out the project's <a href="https://github.com/anth-volk/8-track-using-spotify">GitHub page</a>.</p>
+					<p><span className="Util_logoInText">STEREO 8s</span> is a full-stack web applcation. The back end, which creates, stores, and deletes users' cartridges, is a RESTful API built using NodeJS and ExpressJS, connected to a PostgreSQL database via Sequelize ORM. The front end, including most requests to Spotify's API, is a ReactJS 17 application. Due to the limitations of the Spotify SDK, it is only available for desktop. For more information, check out the project's <a href="https://github.com/anth-volk/8-track-using-spotify">GitHub page</a>.</p>
 				</div>
 				<div className="Home_about_halfSection Home_about_imageContainer">
 					<img src={unspooledTapeImage} loading="lazy" alt="Unspooled magnetic audio tape" />
