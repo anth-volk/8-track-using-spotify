@@ -140,14 +140,16 @@ export default function CartCreation(props) {
 				programs: albumTracksDistributed
 			};
 
+			console.log(finalizedAlbum);
+
 			let programElems = finalizedAlbum.programs.map((program) => {
 				return (
-					<div className='programContainer'>
+					<div className='programContainer' key={program.program_number}>
 						<p className='programContainer_number'>{program.program_number}</p>
 						<div className='programContainer_trackContainer'>
 							{program.tracks.map((track) => {
 								return (
-									<p className='programContainer_track'>{track.name}</p>
+									<p className='programContainer_track' key={track.id}>{track.name}</p>
 								)
 							})}
 						</div>

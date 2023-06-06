@@ -31,7 +31,7 @@ export default function Home() {
 					</button>
 					<div className="Home_heroFooter_spotifyTag">
 						<small className="Home_heroFooter_spotifyTag_text">Powered by</small>
-						<img className="Home_heroFooter_spotifyLogo" src={spotifyLogoImage} />
+						<img className="Home_heroFooter_spotifyLogo" src={spotifyLogoImage} alt="Spotify logo, in white" />
 					</div>
 				</div>
 			</div>
