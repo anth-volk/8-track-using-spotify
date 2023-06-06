@@ -542,9 +542,17 @@ export default function CartPlayer(props) {
 								)}
 							</div>
 							<div className="CartPlayer_buttonContainer">
-								<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
-								</button>
-								<button type='button' className='programButton' onClick={handleProgramChange}></button>
+								<div className="CartPlayer_buttonAndDesc">
+									<button type='button' className={`playbackButton ${isSpotifyReady ? 'active' : 'disabled'}`} onClick={handlePlayPause}>
+									</button>
+									<p className="CartPlayer_bottomText">
+										{isCartPlaying ? 'PAUSE' : 'PLAY'}
+									</p>
+								</div>
+								<div className="CartPlayer_buttonAndDesc">
+									<button type='button' className='programButton' onClick={handleProgramChange}></button>
+									<p className="CartPlayer_bottomText">PROGRAM</p>
+								</div>
 							</div>
 							<div className='audioElements'>
 								<audio src={tapeHiss} ref={tapeHissRef} />
@@ -553,10 +561,6 @@ export default function CartPlayer(props) {
 						</div>
 						<div className="CartPlayer_bottomContainer">
 							<p className="CartPlayer_bottomText bottomText_copyright">JavaSonic</p>
-							<p className="CartPlayer_bottomText">
-								{isCartPlaying ? 'PAUSE' : 'PLAY'}
-							</p>
-							<p className="CartPlayer_bottomText">PROGRAM</p>
 						</div>
 					</div>
 				</div>
