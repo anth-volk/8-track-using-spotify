@@ -1,6 +1,6 @@
 {
 	"name": "8-track-using-spotify",
-	"version": "0.1",
+	"version": "0.1.0",
 	"description": "A full-stack application that simulates an 8-track player via a premium user's Spotify account",
 	"main": "/server/app.js",
 	"scripts": {
