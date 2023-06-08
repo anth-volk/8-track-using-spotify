@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"server:dev": "nodemon ./server/app.js",
-		"server:prod": "node ./server/app.js",
+		"server:prod": "export NODE_ENV=production; node ./server/app.js",
 		"client:prod": "cd ./client && npm run build",
 		"client:dev": "cd ./client && npm run start",
 		"db:create": "sequelize-cli db:create",
