@@ -47,6 +47,10 @@ else {
 }
 
 // Middleware
+app.use((req, res, next) => {
+	console.log(req);
+	next();
+});
 app.use(cors({
 	origin: [process.env.FRONTEND_TLD]
 }));
