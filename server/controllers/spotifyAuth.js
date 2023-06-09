@@ -42,6 +42,7 @@ async function spotifyAuthCallback(req, res) {
 
 	// If state is null
 	if (state === null || req.cookies.spotify_state !== state || req.query.error) {
+		console.log('Spotify request error');
 		res.redirect('/error');
 	}
 	else {
@@ -71,6 +72,8 @@ async function spotifyAuthCallback(req, res) {
 
 		// If token is successfully requested...
 		if (spotifyRequestRaw.ok) {
+
+			console.log('Spotify request OK');
 
 			// Convert raw request data to JSON
 			const spotifyRequestJSON = await spotifyRequestRaw.json();
