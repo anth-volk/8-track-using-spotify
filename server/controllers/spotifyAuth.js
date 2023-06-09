@@ -40,6 +40,9 @@ async function spotifyAuthCallback(req, res) {
 	const code = req.query.code || null;
 	const state = req.query.state || null;
 
+	console.log('code: ', code);
+	console.log('state: ', state);
+
 	// If state is null
 	if (state === null || req.cookies.spotify_state !== state || req.query.error) {
 		console.log('Spotify request error');
