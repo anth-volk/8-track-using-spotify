@@ -3,6 +3,9 @@
 	"version": "0.1.0",
 	"description": "A full-stack application that simulates an 8-track player via a premium user's Spotify account",
 	"main": "/server/app.js",
+	"engines": {
+		"node": "19"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"server:dev": "nodemon ./server/app.js",
