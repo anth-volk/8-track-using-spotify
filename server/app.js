@@ -48,7 +48,8 @@ else {
 
 // Middleware
 app.use(cors({
-	origin: [process.env.FRONTEND_TLD]
+	origin: [process.env.FRONTEND_TLD],
+	methods: ['GET', 'POST', 'UPDATE', 'DELETE']
 }));
 app.options('*', cors());
 app.use(bodyParser.json());
