@@ -13,7 +13,7 @@
 		"client:prod": "cd ./client && npm run build",
 		"client:dev": "cd ./client && npm run start",
 		"db:create": "sequelize-cli db:create",
-		"db:migrate": "sequelize-cli db:migrate",
+		"db:migrate": "sequelize-cli db:migrate --env production",
 		"db:g:migration": "sequelize-cli migration:generate --name",
 		"db:seeds": "sequelize-cli db:seed:all",
 		"db:g:seed": "sequelize-cli seed:generate --name",
