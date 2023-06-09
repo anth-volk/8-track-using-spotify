@@ -22,7 +22,12 @@ if (config.use_env_variable) {
 // ORM configuration
 let sequelize = null;
 if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
-	sequelize = new Sequelize(process.env.DB_PROD_URL);
+	sequelize = new Sequelize(process.env.DB_PROD_URL, {
+		ssl: true,
+		dialectOptions: {
+			ssl: true
+		}
+	});
 }
 else {
 	sequelize = new Sequelize(
