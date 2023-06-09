@@ -16,6 +16,9 @@ module.exports = {
 		"dialect": "postgres"
 	},
 	"production": {
+		"username": process.env.DB_PROD_USERNAME,
+		"password": process.env.DB_PROD_PASSWORD,
+		"database": process.env.DB_NAME_PROD,
 		"url": process.env.DB_PROD_URL,
 		"dialect": "postgres",
 		"ssl": true,
