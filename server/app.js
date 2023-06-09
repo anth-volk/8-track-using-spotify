@@ -47,13 +47,10 @@ else {
 }
 
 // Middleware
-app.use((req, res, next) => {
-	console.log(req);
-	next();
-});
 app.use(cors({
 	origin: [process.env.FRONTEND_TLD]
 }));
+app.options('*', cors());
 app.use(bodyParser.json());
 app.use('/api/v1/protected', verifyJWT);
 app.use('/api/v1/spotify_api', spotifyAuthHeaders);
