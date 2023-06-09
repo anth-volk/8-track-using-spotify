@@ -32,9 +32,6 @@ else {
 	);
 }
 
-console.log('index sequelize');
-console.log(sequelize);
-
 fs
 	.readdirSync(__dirname)
 	.filter(file => {
