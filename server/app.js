@@ -32,6 +32,8 @@ const { Sequelize } = require('sequelize');
 // ORM configuration
 if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
 	const sequelize = new Sequelize(process.env.DB_PROD_URL);
+	console.log('prod sequelize');
+	console.log(sequelize);
 }
 else {
 	const sequelize = new Sequelize(
@@ -43,6 +45,8 @@ else {
 			dialect: 'postgres'
 		}
 	);
+	console.log('dev sequelize');
+	console.log(sequelize);
 }
 
 // Middleware
