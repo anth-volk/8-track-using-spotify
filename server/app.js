@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Express configuration
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 app.use(cookieParser());
 
@@ -30,15 +30,20 @@ const errorRoutes = require('./routes/error.js');
 const { Sequelize } = require('sequelize');
 
 // ORM configuration
-const sequelize = new Sequelize(
-	process.env.DB_NAME_DEV,
-	process.env.DB_USERNAME,
-	process.env.DB_PASSWORD,
-	{
-		host: process.env.DB_HOST,
-		dialect: 'postgres'
-	}
-);
+if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
+	const sequelize = new Sequelize(process.env.DB_PROD_URL);
+}
+else {
+	const sequelize = new Sequelize(
+		process.env.DB_NAME_DEV,
+		process.env.DB_USERNAME,
+		process.env.DB_PASSWORD,
+		{
+			host: process.env.DB_HOST,
+			dialect: 'postgres'
+		}
+	);
+}
 
 // Middleware
 app.use(cors());
