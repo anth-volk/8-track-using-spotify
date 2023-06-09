@@ -1,2 +1,2 @@
-/api/* 	https://stereo-8s-backend.onrender.com/api/:splat
+/api/* 	https://stereo-8s-backend.onrender.com/api/:splat	301!
 /*		/index.html 200
