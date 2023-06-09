@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -9,11 +10,30 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../sequelize_config/config/config.js')[env];
 const db = {};
 
+/*
 let sequelize;
 if (config.use_env_variable) {
 	sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
 	sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
+*/
+
+// ORM configuration
+let sequelize = null;
+if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
+	sequelize = new Sequelize(process.env.DB_PROD_URL);
+}
+else {
+	sequelize = new Sequelize(
+		process.env.DB_NAME_DEV,
+		process.env.DB_USERNAME,
+		process.env.DB_PASSWORD,
+		{
+			host: process.env.DB_HOST,
+			dialect: 'postgres'
+		}
+	);
 }
 
 console.log('index sequelize');
