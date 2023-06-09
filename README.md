@@ -1,42 +1,22 @@
-<!-- SVG bounding structure to allow outside styling (via foreignObject) -->
-<!-- Created following tutorial at https://pragmaticpineapple.com/adding-custom-html-and-css-to-github-readme/ -->
-<svg fill="none" viewBox="0 0 600 300" width="600" height="300" xmlns="http://www.w3.org/2000/svg">
-	<foreignObject width="100%" height="100%">
-    	<div xmlns="http://www.w3.org/1999/xhtml">
-			<style>
-				@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+# STEREO 8s
 
-				#logo {
-					font-family: 'Monoton', 'Prisma', 'Open Sans', sans-serif;
-					color: #e8602b;
-				}
-			</style>
-		</div>
-	</foreignObject>
-</svg>
+## Overview
+Welcome to the official repository of STEREO 8s, a SERN-stack web application that aims to simulate the experience of an 8-track player for users with premium Spotify subscriptions.
 
+To report a bug or request a feature, open a new ticket at the (issues)[https://www.github.com/anth-volk/stereo-8s/issues] tab above.
 
-<!-- Project Header -->
-<br />
-<div align='center'>
-	<!-- Logo -->
-	<a href='https://www.github.com/anth-volk/stereo-8s'>
-		<img src='client/images/logo.png' alt='STEREO 8s logo' width='100' style='border-radius: 5px;'>
-	</a>
-	<!-- Links Tab -->
-	<h3>STEREO 8s</h3>
-	<p>
-		<a href='https://www.github.com/anth-volk/stereo-8s/issues'>
-			Report a Bug
-		</a>
-		 . 
-		<a href='https://www.github.com/anth-volk/stereo-8s/issues'>
-			Request a Feature
-		</a>
-	</p>
-</div>
+## Structure
+The application is divided into two parts: server and client.
 
-# Overview
-Welcome to 8-track-using-spotify, an in-development SERN-stack web application that aims to simulate an 8-track player, for users with premium Spotify subscriptions.
+The server side is a RESTful API built using Node and Express that handles both user authentication and the creation of user 8-track "cartridges," which are stored in a remote SQL database through three related tables representing each album, 8-track "program," and track. The user authentication process utilizes a pair of JSON web tokens, one for short-term authentication and one for longer-term token refreshing, hashing the refresh token and storing both in sessionStorage in order to diminish the risk of cross-site scripting and man-in-the-middle authentication attacks.
 
-# 
+The client, meanwhile, is built using React and the Spotify API & SDK. After login, users connect to Spotify via a server-side request to Spotify's authentication process, after which the client-side SDK loads. After the user creates a simulated 8-track "cartridge," the data structure representing it is stored in the remote SQL database. Upon client-side reload, all of the user's cartridges are fetched to create their virtual "library." When a user selects their cartridge, the SDK then attempts to create a local Spotify connection, after which playback alternates between Spotify tracks (enqueued via the Spotify API) and local effect audio.
+
+To fully simulate the 8-track experience, when users create new "cartridges," these cartridges contain one album, the content of which is fetched via the Spotify API. These albums are then broken up and redistributed algorithmically onto the "cartridge" to limit the amount of dead space on each of the cartridge's four "programs." Playback includes moments of tape hiss, as well as the sound of the program arm of the 8-track "player" changing programs.
+
+## Known Issues
+* If a user attempts to play too many Spotify tracks at once, such as by pressing the PROGRAM button too quickly, the Spotify SDK will respond with a `202 Accepted` and attempt to play back music, but nothing will play.
+* If a user launches the app multiple times, the SDK will create multiple instantiations of the local player; this will be resolved in an upcoming patch.
+
+## Limitations
+* At the moment, the Spotify SDK does not work with React 18, requiring the app to be frozen at React 17 and disallowing the use of v.18's `Suspense` feature.
