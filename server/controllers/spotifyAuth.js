@@ -7,8 +7,8 @@ const { constructForm, generateRandomString } = require('../utilities/spotify');
 // Spotify auth setup
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = 'http://localhost:8000/api/v1/spotify_auth/callback';
-const FRONTEND_URL = 'http://localhost:3000'
+const REDIRECT_URI = (process.env.BACKEND_TLD || 'http://localhost:8000') + '/api/v1/spotify_auth/callback';
+const FRONTEND_URL = process.env.FRONTEND_TLD || 'http://localhost:3000';
 
 // Make Spotify auth cookies valid for 30 days
 const MAX_AGE = 60 * 60 * 24 * 30
