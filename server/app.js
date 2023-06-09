@@ -47,10 +47,7 @@ else {
 }
 
 // Middleware
-app.use(cors({
-	credentials: true,
-	origin: [process.env.FRONTEND_TLD]
-}));
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/v1/protected', verifyJWT);
 app.use('/api/v1/spotify_api', spotifyAuthHeaders);
