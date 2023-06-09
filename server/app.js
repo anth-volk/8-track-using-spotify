@@ -30,13 +30,12 @@ const errorRoutes = require('./routes/error.js');
 const { Sequelize } = require('sequelize');
 
 // ORM configuration
+let sequelize = null;
 if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
-	const sequelize = new Sequelize(process.env.DB_PROD_URL);
-	console.log('prod sequelize');
-	console.log(sequelize);
+	sequelize = new Sequelize(process.env.DB_PROD_URL);
 }
 else {
-	const sequelize = new Sequelize(
+	sequelize = new Sequelize(
 		process.env.DB_NAME_DEV,
 		process.env.DB_USERNAME,
 		process.env.DB_PASSWORD,
@@ -45,8 +44,6 @@ else {
 			dialect: 'postgres'
 		}
 	);
-	console.log('dev sequelize');
-	console.log(sequelize);
 }
 
 // Middleware

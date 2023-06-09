@@ -8,15 +8,22 @@ const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');
 
 // ORM configuration
-const sequelize = new Sequelize(
-	process.env.DB_NAME_DEV,
-	process.env.DB_USERNAME,
-	process.env.DB_PASSWORD,
-	{
-		host: process.env.DB_HOST,
-		dialect: 'postgres'
-	}
-);
+let sequelize = null;
+if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
+	sequelize = new Sequelize(process.env.DB_PROD_URL);
+}
+else {
+	sequelize = new Sequelize(
+		process.env.DB_NAME_DEV,
+		process.env.DB_USERNAME,
+		process.env.DB_PASSWORD,
+		{
+			host: process.env.DB_HOST,
+			dialect: 'postgres'
+		}
+	);
+}
+
 const { User } = require('../models');
 
 // Other constants
