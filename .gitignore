@@ -4,5 +4,4 @@
 /server/node_modules
 /server/other
 /server/testing
-.sequelizerc
 .env
